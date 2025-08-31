@@ -1,0 +1,177 @@
+/* ===== GLOBAL STYLES ===== */
+body {
+    background-color: #404040;
+    font-family: 'RoundedFixedsys', sans-serif;
+}
+
+/* ===== FONTS ===== */
+@font-face {
+    font-family: 'RoundedFixedsys';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* ===== HEADER COMPONENT ===== */
+.Dy_Header {
+    /* Layout */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: baseline;
+
+    /* Spacing */
+    padding: 15px 20px;
+    gap: 30px;
+
+    /* Visual */
+    background-color: #282c34;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* Typography */
+    font-family: 'RoundedFixedsys', sans-serif;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+/* ===== LOGO SECTION ===== */
+.logo-container {
+    /* Layout */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* Spacing */
+    gap: 8px;
+    padding: 5px;
+
+    /* Visual */
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+/* Logo Image */
+.logo-container img {
+    /* Size */
+    width: 80px;
+    height: 80px;
+
+    /* Visual */
+    object-fit: cover;
+    border-radius: 50%;
+
+    /* Animation */
+    transition: all 0.3s ease;
+}
+
+/* Logo Text */
+.logo-container p {
+    /* Typography */
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'RoundedFixedsys', sans-serif;
+    color: white;
+
+    /* Spacing */
+    margin: 0;
+    padding: 0;
+
+    /* Visual */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+
+    /* Animation */
+    transition: color 0.2s ease;
+}
+
+.logo-container p:hover {
+    color: #B4E965;
+}
+
+/* ===== NAVIGATION LINKS ===== */
+.Dy_guidebar_link_container a {
+    /* Typography */
+    color: white;
+    text-decoration: none;
+    font-family: 'RoundedFixedsys', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+
+    /* Spacing */
+    padding: 8px 16px;
+    margin: 0 5px;
+
+    /* Visual */
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    /* Animation */
+    transition: all 0.3s ease;
+}
+
+.Dy_guidebar_link_container a:hover {
+    background-color: rgba(180, 233, 101, 0.2);
+    border-color: #B4E965;
+    color: #B4E965;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(180, 233, 101, 0.3);
+}
+
+.Dy_guidebar_link_container a:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(180, 233, 101, 0.2);
+}
+
+/* ===== LOGIN BUTTON ===== */
+.Dy_login_button {
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Spacing */
+    margin-left: auto;
+}
+
+.Dy_login_button a {
+    /* Typography */
+    color: white;
+    text-decoration: none;
+    font-family: 'RoundedFixedsys', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+
+    /* Spacing */
+    padding: 10px 20px;
+    margin: 0;
+
+    /* Visual */
+    border-radius: 8px;
+    background-color: rgba(180, 233, 101, 0.2);
+    border: 2px solid #B4E965;
+
+    /* Animation */
+    transition: all 0.3s ease;
+}
+
+.Dy_login_button a:hover {
+    background-color: #B4E965;
+    color: #282c34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(180, 233, 101, 0.4);
+}
+
+.Dy_login_button a:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(180, 233, 101, 0.3);
+}
