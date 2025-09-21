@@ -1,36 +1,34 @@
+import { Link } from 'react-router-dom';
 
 export default function Dy_login() {
     return (
         <>
-            <div className="Dy_login_container">
-                <div className="Dy_RyLoWrapper">
-                    <div className="do_login_container">
+            <div className="login_container">
+                <div className="login_container_wrapper">
+                    <span className="login_form">
+                        <p className="login_form_header">Login</p>
                         <form>
-                            <p>
-                                you already have an account?
-                                login here
-                            </p>
-                            <div className="Dy_login_id_container">
-                                <label for="id_input">ID</label>
-                                <input className="id_input" type="text" placeholder="ID" />
-                            </div>
-                            <div className="Dy_login_pw_container">
-                                <label for="pw_input">Password</label>
-                                <input className="pw_input" type="password" placeholder="Password" />
-                            </div>
-                            <div className="Dy_login_button_container">
-                                <button className="login_button" type="submit">Login</button>
-                            </div>
+                            <input type="text" placeholder="ID" /><p />
+                            <input type="password" placeholder="Password" /><p />
+                            <button type="submit">로그인</button>
                         </form>
-                    </div>
-                    <div className="go_register_container">
-                        <p>Don't have an account?</p>
-                        <a href="/register">Register</a>
-                        <div className="account_help_buttons">
-                            <a href="/find-id" className="find_id_button">Find ID</a>
-                            <a href="/reset-password" className="reset_password_button">Reset Password</a>
+                    </span>
+                    <span className="account_form">
+                        <p className="account_form_header">Account Service</p>
+                        <div className="account_form_link">
+                            <li>
+                                <Link to="/register">회원 가입</Link>
+                            </li>
+                            <p />
+                            <li>
+                                <Link to="/id_find">아이디 찾기</Link>
+                            </li>
+                            <p />
+                            <li>
+                                <Link to="/pw_reset">비밀번호 재설정</Link>
+                            </li>
                         </div>
-                    </div>
+                    </span>
                 </div>
             </div>
         </>
