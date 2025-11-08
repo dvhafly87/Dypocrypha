@@ -59,7 +59,7 @@ export default function Header() {
         <Link to="/test">게시판</Link>
         <Link to="/test2">프로젝트</Link>
         <Link to="/test3">아카이브</Link>
-        <Link to="/test4">유튜브</Link>
+        <Link to="/test4">AI</Link>
       </nav>
 
       {/* 사이드바 오버레이 */}
@@ -94,7 +94,7 @@ export default function Header() {
           <Link to="/test" onClick={toggleSidebar}>게시판</Link>
           <Link to="/test2" onClick={toggleSidebar}>프로젝트</Link>
           <Link to="/test3" onClick={toggleSidebar}>아카이브</Link>
-          <Link to="/test4" onClick={toggleSidebar}>유튜브 채널</Link>
+          <Link to="/test4" onClick={toggleSidebar}>AI</Link>
         </nav>
       </aside>
     </>

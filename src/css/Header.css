@@ -153,6 +153,9 @@
   background-color: #fafafa;
   border-bottom: 1px solid #e0e0e0;
   box-sizing: border-box;
+  position: sticky;
+  z-index: 100;
+  top: 60px;
 }
 
 .sub-nav a {
