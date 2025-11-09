@@ -3,7 +3,7 @@ import {useState, useEffect} from 'react';
 import '../css/MainHome.css';
 
 import DOAI from '../img/doge.jpeg';
-import DoBanner from '../img/banner.jpeg';
+import DoBanner from '../img/dogae.jpeg';
 
 export default function MainHome() {
     return (

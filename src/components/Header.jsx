@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
+
 import '../css/Header.css';
-import DOGE from '../img/doge.jpeg';
+
+import DOGE from '../../public/A1.svg';
 import SIC from '../img/sic.jpg';
 
 export default function Header() {

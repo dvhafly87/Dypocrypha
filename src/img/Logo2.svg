@@ -1,0 +1,149 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+
+  
+  <!-- Outer mystical circle -->
+  <circle cx="200" cy="200" r="140" fill="none" stroke="url(#gradOuter)" stroke-width="2" opacity="0.6">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 200 200"
+      to="360 200 200"
+      dur="60s"
+      repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Inner circle -->
+  <circle cx="200" cy="200" r="120" fill="none" stroke="url(#gradInner)" stroke-width="1.5" opacity="0.4">
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="360 200 200"
+      to="0 200 200"
+      dur="45s"
+      repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Central wavy/organic lines -->
+  <g id="wavyLines" opacity="0.7">
+    <!-- Top wavy line -->
+    <path d="M 160 180 Q 170 175, 180 180 T 200 180 T 220 180 T 240 180" 
+          fill="none" stroke="url(#waveGrad1)" stroke-width="2">
+      <animate attributeName="d" 
+               values="M 160 180 Q 170 175, 180 180 T 200 180 T 220 180 T 240 180;
+                       M 160 180 Q 170 185, 180 180 T 200 180 T 220 180 T 240 180;
+                       M 160 180 Q 170 175, 180 180 T 200 180 T 220 180 T 240 180"
+               dur="4s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Middle wavy line -->
+    <path d="M 150 200 Q 165 195, 180 200 T 200 200 T 220 200 T 250 200" 
+          fill="none" stroke="url(#waveGrad2)" stroke-width="2.5">
+      <animate attributeName="d" 
+               values="M 150 200 Q 165 195, 180 200 T 200 200 T 220 200 T 250 200;
+                       M 150 200 Q 165 205, 180 200 T 200 200 T 220 200 T 250 200;
+                       M 150 200 Q 165 195, 180 200 T 200 200 T 220 200 T 250 200"
+               dur="3.5s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Bottom wavy line -->
+    <path d="M 160 220 Q 170 225, 180 220 T 200 220 T 220 220 T 240 220" 
+          fill="none" stroke="url(#waveGrad3)" stroke-width="2">
+      <animate attributeName="d" 
+               values="M 160 220 Q 170 225, 180 220 T 200 220 T 220 220 T 240 220;
+                       M 160 220 Q 170 215, 180 220 T 200 220 T 220 220 T 240 220;
+                       M 160 220 Q 170 225, 180 220 T 200 220 T 220 220 T 240 220"
+               dur="4.5s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Curved diagonal lines -->
+    <path d="M 175 165 Q 185 175, 195 185 Q 205 195, 215 205" 
+          fill="none" stroke="#3cb371" stroke-width="1.5" opacity="0.5">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" repeatCount="indefinite"/>
+    </path>
+    
+    <path d="M 185 235 Q 195 225, 205 215 Q 215 205, 225 195" 
+          fill="none" stroke="#2e8b57" stroke-width="1.5" opacity="0.5">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3.2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Vertical curved lines -->
+    <path d="M 200 165 Q 195 180, 200 195 Q 205 210, 200 225" 
+          fill="none" stroke="#00ff7f" stroke-width="1.8" opacity="0.4">
+      <animate attributeName="d" 
+               values="M 200 165 Q 195 180, 200 195 Q 205 210, 200 225;
+                       M 200 165 Q 205 180, 200 195 Q 195 210, 200 225;
+                       M 200 165 Q 195 180, 200 195 Q 205 210, 200 225"
+               dur="5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Central glowing dot -->
+  <circle cx="200" cy="200" r="4" fill="#00ff7f">
+    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Mystical rays -->
+  <g opacity="0.3">
+    <line x1="200" y1="60" x2="200" y2="90" stroke="#3cb371" stroke-width="2"/>
+    <line x1="200" y1="310" x2="200" y2="340" stroke="#3cb371" stroke-width="2"/>
+    <line x1="60" y1="200" x2="90" y2="200" stroke="#3cb371" stroke-width="2"/>
+    <line x1="310" y1="200" x2="340" y2="200" stroke="#3cb371" stroke-width="2"/>
+  </g>
+  
+  <!-- Decorative corner elements -->
+  <g opacity="0.4">
+    <path d="M 120 80 Q 110 80 110 90" fill="none" stroke="#2e8b57" stroke-width="1.5"/>
+    <path d="M 280 80 Q 290 80 290 90" fill="none" stroke="#2e8b57" stroke-width="1.5"/>
+    <path d="M 120 320 Q 110 320 110 310" fill="none" stroke="#2e8b57" stroke-width="1.5"/>
+    <path d="M 280 320 Q 290 320 290 310" fill="none" stroke="#2e8b57" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Text: Dypocrypha -->
+  <text x="200" y="280" font-family="'Trebuchet MS', 'Verdana', sans-serif" font-size="34" fill="url(#textGrad)" text-anchor="middle" letter-spacing="2" font-weight="500">
+    Dypocrypha
+  </text>
+  
+  <!-- Pulsing glow effect -->
+  <circle cx="200" cy="200" r="160" fill="none" stroke="#3cb371" stroke-width="1" opacity="0.2">
+    <animate attributeName="r" values="160;165;160" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Gradients -->
+  <defs>
+    <radialGradient id="gradOuter">
+      <stop offset="0%" style="stop-color:#3cb371;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#2e8b57;stop-opacity:0.5"/>
+    </radialGradient>
+    
+    <radialGradient id="gradInner">
+      <stop offset="0%" style="stop-color:#2e8b57;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00ff7f;stop-opacity:0.3"/>
+    </radialGradient>
+    
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3cb371;stop-opacity:0.6"/>
+      <stop offset="50%" style="stop-color:#00ff7f;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#3cb371;stop-opacity:0.6"/>
+    </linearGradient>
+    
+    <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2e8b57;stop-opacity:0.7"/>
+      <stop offset="50%" style="stop-color:#3cb371;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#2e8b57;stop-opacity:0.7"/>
+    </linearGradient>
+    
+    <linearGradient id="waveGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3cb371;stop-opacity:0.6"/>
+      <stop offset="50%" style="stop-color:#00ff7f;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#3cb371;stop-opacity:0.6"/>
+    </linearGradient>
+    
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2e8b57"/>
+      <stop offset="50%" style="stop-color:#00ff7f"/>
+      <stop offset="100%" style="stop-color:#2e8b57"/>
+    </linearGradient>
+  </defs>
+</svg>
