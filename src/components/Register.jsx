@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../css/Register.css';
+import API from '../config/apiConfig.js';
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -29,8 +30,21 @@ export default function Register() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleEmailVerification = (e) => {
+    const handleEmailVerification = async (e) => {
         e.preventDefault();
+
+        if (!formData.email) {
+            alert('이메일을 입력해주세요.');
+            return;
+        } else {
+            const response = await fetch(`${API.API_BASE_URL}/member/email/verification`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({memberRegisterEmail: formData.email})
+            });
+        }
         if (formData.email) {
             setVerification(prev => ({ ...prev, emailSent: true }));
             alert('인증 코드가 발송되었습니다.');
@@ -61,6 +75,10 @@ export default function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        fetch(`${API.API_BASE_URL}/test`,{
+            method: 'GET'
+        })
         
         if (!verification.emailVerified) {
             alert('이메일 인증을 완료해주세요.');
@@ -75,7 +93,7 @@ export default function Register() {
             alert('비밀번호가 일치하지 않습니다.');
             return;
         }
-        
+
         if (!formData.birthYear || !formData.birthMonth || !formData.birthDay) {
             alert('생년월일을 선택해주세요.');
             return;
