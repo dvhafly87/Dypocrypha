@@ -36,7 +36,7 @@ export default function AccountService() {
                             </div>
                             <div className="feature-item">
                                 <div className="feature-icon">✓</div>
-                                <span>24시간 고객 지원</span>
+                                <span>간편한 시작 절차</span>
                             </div>
                         </div>
                     </div>
