@@ -37,6 +37,7 @@ export default function Register() {
             alert('이메일을 입력해주세요.');
             return;
         } else {
+
             const response = await fetch(`${API.API_BASE_URL}/member/email/verification`,{
                 method: 'POST',
                 headers: {
@@ -44,22 +45,50 @@ export default function Register() {
                 },
                 body: JSON.stringify({memberRegisterEmail: formData.email})
             });
-        }
-        if (formData.email) {
-            setVerification(prev => ({ ...prev, emailSent: true }));
-            alert('인증 코드가 발송되었습니다.');
-        } else {
-            alert('이메일을 입력해주세요.');
+
+            if(!response.ok){
+                return;
+            }
+
+            const result = await response.json();
+
+            if(result.success){
+                setVerification(prev => ({ ...prev, emailSent: true }));
+                alert('인증 코드가 발송되었습니다.');
+            } else {
+                alert(result.message);
+            }
         }
     };
 
-    const handleEmailVerifyCheck = (e) => {
+    const handleEmailVerifyCheck = async (e) => {
         e.preventDefault();
-        if (formData.emailVerifyCode) {
-            setVerification(prev => ({ ...prev, emailVerified: true }));
-            alert('이메일 인증이 완료되었습니다.');
+
+        if (!formData.emailVerifyCode) {
+            alert('이메일 인증번호를 입력해주세요');
+            return;
         } else {
-            alert('인증 코드를 입력해주세요.');
+
+            const response = await fetch(`${API.API_BASE_URL}/member/email/verifycationCheck`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({memberRegisterVerifyCheck: formData.emailVerifyCode})
+            });
+
+            if(!response.ok){
+                return;
+            }
+
+            const result = await response.json();
+
+            if(result.Verificheck){
+                setVerification(prev => ({ ...prev, emailVerified: true }));
+                alert('이메일 인증이 완료되었습니다.');
+            } else {
+                alert(result.message);
+            }
         }
     };
 
