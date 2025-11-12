@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import '../css/Header.css';
 
-import DOGE from '../../public/A1.svg';
+import DOGE from '../../public/A3.svg';
 import SIC from '../img/sic.jpg';
 
 export default function Header() {

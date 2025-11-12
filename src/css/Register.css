@@ -333,3 +333,13 @@
         font-size: 0.875rem;
     }
 }
+
+/*Valid Checker*/
+.emailValid {
+    border: solid 3px red !important;
+    color: red;
+}
+
+.emailValid::placeholder{
+    color: red;
+}

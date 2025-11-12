@@ -13,6 +13,7 @@ export default function Register() {
         birthMonth: '',
         birthDay: ''
     });
+    const [isEmailValid, setIsEmailValid] = useState(true);
 
     const [verification, setVerification] = useState({
         emailSent: false,
@@ -28,16 +29,32 @@ export default function Register() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        
+        if (name === 'email') {
+            const trimmedValue = value.trim();
+            let isValid = true;
+            
+            if (!trimmedValue) {
+                isValid = false;
+            } else {
+                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/;
+                isValid = emailPattern.test(trimmedValue);
+            }
+    
+            setIsEmailValid(isValid);
+        }
     };
+    
+    
 
     const handleEmailVerification = async (e) => {
         e.preventDefault();
 
         if (!formData.email) {
-            alert('이메일을 입력해주세요.');
+            alert('적합한 형식의 이메일을 입력해주세요');
             return;
-        } else {
 
+        } else {
             const response = await fetch(`${API.API_BASE_URL}/member/email/verification`,{
                 method: 'POST',
                 headers: {
@@ -51,7 +68,6 @@ export default function Register() {
             }
 
             const result = await response.json();
-
             if(result.success){
                 setVerification(prev => ({ ...prev, emailSent: true }));
                 alert('인증 코드가 발송되었습니다.');
@@ -168,12 +184,14 @@ export default function Register() {
                         <div className="register-form">
                             
                             <div className="input-group">
-                                <label htmlFor="register-email">이메일</label>
+                                <label htmlFor="register-email" style={isEmailValid ?  {} : {color: 'red'}}>{isEmailValid ? '이메일' : '적합한 형식의 이메일을 입력해주세요'}</label>
                                 <div className="input-with-button">
                                     <input 
                                         type="email" 
-                                        placeholder="example@email.com" 
+                                        placeholder='example@email.com'
+                                        autoComplete="off" 
                                         name="email"
+                                        className={isEmailValid ? '' : 'emailValid'}
                                         id="register-email"
                                         value={formData.email}
                                         onChange={handleInputChange}
@@ -197,6 +215,7 @@ export default function Register() {
                                         <input 
                                             type="text" 
                                             placeholder="인증 코드 입력" 
+                                            autoComplete="off" 
                                             name="emailVerifyCode"
                                             id="register-email-verify"
                                             value={formData.emailVerifyCode}
@@ -221,6 +240,7 @@ export default function Register() {
                                     <input 
                                         type="text" 
                                         placeholder="닉네임" 
+                                        autoComplete="off" 
                                         name="nickname"
                                         id="register-nickname"
                                         value={formData.nickname}
@@ -243,6 +263,7 @@ export default function Register() {
                                 <input 
                                     type="password" 
                                     placeholder="비밀번호" 
+                                    autoComplete="off" 
                                     name="password"
                                     id="register-password"
                                     value={formData.password}
@@ -251,6 +272,7 @@ export default function Register() {
                                 <input 
                                     type="password" 
                                     placeholder="비밀번호 확인" 
+                                    autoComplete="off" 
                                     name="passwordConfirm"
                                     id="register-password-confirm"
                                     value={formData.passwordConfirm}
