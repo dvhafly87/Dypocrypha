@@ -1,7 +1,4 @@
-// src/components/ToastContext.jsx
-
-import React, { createContext, useContext, useState } from 'react'; // ⭐️ React만 있어도 됨
-import '../css/Toast.css'; // ⭐️ CSS 임포트 (필수)
+import React, { createContext, useContext, useState } from 'react'; 
 
 const ToastContext = createContext();
 
@@ -48,7 +45,6 @@ export function ToastProvider({ children }) {
     return (
         <ToastContext.Provider value={{ addToast, removeToast }}>
             {children}
-            {/* ⭐️ ToastContainer를 여기에 렌더링합니다. */}
             <ToastContainer toasts={toasts} removeToast={removeToast} /> 
         </ToastContext.Provider>
     );
