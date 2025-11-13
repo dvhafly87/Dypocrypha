@@ -13,12 +13,13 @@ export default function Register() {
         birthMonth: '',
         birthDay: ''
     });
-    const [isEmailValid, setIsEmailValid] = useState(true);
 
     const [verification, setVerification] = useState({
         emailSent: false,
         emailVerified: false,
-        nicknameChecked: false
+        nicknameChecked: false,
+        isLoading: false,
+        isEmailValid: true
     });
 
     const currentYear = new Date().getFullYear();
@@ -41,20 +42,31 @@ export default function Register() {
                 isValid = emailPattern.test(trimmedValue);
             }
     
-            setIsEmailValid(isValid);
+            setVerification(prev => ({ ...prev, isEmailValid: isValid }));
         }
     };
-    
-    
 
     const handleEmailVerification = async (e) => {
         e.preventDefault();
 
         if (!formData.email) {
             alert('적합한 형식의 이메일을 입력해주세요');
+            setVerification(prev => ({ ...prev, isEmailValid: false }));
             return;
+        }
 
-        } else {
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/;
+        const isValid = emailPattern.test(formData.email);
+        
+        if (!isValid) {
+            alert("적합한 형식의 이메일을 입력해주세요");
+            setVerification(prev => ({ ...prev, isEmailValid: false }));
+            return;
+        }
+
+        setVerification(prev => ({ ...prev, isLoading: true }));
+
+        try {
             const response = await fetch(`${API.API_BASE_URL}/member/email/verification`,{
                 method: 'POST',
                 headers: {
@@ -64,16 +76,23 @@ export default function Register() {
             });
 
             if(!response.ok){
+                alert("서버 통신 에러: 500");
+                setVerification(prev => ({ ...prev, isLoading: false }));
                 return;
             }
 
             const result = await response.json();
+
             if(result.success){
-                setVerification(prev => ({ ...prev, emailSent: true }));
+                setVerification(prev => ({ ...prev, emailSent: true, isLoading: false }));
                 alert('인증 코드가 발송되었습니다.');
             } else {
                 alert(result.message);
+                setVerification(prev => ({ ...prev, isLoading: false }));
             }
+        } catch (error) {
+            alert("네트워크 오류가 발생했습니다.");
+            setVerification(prev => ({ ...prev, isLoading: false }));
         }
     };
 
@@ -84,7 +103,6 @@ export default function Register() {
             alert('이메일 인증번호를 입력해주세요');
             return;
         } else {
-
             const response = await fetch(`${API.API_BASE_URL}/member/email/verifycationCheck`,{
                 method: 'POST',
                 headers: {
@@ -184,26 +202,28 @@ export default function Register() {
                         <div className="register-form">
                             
                             <div className="input-group">
-                                <label htmlFor="register-email" style={isEmailValid ?  {} : {color: 'red'}}>{isEmailValid ? '이메일' : '적합한 형식의 이메일을 입력해주세요'}</label>
+                                <label htmlFor="register-email" style={verification.isEmailValid ?  {} : {color: 'red'}}>
+                                    {verification.isEmailValid ? '이메일' : '적합한 형식의 이메일을 입력해주세요'}
+                                </label>
                                 <div className="input-with-button">
                                     <input 
                                         type="email" 
                                         placeholder='example@email.com'
                                         autoComplete="off" 
                                         name="email"
-                                        className={isEmailValid ? '' : 'emailValid'}
+                                        className={verification.isEmailValid ? '' : 'emailValid'}
                                         id="register-email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        disabled={verification.emailSent}
+                                        disabled={verification.emailSent || verification.isLoading}
                                     />
                                     <button 
                                         type="button" 
                                         className="verify-btn"
                                         onClick={handleEmailVerification}
-                                        disabled={verification.emailSent}
+                                        disabled={verification.emailSent || verification.isLoading}
                                     >
-                                        {verification.emailSent ? '발송완료' : '인증'}
+                                        {verification.isLoading ? '처리중...' : verification.emailSent ? '발송완료' : '인증'}
                                     </button>
                                 </div>
                             </div>
