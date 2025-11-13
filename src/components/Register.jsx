@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useToast } from '../components/ToastContext.jsx';
+
 import '../css/Register.css';
 import API from '../config/apiConfig.js';
 
 export default function Register() {
+    const { addToast } = useToast();
+
     const [formData, setFormData] = useState({
         email: '',
         emailVerifyCode: '',
@@ -50,7 +54,7 @@ export default function Register() {
         e.preventDefault();
 
         if (!formData.email) {
-            alert('적합한 형식의 이메일을 입력해주세요');
+            addToast('적합한 형식의 이메일을 입력해주세요','warning');
             setVerification(prev => ({ ...prev, isEmailValid: false }));
             return;
         }
@@ -59,7 +63,7 @@ export default function Register() {
         const isValid = emailPattern.test(formData.email);
         
         if (!isValid) {
-            alert("적합한 형식의 이메일을 입력해주세요");
+            addToast('적합한 형식의 이메일을 입력해주세요','warning');  
             setVerification(prev => ({ ...prev, isEmailValid: false }));
             return;
         }
@@ -85,13 +89,13 @@ export default function Register() {
 
             if(result.success){
                 setVerification(prev => ({ ...prev, emailSent: true, isLoading: false }));
-                alert('인증 코드가 발송되었습니다.');
+                addToast("인증코드가 발송되었습니다", 'success');
             } else {
-                alert(result.message);
+                addToast(result.message + "메일 생성 실패 관리자 문의 요망", "warning");
                 setVerification(prev => ({ ...prev, isLoading: false }));
             }
         } catch (error) {
-            alert("네트워크 오류가 발생했습니다.");
+            addToast("NetworkError", "warning");
             setVerification(prev => ({ ...prev, isLoading: false }));
         }
     };
@@ -100,7 +104,7 @@ export default function Register() {
         e.preventDefault();
 
         if (!formData.emailVerifyCode) {
-            alert('이메일 인증번호를 입력해주세요');
+            addToast("인증코드를 입력해주세요", "warning");
             return;
         } else {
             const response = await fetch(`${API.API_BASE_URL}/member/email/verifycationCheck`,{
@@ -119,9 +123,12 @@ export default function Register() {
 
             if(result.Verificheck){
                 setVerification(prev => ({ ...prev, emailVerified: true }));
-                alert('이메일 인증이 완료되었습니다.');
+                addToast("인증 완료되었습니다", "success");
             } else {
-                alert(result.message);
+                setVerification(prev => ({ ...prev, emailSent: false }));
+                setFormData(prev => ({ ...prev, emailVerifyCode: '' }));
+                addToast("인증코드가 일치하지 않습니다.", "warning");
+                return;
             }
         }
     };

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastProvider } from './components/ToastContext.jsx';
 
 import Header from './components/Header.jsx'
 import MainHome from './components/MainHome.jsx'
@@ -12,6 +13,7 @@ import './css/App.css'
 export default function App() {
   return (
     <>
+    <ToastProvider>
       <Router>
         <Header />
         <Routes>
@@ -22,6 +24,7 @@ export default function App() {
           <Route path="/test2" element={<TestComponents2 />} />
         </Routes>
       </Router>
+    </ToastProvider>
     </>
   )
 }
