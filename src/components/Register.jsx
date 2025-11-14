@@ -111,6 +111,7 @@ export default function Register() {
             if(result.success){
                 setVerification(prev => ({ ...prev, emailSent: true, isLoading: false }));
                 addToast("인증코드가 발송되었습니다", 'success');
+                //
             } else {
                 addToast(result.message + "메일 생성 실패 관리자 문의 요망", "warning");
                 setVerification(prev => ({ ...prev, isLoading: false }));
