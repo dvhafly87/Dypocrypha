@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { useToast } from '../components/ToastContext.jsx';
 
 import '../css/Register.css';
@@ -23,13 +23,32 @@ export default function Register() {
         emailVerified: false,
         nicknameChecked: false,
         isLoading: false,
-        isEmailValid: true
+        isEmailValid: true,
+        memberKeyId:''
     });
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: currentYear - 1939 }, (_, i) => currentYear - i);
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+    useEffect(() => {
+        const fetchMemberInfo = async () => {
+            const response = await fetch(`${API.API_BASE_URL}/member/register/genmemberId`,{
+                method: 'POST',
+            });
+            const result = await response.json();
+            if(!result.memberkeyid){
+                addToast("멤버키 생성 실패", "warning");
+            } else{
+                setVerification(prev => ({ 
+                    ...prev, 
+                    memberKeyId: result.memberkeyid
+                }));
+            }
+        };
+        fetchMemberInfo();
+      }, []); 
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -80,7 +99,7 @@ export default function Register() {
             });
 
             if(!response.ok){
-                alert("서버 통신 에러: 500");
+                addToast('서버 통신 에러: 500', 'warning');
                 setVerification(prev => ({ ...prev, isLoading: false }));
                 return;
             }
@@ -102,8 +121,12 @@ export default function Register() {
 
     const handleEmailVerifyCheck = async (e) => {
         e.preventDefault();
-
+        const verifycodeRule = /^\d{6}$/;
+        
         if (!formData.emailVerifyCode) {
+            addToast("인증코드를 입력해주세요", "warning");
+            return;
+        } else if(!verifycodeRule.test(formData.emailVerifyCode)) {
             addToast("인증코드를 입력해주세요", "warning");
             return;
         } else {
@@ -133,8 +156,33 @@ export default function Register() {
         }
     };
 
-    const handleNicknameCheck = (e) => {
+    const handleNicknameCheck = async (e) => {
         e.preventDefault();
+        const nicknameRule = /^[a-zA-Z0-9가-힣]{1,20}$/;
+
+        if(!formData.nickname){
+            addToast("닉네임을 입력해주세요", "warning");
+            return;
+        } else if(!nicknameRule.test(formData.nickname)) {
+            addToast("닉네임에 한자&특수문자는 사용 불가능합니다", "warning");
+            return;
+        } else {
+            const response = await fetch(`${API.API_BASE_URL}/member/dupcheck/nickname`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({memberRegisterNickName: formData.nickname})
+            });
+
+            if(!response.ok){
+                return;
+            }
+
+            const result = await response.json();
+
+        }
+
         if (formData.nickname) {
             setVerification(prev => ({ ...prev, nicknameChecked: true }));
             alert('사용 가능한 닉네임입니다.');
@@ -145,10 +193,6 @@ export default function Register() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        fetch(`${API.API_BASE_URL}/test`,{
-            method: 'GET'
-        })
         
         if (!verification.emailVerified) {
             alert('이메일 인증을 완료해주세요.');
@@ -209,6 +253,7 @@ export default function Register() {
                         <div className="register-form">
                             
                             <div className="input-group">
+                                <input type="hidden" name="memberkey" id="register-key" value={verification.memberKeyId} readOnly/>
                                 <label htmlFor="register-email" style={verification.isEmailValid ?  {} : {color: 'red'}}>
                                     {verification.isEmailValid ? '이메일' : '적합한 형식의 이메일을 입력해주세요'}
                                 </label>
