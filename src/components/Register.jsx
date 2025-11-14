@@ -8,6 +8,7 @@ export default function Register() {
     const { addToast } = useToast();
 
     const [formData, setFormData] = useState({
+        memberKey: '',
         email: '',
         emailVerifyCode: '',
         nickname: '',
@@ -24,7 +25,6 @@ export default function Register() {
         nicknameChecked: false,
         isLoading: false,
         isEmailValid: true,
-        memberKeyId:''
     });
 
     const currentYear = new Date().getFullYear();
@@ -41,9 +41,9 @@ export default function Register() {
             if(!result.memberkeyid){
                 addToast("멤버키 생성 실패", "warning");
             } else{
-                setVerification(prev => ({ 
-                    ...prev, 
-                    memberKeyId: result.memberkeyid
+                setFormData(prev => ({
+                    ...prev,
+                    memberKey: result.memberkeyid
                 }));
             }
         };
@@ -95,7 +95,9 @@ export default function Register() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({memberRegisterEmail: formData.email})
+                body: JSON.stringify({
+                    memberRegisterEmail: formData.email
+                })
             });
 
             if(!response.ok){
@@ -135,7 +137,10 @@ export default function Register() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({memberRegisterVerifyCheck: formData.emailVerifyCode})
+                body: JSON.stringify({
+                    memberRegisterVerifyCheck: formData.emailVerifyCode,
+                    memberRegisterKey: formData.memberKey
+                })
             });
 
             if(!response.ok){
@@ -251,9 +256,7 @@ export default function Register() {
                     <div className="register-container">
                         <h2>계정 정보 입력</h2>
                         <div className="register-form">
-                            
                             <div className="input-group">
-                                <input type="hidden" name="memberkey" id="register-key" value={verification.memberKeyId} readOnly/>
                                 <label htmlFor="register-email" style={verification.isEmailValid ?  {} : {color: 'red'}}>
                                     {verification.isEmailValid ? '이메일' : '적합한 형식의 이메일을 입력해주세요'}
                                 </label>
