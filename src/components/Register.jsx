@@ -139,6 +139,7 @@ export default function Register() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    memberRegisterEmail: formData.email,
                     memberRegisterVerifyCheck: formData.emailVerifyCode,
                     memberRegisterKey: formData.memberKey
                 })
