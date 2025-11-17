@@ -25,6 +25,8 @@ export default function Register() {
         nicknameChecked: false,
         isLoading: false,
         isEmailValid: true,
+        isPasswordValid: true,
+        passwordsMatch: true
     });
 
     const currentYear = new Date().getFullYear();
@@ -66,6 +68,31 @@ export default function Register() {
             }
     
             setVerification(prev => ({ ...prev, isEmailValid: isValid }));
+        }
+    
+        if(name === 'password') {
+            const passwordhollow = value.trim();
+            let pwValid = true;
+    
+            if(!passwordhollow) {
+                pwValid = false;
+            } else {
+                const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+                pwValid = passwordPattern.test(passwordhollow);
+            }
+    
+            setVerification(prev => ({
+                ...prev, 
+                isPasswordValid: pwValid,
+                passwordsMatch: formData.passwordConfirm ? value === formData.passwordConfirm : true
+            }));
+        }
+    
+        if(name === 'passwordConfirm') {
+            setVerification(prev => ({
+                ...prev,
+                passwordsMatch: value === formData.password
+            }));
         }
     };
 
@@ -195,30 +222,72 @@ export default function Register() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (!verification.emailVerified) {
-            alert('이메일 인증을 완료해주세요.');
-            return;
-        }
-        if (!verification.nicknameChecked) {
-            alert('닉네임 중복확인을 해주세요.');
+            addToast('이메일 인증을 완료해주세요.', 'warning');
             return;
         }
 
-        if (formData.password !== formData.passwordConfirm) {
-            alert('비밀번호가 일치하지 않습니다.');
+        if (!verification.nicknameChecked) {
+            addToast('닉네임 중복확인을 해주세요.', 'warning');
+            return;
+        }
+
+        if (!formData.password) {
+            addToast('비밀번호를 입력해주세요.', 'warning');
+            return;
+        }
+
+        if (!formData.passwordConfirm) {
+            addToast('비밀번호 확인을 입력해주세요.', 'warning');
+            return;
+        }
+        if (!verification.passwordsMatch) {
+            addToast('비밀번호가 일치하지 않습니다.', 'warning');
+            return;
+        }
+
+        if (!verification.isPasswordValid) {
+            addToast('비밀번호 형식이 올바르지 않습니다.', 'warning');
             return;
         }
 
         if (!formData.birthYear || !formData.birthMonth || !formData.birthDay) {
-            alert('생년월일을 선택해주세요.');
+            addToast('생년월일을 선택해주세요.', 'warning');
             return;
         }
 
-        // console.log('회원가입 데이터:', formData);
-        // alert('회원가입이 완료되었습니다!');
+        const birthDate = new Date(formData.birthYear, formData.birthMonth - 1, formData.birthDay);
+        if (birthDate.getDate() !== parseInt(formData.birthDay)) {
+            addToast('유효하지 않은 날짜입니다.', 'warning');
+            return;
+        }
+        const birth = formData.birthYear + formData.birthMonth + formData.birthDay;
+    
+        const response = await fetch(`${API.API_BASE_URL}/member/register`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                memberRegisterKey: formData.memberKey,
+                memberRegisterEmail: formData.email,
+                memberRegisterVerifyCheck: formData.emailVerifyCode,
+                memberRegisterNickName: formData.nickname,
+                memberRegisterPassword: formData.password,
+                memberRegisterPasswordChk: formData.passwordConfirm,
+                memberRegisterBirth: birth
+            })
+        });
+
+        if(!response.ok){
+            return;
+        }
+
+        const result = await response.json();
+
     };
 
     return (
@@ -333,22 +402,36 @@ export default function Register() {
                             </div>
 
                             <div className="input-group">
-                                <label htmlFor="register-password">비밀번호</label>
+                                <label 
+                                    htmlFor="register-password" 
+                                    style={verification.isPasswordValid ? {} : {color: 'red'}}
+                                >
+                                    {verification.isPasswordValid 
+                                        ? '비밀번호' 
+                                        : '비밀번호는 8자 이상, 영문+숫자+특수문자(@$!%*#?&) 조합이어야 합니다'}
+                                </label>
                                 <input 
                                     type="password" 
                                     placeholder="비밀번호" 
                                     autoComplete="off" 
                                     name="password"
                                     id="register-password"
+                                    className={verification.isPasswordValid ? '' : 'passwordInvalid'}
                                     value={formData.password}
                                     onChange={handleInputChange}
                                 />
+                                {!verification.passwordsMatch && formData.passwordConfirm && (
+                                    <span style={{color: 'red', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                                        비밀번호가 일치하지 않습니다
+                                    </span>
+                                )}
                                 <input 
                                     type="password" 
                                     placeholder="비밀번호 확인" 
                                     autoComplete="off" 
                                     name="passwordConfirm"
                                     id="register-password-confirm"
+                                    className={verification.passwordsMatch ? '' : 'passwordInvalid'}
                                     value={formData.passwordConfirm}
                                     onChange={handleInputChange}
                                     style={{ marginTop: '0.5rem' }}
