@@ -117,7 +117,7 @@ export default function Register() {
                 setVerification(prev => ({ ...prev, isLoading: false }));
             }
         } catch (error) {
-            addToast("NetworkError", "warning");
+            addToast("NetworkError"+error, "warning");
             setVerification(prev => ({ ...prev, isLoading: false }));
         }
     };
@@ -181,20 +181,17 @@ export default function Register() {
                 },
                 body: JSON.stringify({memberRegisterNickName: formData.nickname})
             });
-
             if(!response.ok){
                 return;
             }
-
             const result = await response.json();
 
-        }
-
-        if (formData.nickname) {
-            setVerification(prev => ({ ...prev, nicknameChecked: true }));
-            alert('사용 가능한 닉네임입니다.');
-        } else {
-            alert('닉네임을 입력해주세요.');
+            if(result.duplicateCheck){
+                setVerification(prev => ({ ...prev, nicknameChecked: true }));
+                addToast(result.duplicateStatus, 'success');
+            } else {
+                addToast(result.duplicateStatus, 'warning')
+            }
         }
     };
 
