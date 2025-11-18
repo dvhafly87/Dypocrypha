@@ -1,11 +1,33 @@
 import { Link } from 'react-router-dom';
 import {useState, useEffect} from 'react';
+import {useToast} from '../components/ToastContext.jsx';
+
 import '../css/MainHome.css';
 
 import DOAI from '../img/doge.jpeg';
 import DoBanner from '../img/dogae.jpeg';
 
 export default function MainHome() {
+    const { addToast } = useToast();
+
+    useEffect(() => {
+        const storedToastData = localStorage.getItem('redirectToast');
+
+        if (storedToastData) {
+            try {
+                const toastData = JSON.parse(storedToastData);
+
+                addToast(toastData.message, toastData.status);
+
+                localStorage.removeItem('redirectToast');
+                
+            } catch (error) {
+                console.error("Failed to parse redirectToast from localStorage:", error);
+                localStorage.removeItem('redirectToast');
+            }
+        }
+    }, [addToast]);
+
     return (
         <>
             <div className="main-home-container">

@@ -264,7 +264,8 @@ export default function Register() {
             addToast('유효하지 않은 날짜입니다.', 'warning');
             return;
         }
-        const birth = formData.birthYear + formData.birthMonth + formData.birthDay;
+
+        const birth = formData.birthYear +"-"+formData.birthMonth +"-"+ formData.birthDay;
     
         const response = await fetch(`${API.API_BASE_URL}/member/register`,{
             method: 'POST',
@@ -285,15 +286,24 @@ export default function Register() {
         if(!response.ok){
             return;
         }
-
+        
         const result = await response.json();
 
+        let toastData;
+
         if(result.RegisterSuccess){
-
+            toastData = {
+                status: 'success',
+                message: result.RegisterStatus
+            };
         } else {
-
+            toastData = {
+                status: 'warning',
+                message: result.RegisterStatus
+            };
         }
-
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        window.location.href = '/';
     };
 
     return (
