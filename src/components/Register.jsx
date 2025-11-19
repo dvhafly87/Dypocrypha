@@ -134,11 +134,19 @@ export default function Register() {
             }
 
             const result = await response.json();
+            let toastData;
 
             if(result.success){
                 setVerification(prev => ({ ...prev, emailSent: true, isLoading: false }));
                 addToast("인증코드가 발송되었습니다", 'success');
-                //
+            } else if(!result.success && result.errorCode == 1224) {
+                toastData = {
+                    status: 'warning',
+                    message: result.EmailMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                window.location.href = '/';
+                setVerification(prev => ({ ...prev, isLoading: false }));
             } else {
                 addToast(result.message + "메일 생성 실패 관리자 문의 요망", "warning");
                 setVerification(prev => ({ ...prev, isLoading: false }));

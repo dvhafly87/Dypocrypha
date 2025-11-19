@@ -7,6 +7,7 @@ import Login from './components/AccountService.jsx'
 import Register from './components/Register.jsx'
 import TestComponents from './components/test.jsx'
 import TestComponents2 from './components/test2.jsx'
+import ResetPassword from './components/ResetPassword.jsx'
 
 import './css/App.css'
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/test" element={<TestComponents />} />
           <Route path="/test2" element={<TestComponents2 />} />
+          <Route path="/resetPassword" element={<ResetPassword />} />
         </Routes>
       </Router>
     </ToastProvider>

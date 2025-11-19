@@ -96,13 +96,6 @@ export default function AccountService() {
                                 </svg>
                                 <span>회원가입</span>
                             </a>
-                            <a href="/findId" className="service-link">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                                <span>아이디 찾기</span>
-                            </a>
                             <a href="/resetPassword" className="service-link">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -110,6 +103,13 @@ export default function AccountService() {
                                 </svg>
                                 <span>비밀번호 재설정</span>
                             </a>
+                            {/* <a href="/findId" className="service-link">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.35-4.35" />
+                                </svg>
+                                <span>아이디 찾기</span>
+                            </a> */}
                         </div>
                     </div>
                 </div>
