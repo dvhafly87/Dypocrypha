@@ -9,6 +9,9 @@ import TestComponents from './components/test.jsx'
 import TestComponents2 from './components/test2.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 
+
+import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
+
 import './css/App.css'
 
 export default function App() {
@@ -24,6 +27,7 @@ export default function App() {
           <Route path="/test" element={<TestComponents />} />
           <Route path="/test2" element={<TestComponents2 />} />
           <Route path="/resetPassword" element={<ResetPassword />} />
+          <Route path="/token" element={<TokenWrapper />} />
         </Routes>
       </Router>
     </ToastProvider>
