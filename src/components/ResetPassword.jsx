@@ -12,14 +12,15 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async () => {
+  // 이메일 전송 공통 함수
+  const sendResetEmail = async (isResend = false) => {
     setError('');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if(!email){
-        setError('이메일 주소를 입력해주세요')
-        return;
+    if (!email) {
+      setError('이메일 주소를 입력해주세요');
+      return;
     } else if (!emailRegex.test(email)) {
       setError('올바른 이메일 주소를 입력해주세요.');
       return;
@@ -27,43 +28,46 @@ export default function ResetPassword() {
 
     setIsLoading(true);
 
-    const response = await fetch(`${API.API_BASE_URL}/member/reset/password`,{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        memberRegisterEmail: email
-                    })
-                });
-    
-    if(!response.ok){
-        return;
-    }
+    try {
+      const response = await fetch(`${API.API_BASE_URL}/member/reset/password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          memberRegisterEmail: email
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if(result.resetPassStt){
-        setTimeout(() => {
-            setIsLoading(false);
-            setStep(2);
-            }, 1500);
-        addToast(result.resetStatus, "success");
-    } else {
-        setTimeout(() => {
-            setIsLoading(false);
-            setStep(1);
-            }, 1500);
+      if (result.resetPassStt) {
+        setStep(2);
+        addToast(
+          isResend ? '인증 메일이 재전송되었습니다.' : result.resetStatus, 
+          "success"
+        );
+      } else {
         addToast(result.resetStatus, "warning");
+      }
+    } catch (error) {
+      console.error('Reset email error:', error);
+      addToast('메일 전송 중 오류가 발생했습니다.', 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleSubmit = () => {
+    sendResetEmail(false);
+  };
+
   const handleResend = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      addToast('인증 메일이 재전송되었습니다.', 'success');
-    }, 1000);
+    sendResetEmail(true);
   };
 
   return (

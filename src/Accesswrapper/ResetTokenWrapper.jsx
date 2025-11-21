@@ -15,7 +15,6 @@ export default function tokenWrapper(){
             setIsLoading(false);
             return; 
         }
-        
         setIsValid(true);
         setIsLoading(false);
       }, [token]);
