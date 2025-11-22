@@ -1,13 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useToast } from '../components/ToastContext.jsx';
 
 import '../css/Login.css';
+import API from '../config/apiConfig.js';
 
 export default function AccountService() {
+    const { addToast } = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = () => {
-        console.log('Login attempt:', { email, password });
+    const handleSubmit = async () => {
+        const response = await fetch(`${API.API_BASE_URL}/member/login`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+               memberLoginEmail: email,
+               memberLoginPassword: password
+            })
+        });
+
+        const result = await response.json();
+
+        let toastData;
+
+        if(result.LoginSuccess){
+          addToast(result.LoginMessage, "success");
+            // toastData = {
+            //     status: 'success',
+            //     message: result.LoginStatus
+            // };
+            
+            // localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            // window.location.href = '/';
+        } else {
+          addToast(result.LoginMessage, "warning");
+        }
     };
 
     return (
