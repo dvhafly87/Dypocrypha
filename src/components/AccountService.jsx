@@ -6,7 +6,7 @@ import API from '../config/apiConfig.js';
 
 export default function AccountService() {
     const { addToast } = useToast();
-    const [loginP, setLoginP] = useState(true);
+    const [loginP, setLoginP] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -50,6 +50,35 @@ export default function AccountService() {
             window.location.href = '/';
         }
     };
+
+    useEffect(() => {
+            const cantAccessThisPageLoginUser = async () => {
+                const response = await fetch(`${API.API_BASE_URL}/member/loginchecker`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+                
+                if(!response.ok){
+                    const toastData = {
+                        status: 'warning',
+                        message: '서버 통신 에러: 500'
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    window.location.href = '/';
+                    return;
+                }
+
+                const result = await response.json();
+
+                if(result.isLogined){
+                    window.location.href = '/';
+                }
+            };
+        cantAccessThisPageLoginUser();
+    }, []);
 
     return (
         <div className="account-service-main-container">
