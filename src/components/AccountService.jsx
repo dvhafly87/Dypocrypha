@@ -6,6 +6,7 @@ import API from '../config/apiConfig.js';
 
 export default function AccountService() {
     const { addToast } = useToast();
+    const [loginP, setLoginP] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -17,25 +18,36 @@ export default function AccountService() {
             },
             body: JSON.stringify({
                memberLoginEmail: email,
-               memberLoginPassword: password
+               memberLoginPassword: password,
+               memberLoginPermt: loginP
             })
         });
 
+        if(!response.ok){
+            try {
+                const errorResult = await response.json();
+                addToast(errorResult.LoginMessage || "로그인 실패: 서버 오류", "warning");
+            } catch (e) {
+                addToast("네트워크 또는 서버 응답 오류", "error");
+            }
+            return false;
+        }
+
         const result = await response.json();
 
-        let toastData;
-
         if(result.LoginSuccess){
-          addToast(result.LoginMessage, "success");
-            // toastData = {
-            //     status: 'success',
-            //     message: result.LoginStatus
-            // };
+        
+            addToast(result.LoginMessage, "success");
             
-            // localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            // window.location.href = '/';
-        } else {
-          addToast(result.LoginMessage, "warning");
+            const toastData = {
+                status: 'success',
+                message: result.LoginMessage 
+            };
+            
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            
+     
+            window.location.href = '/';
         }
     };
 
@@ -100,7 +112,10 @@ export default function AccountService() {
 
                             <div className="remember-forgot">
                                 <label className="remember-me">
-                                    <input type="checkbox" />
+                                    <input 
+                                        type="checkbox"
+                                        checked={loginP}
+                                        onChange={(e) => setLoginP(e.target.checked)}/>
                                     <span>로그인 상태 유지</span>
                                 </label>
                             </div>
