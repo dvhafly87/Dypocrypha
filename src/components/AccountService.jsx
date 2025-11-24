@@ -13,6 +13,7 @@ export default function AccountService() {
     const handleSubmit = async () => {
         const response = await fetch(`${API.API_BASE_URL}/member/login`,{
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -53,29 +54,20 @@ export default function AccountService() {
 
     useEffect(() => {
             const cantAccessThisPageLoginUser = async () => {
-                const response = await fetch(`${API.API_BASE_URL}/member/loginchecker`, {
+                const response = await fetch(`${API.API_BASE_URL}/member/login/checker`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include',
                 });
-                
-                if(!response.ok){
-                    const toastData = {
-                        status: 'warning',
-                        message: '서버 통신 에러: 500'
-                    };
-                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    window.location.href = '/';
-                    return;
-                }
 
                 const result = await response.json();
 
                 if(result.isLogined){
-                    window.location.href = '/';
+                    window.location.href = "/";
                 }
+               
             };
         cantAccessThisPageLoginUser();
     }, []);
