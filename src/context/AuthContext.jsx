@@ -1,12 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useToast } from '../components/ToastContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 // API 경로는 실제 환경에 맞게 수정하세요.
 import API from '../config/apiConfig';
 const LOGIN_CHECKER_URL = `${API.API_BASE_URL}/member/login/checker`;
+const LOGOUT_URL = `${API.API_BASE_URL}/member/logout`;
+
 
 // Context 객체 생성
 const AuthContext = createContext({
     isLogined: false,
+    logout: () => {},
 });
 
 // Custom Hook
@@ -17,7 +22,50 @@ export const useAuth = () => {
 // Provider 컴포넌트 생성
 export const AuthProvider = ({ children }) => {
     // 초기값은 false입니다.
+    const { addToast } = useToast();
+    const navigate = useNavigate();
     const [isLogined, setIsLogined] = useState(false);
+
+    const loginSuccess = () => {
+        setIsLogined(true);
+    };
+
+    // --- 2. 로그아웃 함수 (ProfileContainer에서 호출될 함수) ---
+    const logout = async () => {
+        try {
+            // 서버에 로그아웃 요청 (쿠키/세션 무효화)
+            const response = await fetch(LOGOUT_URL, {
+                method: 'POST',
+                credentials: 'include', // 세션/쿠키를 포함하여 요청
+                headers: {'Content-Type': 'application/json'},
+            });
+
+            const result = await response.json();
+
+            if(!response.ok){
+                addToast("로그아웃 처리 중 오류 발생", "warning");
+                setIsLogined(false);
+                navigate('/login'); 
+            }
+
+            if(result.logoutSuccess){
+                // 클라이언트 상태 변경 및 토큰 삭제
+                setIsLogined(false);
+                const toastData = {
+                    status: 'success',
+                    message: result.LogoutMessage 
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/'); // 로그아웃 후 로그인 페이지로 이동
+            }
+        } catch (error) {
+            // 네트워크 오류가 나더라도 클라이언트 측에서는 로그아웃 처리 (강제 로그아웃)
+            addToast("로그아웃 처리 중 오류 발생: "+error, "warning");
+            setIsLogined(false);
+            // localStorage.removeItem('authToken');
+            navigate('/login'); 
+        }
+    };
 
     // 오직 로그인 상태 확인 로직만 포함합니다.
     useEffect(() => {
@@ -52,6 +100,8 @@ export const AuthProvider = ({ children }) => {
     // Context Value 정의: 오직 isLogined 상태만 제공
     const value = {
         isLogined,
+        logout,
+        loginSuccess
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

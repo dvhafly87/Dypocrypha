@@ -6,7 +6,7 @@ import '../css/Login.css';
 import API from '../config/apiConfig.js';
 
 export default function AccountService() {
-    const { isLogined } = useAuth();
+    const { isLogined, loginSuccess } = useAuth();
     const navigate = useNavigate();
     const { addToast } = useToast();
     const [loginP, setLoginP] = useState(false);
@@ -46,6 +46,8 @@ export default function AccountService() {
         const result = await response.json();
 
         if(result.LoginSuccess){
+            loginSuccess(); 
+            
             const toastData = {
                 status: 'success',
                 message: result.LoginMessage 
@@ -53,6 +55,8 @@ export default function AccountService() {
             
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             
+            // 💡 리디렉션: isLogined가 이미 true로 업데이트 되었으므로
+            // 다음 화면에서 프로필 등의 UI가 정상적으로 표시됩니다.
             navigate('/');
         }
     };

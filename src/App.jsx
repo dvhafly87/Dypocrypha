@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext.jsx'
 import { ToastProvider } from './components/ToastContext.jsx';
 
 import Header from './components/Header.jsx'
@@ -17,20 +18,22 @@ import './css/App.css'
 export default function App() {
   return (
     <>
-    <ToastProvider>
       <Router>
-        <Header />
-        <Routes>
-          <Route path="/" element={<MainHome />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/test" element={<TestComponents />} />
-          <Route path="/test2" element={<TestComponents2 />} />
-          <Route path="/resetPassword" element={<ResetPassword />} />
-          <Route path="/token" element={<TokenWrapper />} />
-        </Routes>
-      </Router>
-    </ToastProvider>
+        <ToastProvider>
+            <AuthProvider>
+              <Header />
+              <Routes>
+                <Route path="/" element={<MainHome />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/test" element={<TestComponents />} />
+                <Route path="/test2" element={<TestComponents2 />} />
+                <Route path="/resetPassword" element={<ResetPassword />} />
+                <Route path="/token" element={<TokenWrapper />} />
+              </Routes>
+            </AuthProvider>
+        </ToastProvider>
+    </Router>
     </>
   )
 }
