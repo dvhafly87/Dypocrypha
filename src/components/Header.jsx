@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
+import ProfileContainer from '../components/ProfileContainer.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 import '../css/Header.css';
 
@@ -7,6 +9,8 @@ import DOGE from '../../public/A3.svg';
 import SIC from '../img/sic.jpg';
 
 export default function Header() {
+  const { isLogined } = useAuth();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -54,7 +58,7 @@ export default function Header() {
             <img src={SIC} alt="검색" className="search-icon" />
           </button>
         </form>
-        <Link className="move-agreeAndlogin" to="/login">로그인</Link>
+        {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
       <nav className="sub-nav">
         <Link to="/">홈</Link>

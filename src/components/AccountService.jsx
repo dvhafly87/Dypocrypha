@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
-
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 import '../css/Login.css';
 import API from '../config/apiConfig.js';
 
 export default function AccountService() {
+    const { isLogined } = useAuth();
+    const navigate = useNavigate();
     const { addToast } = useToast();
     const [loginP, setLoginP] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    useEffect(() => {
+        if (isLogined) {
+            navigate('/', { replace: true }); 
+        }
+    }, [isLogined, navigate]);
 
     const handleSubmit = async () => {
         const response = await fetch(`${API.API_BASE_URL}/member/login`,{
@@ -37,9 +46,6 @@ export default function AccountService() {
         const result = await response.json();
 
         if(result.LoginSuccess){
-        
-            addToast(result.LoginMessage, "success");
-            
             const toastData = {
                 status: 'success',
                 message: result.LoginMessage 
@@ -47,30 +53,9 @@ export default function AccountService() {
             
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             
-     
-            window.location.href = '/';
+            navigate('/');
         }
     };
-
-    useEffect(() => {
-            const cantAccessThisPageLoginUser = async () => {
-                const response = await fetch(`${API.API_BASE_URL}/member/login/checker`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                const result = await response.json();
-
-                if(result.isLogined){
-                    window.location.href = "/";
-                }
-               
-            };
-        cantAccessThisPageLoginUser();
-    }, []);
 
     return (
         <div className="account-service-main-container">
