@@ -1,26 +1,53 @@
-import React from 'react'; // React import 추가
+import React, { useEffect, useState} from 'react'; // React import 추가
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // 👈 AuthContext 파일 경로에 맞게 수정 필요
+import { useNavigate } from 'react-router-dom';
+
 import '../css/ProfileContainer.css';
 
+import API from '../config/apiConfig';
 import Doge from '../img/doge.jpeg';
 
 export default function ProfileContainer() {
-  
-  // 💡 1. useAuth 훅을 사용하여 전역 상태와 함수를 가져옵니다.
-  const { logout, isLogined } = useAuth(); 
+    const [userNickname, setUserNickname] = useState('');
+    const { logout, isLogined } = useAuth(); 
+    const navigate = useNavigate();
 
-  // 임시 사용자 데이터 (실제로는 AuthContext나 props에서 받아옴)
-  const userNickname = "사용자";
+    const handleLogout = () => {
+      logout();
+      const toastData = {
+            status: 'success',
+            message: "로그아웃 되었습니다" 
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate('/');  
+    };
 
-  // 💡 2. 로그아웃 핸들러를 AuthContext의 logout 함수로 대체합니다.
-  const handleLogout = () => {
-    logout(); // 👈 전역으로 가져온 logout 함수 호출
-  };
+   // 오직 로그인 상태 확인 로직만 포함합니다.
+    useEffect(() => {
+       const profileInformationCalling = async () => {
+            try {
+                const response = await fetch(`${API.API_BASE_URL}/member/profileInformation`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const result = await response.json();
+                if(!result.getProfileInfo){
+                    handleLogout();
+                } else {
+                    setUserNickname(result.nickname);
+                }
+            } catch (error) {
+                console.error("로그인 상태 확인 실패:", error);
+                setIsLogined(false); 
+            }
+       }
+       profileInformationCalling();
+    }, []);
 
   return (
     <div className="profile-container">
-      {/* isLogined 상태를 활용하여 로그인 시에만 보여주는 등의 로직을 추가할 수 있습니다. */}
       {isLogined && ( 
         <>
           <div className="profile-image-wrapper">
@@ -36,7 +63,6 @@ export default function ProfileContainer() {
               <Link to="/mypage" className="profile-mypage-link">
                 마이페이지
               </Link>
-              {/* 💡 3. 버튼 클릭 시 handleLogout 연결 */}
               <button onClick={handleLogout} className="profile-logout-btn">
                 로그아웃
               </button>

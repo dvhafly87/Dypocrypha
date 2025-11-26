@@ -60,7 +60,7 @@ export default function Header() {
         </form>
         {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
-      <nav className="sub-nav">
+      <nav className="sub-nav" style={{ top: isLogined ? '111px' : '90px' }}>
         <Link to="/">홈</Link>
         <Link to="/test">게시판</Link>
         <Link to="/test2">프로젝트</Link>

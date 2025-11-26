@@ -19,21 +19,21 @@ export default function App() {
   return (
     <>
       <Router>
-        <ToastProvider>
+          <ToastProvider>
             <AuthProvider>
-              <Header />
-              <Routes>
-                <Route path="/" element={<MainHome />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/test" element={<TestComponents />} />
-                <Route path="/test2" element={<TestComponents2 />} />
-                <Route path="/resetPassword" element={<ResetPassword />} />
-                <Route path="/token" element={<TokenWrapper />} />
-              </Routes>
+                <Header />
+                <Routes>
+                  <Route path="/" element={<MainHome />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/test" element={<TestComponents />} />
+                  <Route path="/test2" element={<TestComponents2 />} />
+                  <Route path="/resetPassword" element={<ResetPassword />} />
+                  <Route path="/token" element={<TokenWrapper />} />
+                </Routes>
             </AuthProvider>
-        </ToastProvider>
-    </Router>
+          </ToastProvider>
+      </Router>
     </>
   )
 }

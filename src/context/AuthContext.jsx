@@ -49,14 +49,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             if(result.logoutSuccess){
-                // 클라이언트 상태 변경 및 토큰 삭제
                 setIsLogined(false);
-                const toastData = {
-                    status: 'success',
-                    message: result.LogoutMessage 
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/'); // 로그아웃 후 로그인 페이지로 이동
             }
         } catch (error) {
             // 네트워크 오류가 나더라도 클라이언트 측에서는 로그아웃 처리 (강제 로그아웃)

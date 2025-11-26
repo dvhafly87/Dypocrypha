@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext';
+import { useNavigate } from 'react-router-dom';
 import API from '../config/apiConfig.js';
 import '../css/Login.css';
 
 export default function ResetPasswordInThisPage(props) {
     const token = props.actualToken;
+    const navigate = useNavigate();
     const { addToast } = useToast();
     const [isValidToken, setIsValidToken] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -127,19 +129,17 @@ export default function ResetPasswordInThisPage(props) {
             const result = await response.json();
 
             if (result.resetPasswordSuccess) {
-                
+                const toastData = {
+                    status: 'success',
+                    message: "비밀번호 변경 성공" 
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/'); 
             } else {
-                addToast({
-                    status: 'error',
-                    message: result.message || '비밀번호 변경에 실패했습니다'
-                });
+                addToast("비밀번호 변경 중 오류 발생", "warning");
             }
         } catch (error) {
-            console.error('Password reset error:', error);
-            addToast({
-                status: 'error',
-                message: '비밀번호 변경 중 오류가 발생했습니다'
-            });
+            addToast("비밀번호 변경 중 오류 발생", "warning");
         }
     };
 
