@@ -1,3 +1,149 @@
-.Board-Main-Container{
-    
+/* --- 전체 레이아웃 설정 (이전과 동일) --- */
+.board-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    padding: 2rem 3rem;
+    gap: 2rem;
+    min-height: 80vh; 
+}
+
+/* --- 사이드바 컨테이너 (이전과 동일) --- */
+.board-side-container {
+    flex: 2;
+    min-width: 250px;
+    max-width: 350px;
+    border: solid 1px #e0e0e0;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- 사이드바 헤더 (이전과 동일) --- */
+.sidebar-header {
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* --- 사이드바 액션 영역 (이전과 동일) --- */
+.sidebar-actions {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #eeeeee;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 검색 컨테이너 */
+.board-search-container {
+    margin-bottom: 5px;
+}
+
+/* 검색 폼: 입력창과 버튼을 하나의 컴포넌트처럼 보이게 합니다. */
+.board-search-form {
+    display: flex;
+    /* 이전: border 속성이 여기에 있었으나, input 필드와 버튼에 각각 적용하여 통합된 모양을 만듭니다. */
+    border-radius: 8px;
+    overflow: hidden;
+    /* 하나의 폼 경계선을 표시합니다. */
+    border: 1px solid #ccc; 
+}
+
+.board-search-form input[type="text"] {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    /* 폼 전체에 경계선을 줬기 때문에 input 자체의 경계선은 제거합니다. */
+    border: none; 
+    border-radius: 8px 0 0 8px; /* 왼쪽만 둥글게 */
+    outline: none;
+    font-size: 0.95rem;
+}
+
+/* 검색 버튼: 배경색을 제거하고 input과 시각적으로 이어지게 합니다. */
+.board-search-button {
+    border: none;
+    background-color: #2ECC71;
+    border-radius: 6px;
+    padding: 0.45rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+/* 호버 시 버튼 영역만 약간 어둡게 처리 */
+.board-search-button:hover {
+    background-color: #f0f0f0; 
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    /* 검색 아이콘 색상을 짙은 회색으로 변경하면 더 깔끔해 보일 수 있습니다. (SIC.jpg가 단색 이미지인 경우) */
+    /* filter: grayscale(100%) brightness(50%); */ 
+}
+
+/* --- 로그인 필요 메시지 (이전과 동일) --- */
+.required-login {
+    color: #ff5722; 
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0 0 5px 0;
+    text-align: right;
+}
+
+/* --- 새 게시판 생성 버튼 (이전과 동일) --- */
+.sidebar-actions-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.sidebar-actions button:hover {
+    background-color: #388e3c;
+    transform: translateY(-1px);
+}
+
+/* --- 게시판 리스트 영역 (이전과 동일) --- */
+.sidebar-boardList {
+    padding: 1.5rem 2rem;
+    color: #424242;
+    font-size: 0.95rem;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* --- 메인 콘텐츠 컨테이너 (이전과 동일) --- */
+.board-main-container {
+    flex: 8;
+    background-color: #ffffff;
+    border: solid 1px #e0e0e0;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: #333;
 }
