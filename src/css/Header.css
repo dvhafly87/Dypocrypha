@@ -153,7 +153,6 @@
   box-sizing: border-box;
   position: sticky;
   z-index: 100;
-  top:90px;
 }
 
 .sub-nav a {
@@ -294,7 +293,10 @@
   .main-header {
     padding: 0.8rem 1rem;
   }
-
+  .brand-box {
+    margin-right: auto;
+    margin-left: 100px;
+  }
   .brand-box img {
     width: 36px;
     height: 36px;
@@ -333,8 +335,9 @@
     display: block;
   }
 
-  .move-agreeAndlogin {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+  /* ========== 핵심: 모바일에서 로그인/프로필 숨김 ========== */
+  .main-header .move-agreeAndlogin,
+  .main-header .profile-container {
+    display:none !important;
   }
 }

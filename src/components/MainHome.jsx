@@ -4,6 +4,7 @@ import {useToast} from '../components/ToastContext.jsx';
 
 import '../css/MainHome.css';
 
+import ProjectSlider from '../components/ProjectSlider.jsx'
 import DOAI from '../img/doge.jpeg';
 import DoBanner from '../img/dogae.jpeg';
 
@@ -12,15 +13,11 @@ export default function MainHome() {
 
     useEffect(() => {
         const storedToastData = localStorage.getItem('redirectToast');
-
         if (storedToastData) {
             try {
                 const toastData = JSON.parse(storedToastData);
-
                 addToast(toastData.message, toastData.status);
-
                 localStorage.removeItem('redirectToast');
-                
             } catch (error) {
                 console.error("Failed to parse redirectToast from localStorage:", error);
                 localStorage.removeItem('redirectToast');
@@ -32,58 +29,7 @@ export default function MainHome() {
         <>
             <div className="main-home-container">
                 <div className="main-upper-section-wrapper">
-                    <div className="personal-project-slider">
-                        <h2>프로젝트</h2>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>프로젝트 명</th>
-                                <th>프로젝트 기간</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td rowSpan="4" className="project-image-cell">
-                                    <img src={DoBanner} alt="프로젝트 배너" className="project-banner-img" />
-                                </td>
-                                <td className="project-info-cell">
-                                <div className="project-info-row">
-                                    <span className="project-info-value">2025.00.00 ~ 2025.00.00</span>
-                                </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="project-info-cell">
-                                <div className="project-info-row">
-                                    <span className="project-info-label">프로젝트 규모</span>
-                                    <span className="project-info-value">개인 프로젝트</span>
-                                </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="project-info-cell">
-                                <div className="project-info-row">
-                                    <span className="project-info-label">프로젝트 설명</span>
-                                    <span className="project-description">어쨋든 블로그 작업 프로젝트</span>
-                                </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="project-info-cell">
-                                <div className="project-info-row">
-                                    <span className="project-info-label">프로젝트 스택</span>
-                                    <div className="stack-tags">
-                                    <span className="stack-tag">React</span>
-                                    <span className="stack-tag">Spring Boot</span>
-                                    <span className="stack-tag">Python</span>
-                                    <span className="stack-tag">PostgreSQL</span>
-                                    </div>
-                                </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div> 
+                    <ProjectSlider />
                 </div>
                 <div className="main-middle-section-wrapper">
                     <div className="recently-posted-section">

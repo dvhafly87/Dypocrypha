@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
+import { useAuth } from '../context/AuthContext.jsx';
 import '../css/Toast.css';
 
 const ToastContext = createContext();
@@ -8,8 +9,9 @@ export const useToast = () => useContext(ToastContext);
 
 // 1. Toast UI 렌더링 컴포넌트
 const ToastContainer = ({ toasts, removeToast }) => {
+    const { isLogined } = useAuth();
     return (
-        <div className="toast-container"> 
+        <div className="toast-container" style={{top: isLogined ? '111px' : '90px'}}> 
             {toasts.map(toast => (
                 <div key={toast.id} className={`toast toast-${toast.type}`}>
                     <p className="toast-message">{toast.message}</p>

@@ -13,17 +13,11 @@ export default function ProfileContainer() {
     const { logout, isLogined } = useAuth(); 
     const navigate = useNavigate();
 
+    let toastData;
     const handleLogout = () => {
-      logout();
-      const toastData = {
-            status: 'success',
-            message: "로그아웃 되었습니다" 
-        };
-        localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/');  
+    logout();
     };
 
-   // 오직 로그인 상태 확인 로직만 포함합니다.
     useEffect(() => {
        const profileInformationCalling = async () => {
             try {

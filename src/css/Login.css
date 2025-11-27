@@ -6,7 +6,7 @@
 
 .account-service-main-container {
     width: 100%;
-    min-height: 100vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -317,4 +317,44 @@
     .feature-item {
         font-size: 0.875rem;
     }
+}
+
+/* 비밀번호 input wrapper */
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    padding-right: 3rem; /* 버튼 공간 확보 */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+.password-toggle-btn:hover {
+    background: rgba(46, 125, 50, 0.1);
+    color: #2e7d32;
+}
+
+.password-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.password-toggle-btn svg {
+    width: 20px;
+    height: 20px;
 }

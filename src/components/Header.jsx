@@ -58,11 +58,14 @@ export default function Header() {
             <img src={SIC} alt="검색" className="search-icon" />
           </button>
         </form>
+        
+        {/* 데스크톱 로그인/프로필 (모바일에서 CSS로 숨김) */}
         {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
+      
       <nav className="sub-nav" style={{ top: isLogined ? '111px' : '90px' }}>
         <Link to="/">홈</Link>
-        <Link to="/test">게시판</Link>
+        <Link to="/board">게시판</Link>
         <Link to="/test2">프로젝트</Link>
         <Link to="/test3">아카이브</Link>
         <Link to="/test4">AI</Link>
@@ -86,6 +89,21 @@ export default function Header() {
           </button>
         </div>
 
+        {/* 모바일 로그인/프로필 영역 */}
+        <div className="sidebar-auth-section">
+          {isLogined ? (
+            <ProfileContainer />
+          ) : (
+            <Link 
+              className="move-agreeAndlogin sidebar-login" 
+              to="/login"
+              onClick={toggleSidebar}
+            >
+              로그인
+            </Link>
+          )}
+        </div>
+
         {/* 사이드바 검색창 */}
         <form className="search-box mobile-search">
           <input type="text" placeholder="키워드 입력" name="search" />
@@ -94,10 +112,10 @@ export default function Header() {
           </button>
         </form>
 
-        {/* 추가 메뉴 항목들 */}
+        {/* 메뉴 항목들 */}
         <nav className="sidebar-nav">
           <Link to="/" onClick={toggleSidebar}>홈</Link>
-          <Link to="/test" onClick={toggleSidebar}>게시판</Link>
+          <Link to="/board" onClick={toggleSidebar}>게시판</Link>
           <Link to="/test2" onClick={toggleSidebar}>프로젝트</Link>
           <Link to="/test3" onClick={toggleSidebar}>아카이브</Link>
           <Link to="/test4" onClick={toggleSidebar}>AI</Link>
@@ -105,4 +123,4 @@ export default function Header() {
       </aside>
     </>
   );
-} 
+}

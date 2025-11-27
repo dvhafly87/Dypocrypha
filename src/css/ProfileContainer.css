@@ -82,6 +82,19 @@
   color: #2ECC71;
 }
 
+/* ========== 사이드바 인증 영역 ========== */
+.sidebar-auth-section {
+  margin-bottom: 1.5rem;
+}
+
+/* 사이드바 로그인 버튼 */
+.sidebar-login {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.9rem 1rem;
+}
+
 /* ========== 태블릿 (900px 이하) ========== */
 @media (max-width: 900px) {
   .profile-container {
@@ -98,30 +111,35 @@
     font-size: 0.95rem;
   }
 
-  .profile-mypage-link {
+  .profile-mypage-link,
+  .profile-logout-btn {
     font-size: 0.8rem;
-    padding: 0.15rem 0.5rem;
+    padding: 0.3rem 0.6rem;
   }
 }
 
 /* ========== 모바일 (600px 이하) ========== */
 @media (max-width: 600px) {
-  .profile-container {
-    padding: 0.3rem 0.6rem;
-    gap: 0.6rem;
+  /* 사이드바 내부 프로필 컨테이너 스타일 */
+  .mobile-sidebar .profile-container {
+    width: 100%;
+    padding: 1rem;
+    gap: 1rem;
+    margin: 0;
   }
 
-  .profile-image-wrapper {
-    width: 40px;
-    height: 40px;
+  .mobile-sidebar .profile-image-wrapper {
+    width: 60px;
+    height: 60px;
   }
 
-  .profile-nickname {
-    font-size: 0.9rem;
+  .mobile-sidebar .profile-nickname {
+    font-size: 1rem;
   }
 
-  .profile-mypage-link {
-    font-size: 0.75rem;
-    padding: 0.15rem 0.45rem;
+  .mobile-sidebar .profile-mypage-link,
+  .mobile-sidebar .profile-logout-btn {
+    font-size: 0.5rem;
+    padding: 0.4rem 0.8rem;
   }
 }

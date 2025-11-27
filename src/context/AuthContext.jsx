@@ -50,6 +50,8 @@ export const AuthProvider = ({ children }) => {
 
             if(result.logoutSuccess){
                 setIsLogined(false);
+                addToast("로그아웃 되었습니다", "success");
+                navigate('/');  
             }
         } catch (error) {
             // 네트워크 오류가 나더라도 클라이언트 측에서는 로그아웃 처리 (강제 로그아웃)

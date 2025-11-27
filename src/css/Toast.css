@@ -2,7 +2,7 @@
 .toast-container {
     /* 화면 우측 상단에 고정 */
     position: fixed;
-    top: 20px; 
+    /* top: 90px;  */
     right: 20px; 
     
     /* 다른 요소 위에 표시되도록 z-index를 높게 설정 */

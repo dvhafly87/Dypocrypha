@@ -6,7 +6,7 @@ import Header from './components/Header.jsx'
 import MainHome from './components/MainHome.jsx'
 import Login from './components/AccountService.jsx'
 import Register from './components/Register.jsx'
-import TestComponents from './components/test.jsx'
+import Board from './components/Board.jsx'
 import TestComponents2 from './components/test2.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 
@@ -26,7 +26,7 @@ export default function App() {
                   <Route path="/" element={<MainHome />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/test" element={<TestComponents />} />
+                  <Route path="/board" element={<Board />} />
                   <Route path="/test2" element={<TestComponents2 />} />
                   <Route path="/resetPassword" element={<ResetPassword />} />
                   <Route path="/token" element={<TokenWrapper />} />
