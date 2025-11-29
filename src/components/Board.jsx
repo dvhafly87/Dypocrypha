@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import {useToast} from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,8 @@ import '../css/BoardMain.css';
 
 export default function BoardMain() {
   const navigate = useNavigate();
+  const [boardList, setBoardList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { addToast } = useToast();
   const { isLogined } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +19,49 @@ export default function BoardMain() {
   const [boardDescription, setBoardDescription] = useState('');
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [boardPassword, setBoardPassword] = useState('');
+
+  useEffect(() => {
+    const boardListCalling = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if(!response.ok){
+          const toastData = {
+            status: 'warning',
+            message: "서버 통신 불가"
+          };
+          localStorage.setItem('redirectToast', JSON.stringify(toastData));
+          navigate('/');
+          return;
+        }
+
+        const result = await response.json();
+
+        if(result.boardListresult){
+          setBoardList(result.boardList);
+        } else {
+          const toastData = {
+            status: 'warning',
+            message: "게시판 조회 에러"
+          };
+          localStorage.setItem('redirectToast', JSON.stringify(toastData));
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('게시판 목록 조회 실패:', error);
+        addToast("게시판 목록을 불러오는데 실패했습니다", "error");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    boardListCalling();
+  }, [navigate, addToast]);
 
   const addNewBoard = () => {
     if(!isLogined) {
@@ -61,12 +106,22 @@ export default function BoardMain() {
     const result = await response.json();
 
     if(result.boardStatus){
-
+      addToast(result.boardMessage, "success");
+      closeModal();
+      // 게시판 목록 새로고침
+      const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const listResult = await listResponse.json();
+      if(listResult.boardListresult){
+        setBoardList(listResult.boardList);
+      }
     } else {
       addToast(result.boardMessage, "warning");
+      closeModal();
     }
-    
-    closeModal();
   };
 
   return (
@@ -89,12 +144,53 @@ export default function BoardMain() {
               + 새 게시판 생성
             </button>
         </div>
+        
         <div className="sidebar-boardList">
-            게시판 리스트 영역
+          {isLoading ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p className="loading-text">게시판 목록을 불러오는 중...</p>
+            </div>
+          ) : boardList.length > 0 ? (
+            boardList.map((board) => (
+              <div 
+                key={board.boardPriId} 
+                className="board-list-item"
+                onClick={() => navigate(`/board/${board.boardPriId}`)}
+              >
+                <div className="board-list-content">
+                  <div className="board-list-header">
+                    {board.boardProtected && <span className="lock-icon">🔒</span>}
+                    <span className="board-name">{board.boardName}</span>
+                  </div>
+                  {board.boardDescription && (
+                    <span className="board-description">{board.boardDescription}</span>
+                  )}
+                  <span className="board-meta">
+                    by {board.boardCreator}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-board-container">
+              <div className="no-board-icon">📋</div>
+              <p className="no-board-message">
+                등록된 게시판이 없습니다
+              </p>
+              <p className="no-board-submessage">
+                새 게시판을 생성해 보세요!
+              </p>
+            </div>
+          )}
         </div>
       </div>
+      
       <div className="board-main-container">
-          asdfdsaf
+        <div className="board-main-placeholder">
+          <h3>게시판을 선택해주세요</h3>
+          <p>왼쪽 사이드바에서 게시판을 선택하거나 새로운 게시판을 생성하세요.</p>
+        </div>
       </div>
 
       {/* 모달 */}
