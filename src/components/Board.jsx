@@ -190,13 +190,13 @@ export default function BoardMain() {
         setBoardList(listResult.boardList);
       }
     } else {
-      const toastData = {
-        status: 'warning',
-        message: result.deleteMessage
-      };
-      localStorage.setItem('redirectToast', JSON.stringify(toastData));
-      navigate('/');
-      return;
+      // const toastData = {
+      //   status: 'warning',
+      //   message: result.deleteMessage
+      // };
+      // localStorage.setItem('redirectToast', JSON.stringify(toastData));
+      // navigate('/');
+      addToast(result.deleteMessage, "warning");
     }
   };
 
