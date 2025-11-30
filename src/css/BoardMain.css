@@ -125,8 +125,8 @@
 .sidebar-boardList {
     padding: 1.5rem 2rem;
     flex-grow: 1;
-    overflow-y: auto;
-    max-height: calc(100vh - 400px);
+    overflow-y: scroll;
+    max-height: calc(90vh - 400px);
 }
 
 /* 스크롤바 스타일링 */
@@ -209,8 +209,15 @@
 }
 
 .lock-icon {
-    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    color: #757575;
+}
+
+.lock-icon svg {
+    display: block;
 }
 
 .board-name {
@@ -478,3 +485,101 @@
         transform: translateY(0);
     }
 }
+
+/* --- 게시판 리스트 헤더 수정 --- */
+.board-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.board-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+/* --- 삭제 버튼 --- */
+.delete-board-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.delete-board-button:hover {
+    opacity: 1;
+    background-color: #ffebee;
+    color: #f44336;
+    transform: scale(1.1);
+}
+
+.delete-board-button svg {
+    display: block;
+}
+
+/* --- 삭제 모달 스타일 --- */
+.delete-modal-header {
+    background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+}
+
+.delete-warning {
+    text-align: center;
+    padding: 1rem;
+    background-color: #fff3e0;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #ffb74d;
+}
+
+.warning-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.warning-message {
+    color: #d84315;
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.5;
+}
+
+.warning-message strong {
+    color: #bf360c;
+}
+
+.warning-submessage {
+    color: #e64a19;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.btn-delete {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #d32f2f;
+    transform: translateY(-1px);
+}
+
