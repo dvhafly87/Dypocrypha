@@ -196,6 +196,13 @@
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
 }
 
+.item-activate {
+    border-color: #4caf50;
+    background-color: #f9fff9;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+}
+
 .board-list-content {
     display: flex;
     flex-direction: column;

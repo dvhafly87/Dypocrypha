@@ -1,0 +1,443 @@
+/* --- 게시판 컨테이너 --- */
+.board-post-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- 로딩 상태 --- */
+.board-post-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 1rem;
+}
+
+.board-post-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.board-post-loading-text {
+    color: #666;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* --- 헤더 영역 --- */
+.board-post-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
+    border-radius: 12px 12px 0 0;
+    margin: -2rem -2rem 0 -2rem;
+}
+
+.board-post-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.board-post-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212121;
+    margin: 0;
+}
+
+.board-post-meta {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.board-post-header-right {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-write-post {
+    padding: 0.75rem 1.5rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-write-post:hover {
+    background-color: #388e3c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-write-post svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* --- 게시글 목록 영역 --- */
+.board-post-list-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 2rem;
+}
+
+/* 스크롤바 스타일 */
+.board-post-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.board-post-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.board-post-list-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.board-post-list-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* --- 게시글 테이블 --- */
+.board-post-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.board-post-table-header {
+    background-color: #f5f5f5;
+    border-top: 2px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.board-post-table-header th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    color: #424242;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+.board-post-table-header th:first-child {
+    text-align: center;
+    width: 80px;
+}
+
+.board-post-table-header th:nth-child(2) {
+    width: auto;
+}
+
+.board-post-table-header th:nth-child(3) {
+    width: 150px;
+}
+
+.board-post-table-header th:nth-child(4) {
+    width: 180px;
+}
+
+.board-post-table-header th:nth-child(5) {
+    text-align: center;
+    width: 80px;
+}
+
+.board-post-table-header th:nth-child(6) {
+    text-align: center;
+    width: 80px;
+}
+
+/* --- 게시글 행 --- */
+.board-post-row {
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.board-post-row:hover {
+    background-color: #f9fff9;
+}
+
+.board-post-row td {
+    padding: 1.25rem 0.75rem;
+    color: #424242;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+/* 고정 게시글 스타일 */
+.board-post-row-pinned {
+    background-color: #fffde7;
+    border-bottom: 1px solid #fff9c4;
+}
+
+.board-post-row-pinned:hover {
+    background-color: #fff9c4;
+}
+
+/* 번호 열 */
+.board-post-number {
+    text-align: center;
+    color: #757575;
+    font-weight: 500;
+}
+
+.board-post-notice-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* 제목 열 */
+.board-post-title-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.board-post-title-text {
+    color: #212121;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.board-post-row:hover .board-post-title-text {
+    color: #4caf50;
+}
+
+.board-post-image-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #2196f3;
+    font-size: 0.85rem;
+}
+
+/* 작성자 열 */
+.board-post-author {
+    color: #616161;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 작성일 열 */
+.board-post-date {
+    color: #757575;
+    font-size: 0.85rem;
+}
+
+/* 조회수 열 */
+.board-post-views {
+    text-align: center;
+    color: #757575;
+    font-weight: 500;
+}
+
+/* 이미지 개수 열 */
+.board-post-images {
+    text-align: center;
+    color: #2196f3;
+    font-weight: 500;
+}
+
+/* --- 빈 게시글 상태 --- */
+.board-post-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+.board-post-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.4;
+}
+
+.board-post-empty-title {
+    color: #424242;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+}
+
+.board-post-empty-message {
+    color: #757575;
+    font-size: 0.95rem;
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+}
+
+.btn-write-first {
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+}
+
+.btn-write-first:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.35);
+}
+
+/* --- 하단 버튼 영역 --- */
+.board-post-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-back {
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    color: #616161;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-back:hover {
+    background-color: #f5f5f5;
+    border-color: #bdbdbd;
+    color: #424242;
+}
+
+/* --- 페이지네이션 (미래 확장용) --- */
+.board-post-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pagination-button {
+    padding: 0.5rem 0.75rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    color: #616161;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-button:hover:not(.pagination-button-active) {
+    background-color: #f5f5f5;
+    border-color: #bdbdbd;
+}
+
+.pagination-button-active {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+    font-weight: 600;
+}
+
+/* --- 반응형 디자인 --- */
+@media (max-width: 768px) {
+    .board-post-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .board-post-header-right {
+        justify-content: flex-end;
+    }
+
+    .board-post-table-header th:nth-child(4),
+    .board-post-date {
+        display: none;
+    }
+
+    .board-post-table-header th:nth-child(3) {
+        width: 100px;
+    }
+
+    .board-post-row td {
+        padding: 1rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-write-post,
+    .btn-back {
+        font-size: 0.85rem;
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+/* --- 애니메이션 --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.board-post-row {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.board-post-row:nth-child(even) {
+    animation-delay: 0.05s;
+}
+
+.board-post-row:nth-child(odd) {
+    animation-delay: 0.1s;
+}

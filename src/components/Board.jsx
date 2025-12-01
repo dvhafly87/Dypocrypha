@@ -2,6 +2,8 @@ import React, { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import {useToast} from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import BoardPost from '../components/Board-Content.jsx';
+import BoardAccessWrapper  from '../Accesswrapper/BoardAccessWrapper.jsx';
 
 import API from '../config/apiConfig.js';
 import SIC from '../img/sic.jpg';
@@ -10,6 +12,9 @@ import '../css/BoardMain.css';
 
 export default function BoardMain() {
   const navigate = useNavigate();
+  const [boardChoice, setBoardChoice] = useState();
+  const [boardChoiceName, setBoardChoiceName] = useState();
+  const [boardChoiceProtect, setBoardChoiceProtect] = useState(false);
   const [boardList, setBoardList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { addToast } = useToast();
@@ -147,6 +152,22 @@ export default function BoardMain() {
     setDeletePassword('');
   };
 
+  const boardChoicer = (id, name, ptd) => {
+    if (id === boardChoice) { 
+      setBoardChoice(null);
+    } else {
+      setBoardChoice(id);
+    }
+
+    if (name === boardChoiceName) { 
+      setBoardChoiceName(null);
+    } else {
+      setBoardChoiceName(name);
+    }
+
+    setBoardChoiceProtect(ptd);
+  }
+
   // 게시판 삭제 처리
   const handleDelete = async (e) => {
     e.preventDefault();
@@ -179,7 +200,6 @@ export default function BoardMain() {
     if(result.deleteStatus){
       addToast(result.deleteMessage, "success");
       closeDeleteModal();
-      // 게시판 목록 새로고침
       const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
         method: 'POST',
         credentials: 'include',
@@ -190,13 +210,8 @@ export default function BoardMain() {
         setBoardList(listResult.boardList);
       }
     } else {
-      // const toastData = {
-      //   status: 'warning',
-      //   message: result.deleteMessage
-      // };
-      // localStorage.setItem('redirectToast', JSON.stringify(toastData));
-      // navigate('/');
       addToast(result.deleteMessage, "warning");
+      return;
     }
   };
 
@@ -231,8 +246,8 @@ export default function BoardMain() {
             boardList.map((board) => (
               <div 
                 key={board.boardPriId} 
-                className="board-list-item"
-                onClick={() => navigate(`/board/${board.boardPriId}`)}
+                className={boardChoice == board.boardPriId ? "board-list-item item-activate" : "board-list-item"}
+                onClick={() => boardChoicer(board.boardPriId, board.boardName, board.boardProtected)}
               >
                 <div className="board-list-content">
                   <div className="board-list-header">
@@ -306,10 +321,35 @@ export default function BoardMain() {
       </div>
       
       <div className="board-main-container">
-        <div className="board-main-placeholder">
-          <h3>게시판을 선택해주세요</h3>
-          <p>왼쪽 사이드바에서 게시판을 선택하거나 새로운 게시판을 생성하세요.</p>
-        </div>
+        {boardChoice == null 
+        ? 
+          <>
+            <div className="board-main-placeholder">
+              <h3>게시판을 선택해주세요</h3>
+              <p>왼쪽 사이드바에서 게시판을 선택하거나 새로운 게시판을 생성하세요.</p>
+            </div>
+          </> 
+          : 
+          boardChoiceProtect ? 
+          <>
+            <div>
+              <BoardAccessWrapper 
+                  boardId={boardChoice} 
+                  boardName={boardChoiceName}
+              />
+            </div>
+          </>
+          :
+            <>
+              <div>
+                <BoardPost 
+                    boardId={boardChoice} 
+                    boardName={boardChoiceName}
+                />
+              </div>
+            </>
+          
+          }
       </div>
 
       {/* 생성 모달 */}
