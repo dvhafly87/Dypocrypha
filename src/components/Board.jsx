@@ -320,7 +320,7 @@ export default function BoardMain() {
         </div>
       </div>
       
-      <div className="board-main-container">
+      <div className={boardChoice == null ? "board-main-container" : "board-main-container-choice"}>
         {boardChoice == null 
         ? 
           <>
@@ -348,7 +348,6 @@ export default function BoardMain() {
                 />
               </div>
             </>
-          
           }
       </div>
 

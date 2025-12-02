@@ -281,6 +281,7 @@
 
 /* --- 메인 콘텐츠 컨테이너 --- */
 .board-main-container {
+    box-sizing: border-box;
     flex: 8;
     background-color: #ffffff;
     border: solid 1px #e0e0e0;
@@ -291,6 +292,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* --- 메인 콘텐츠 컨테이너 --- */
+.board-main-container-choice{
+    flex: 8;
+    background-color: #ffffff;
+    border: solid 1px #e0e0e0;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: #333;
+    display: flex
 }
 
 .board-main-placeholder {
