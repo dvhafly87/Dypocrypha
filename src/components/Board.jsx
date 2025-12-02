@@ -11,6 +11,9 @@ import SIC from '../img/sic.jpg';
 import '../css/BoardMain.css';
 
 export default function BoardMain() {
+  const BOARD_ID_KEY = 'selectedBoardId';
+  const BOARD_NAME_KEY = 'selectedBoardName';
+  const BOARD_PTD_KEY = 'selectedBoardPtd';
   const navigate = useNavigate();
   const [boardChoice, setBoardChoice] = useState();
   const [boardChoiceName, setBoardChoiceName] = useState();
@@ -29,6 +32,18 @@ export default function BoardMain() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
+
+  useEffect(() => {
+    const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
+    const savedBoardName = localStorage.getItem(BOARD_NAME_KEY);
+    const savedBoardPtd = localStorage.getItem(BOARD_PTD_KEY);
+  
+    if (savedBoardId) {
+      setBoardChoice(parseInt(savedBoardId, 10));
+      setBoardChoiceName(savedBoardName);
+      setBoardChoiceProtect(savedBoardPtd ? parseInt(savedBoardPtd, 10) : false);
+    }
+  }, []);
 
   useEffect(() => {
     const boardListCalling = async () => {
@@ -153,20 +168,34 @@ export default function BoardMain() {
   };
 
   const boardChoicer = (id, name, ptd) => {
+    let newId, newName, newPtd;
+
     if (id === boardChoice) { 
-      setBoardChoice(null);
+      newId = null;
+      newName = null;
+      newPtd = null;
     } else {
-      setBoardChoice(id);
+      newId = id;
+      newName = name;
+      newPtd = ptd;
     }
 
-    if (name === boardChoiceName) { 
-      setBoardChoiceName(null);
-    } else {
-      setBoardChoiceName(name);
-    }
+    // 상태 업데이트 (localStorage가 아닌 계산된 값 사용)
+    setBoardChoice(newId);
+    setBoardChoiceName(newName);
+    setBoardChoiceProtect(newPtd); 
 
-    setBoardChoiceProtect(ptd);
-  }
+    // localStorage 업데이트
+    if (newId !== null) {
+      localStorage.setItem(BOARD_ID_KEY, newId.toString());
+      localStorage.setItem(BOARD_NAME_KEY, newName);
+      localStorage.setItem(BOARD_PTD_KEY, newPtd.toString());
+    } else {
+      localStorage.removeItem(BOARD_ID_KEY);
+      localStorage.removeItem(BOARD_NAME_KEY);
+      localStorage.removeItem(BOARD_PTD_KEY);
+    }
+  };
 
   // 게시판 삭제 처리
   const handleDelete = async (e) => {
