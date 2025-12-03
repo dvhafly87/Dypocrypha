@@ -11,9 +11,6 @@ import Doge from '../img/doge.jpeg';
 export default function ProfileContainer() {
     const [userNickname, setUserNickname] = useState('');
     const { logout, isLogined } = useAuth(); 
-    const navigate = useNavigate();
-
-    let toastData;
     const handleLogout = () => {
     logout();
     };

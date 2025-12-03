@@ -153,6 +153,7 @@
   box-sizing: border-box;
   position: sticky;
   z-index: 100;
+  top: 90px;
 }
 
 .sub-nav a {
@@ -167,9 +168,8 @@
   color: #2ECC71;
 }
 
-/* ========== 사이드바 (기본 숨김 - 모바일에서만 표시) ========== */
+/* ========== 사이드바 오버레이 (항상 존재하지만 숨김) ========== */
 .sidebar-overlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -177,31 +177,53 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 98;
-  animation: fadeIn 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  pointer-events: none;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
+/* ========== 모바일 사이드바 (항상 존재하지만 화면 밖에 위치) ========== */
 .mobile-sidebar {
-  display: none;
   position: fixed;
   top: 0;
-  left: -350px;
+  left: -320px;
   width: 280px;
   height: 100%;
   background-color: #ffffff;
   z-index: 99;
   padding: 1.5rem;
-  transition: left 0.3s ease;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-sidebar.open {
   left: 0;
+}
+
+/* 스크롤바 스타일 */
+.mobile-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.mobile-sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.mobile-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .sidebar-header {
@@ -285,6 +307,46 @@
   .sub-nav {
     padding: 1rem 1.5rem;
     gap: 1.5rem;
+    top: 97px;
+  }
+}
+
+/* ========== 태블릿 세로모드 (601-773px) ========== */
+@media (min-width: 601px) and (max-width: 773px) {
+  .main-header {
+    padding: 0.85rem 1.4rem;
+  }
+
+  .brand-box img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-box a {
+    font-size: 1.3rem;
+  }
+
+  .desktop-search {
+    max-width: 220px;
+  }
+
+  .search-box input {
+    font-size: 0.85rem;
+  }
+
+  .move-agreeAndlogin {
+    padding: 0.65rem 1.1rem;
+    font-size: 0.88rem;
+  }
+
+  .sub-nav {
+    padding: 0.9rem 1.4rem;
+    gap: 1.3rem;
+    top: 95px;
+  }
+
+  .sub-nav a {
+    font-size: 0.95rem;
   }
 }
 
@@ -293,13 +355,15 @@
   .main-header {
     padding: 0.8rem 1rem;
   }
+
   .brand-box {
     margin-right: auto;
     margin-left: 100px;
   }
+
   .brand-box img {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
 
   .brand-box a {
@@ -324,20 +388,60 @@
   /* 서브 네비게이션 숨김 */
   .sub-nav {
     display: none;
-  }f
-
-  /* 사이드바 활성화 */
-  .mobile-sidebar {
-    display: block;
   }
 
-  .sidebar-overlay {
-    display: block;
-  }
-
-  /* ========== 핵심: 모바일에서 로그인/프로필 숨김 ========== */
+  /* 모바일에서 로그인/프로필 숨김 */
   .main-header .move-agreeAndlogin,
   .main-header .profile-container {
-    display:none !important;
+    display: none !important;
+  }
+}
+
+/* ========== 초소형 모바일 (400px 이하) ========== */
+@media (max-width: 400px) {
+  .main-header {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .brand-box {
+    margin-left: 45px;
+  }
+
+  .brand-box img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-box a {
+    font-size: 1.1rem;
+  }
+
+  .mobile-sidebar {
+    width: 260px;
+    left: -300px;
+    padding: 1.2rem;
+  }
+
+  .sidebar-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .sidebar-nav a {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ========== body 스크롤 방지 (사이드바 열릴 때) ========== */
+body.sidebar-open {
+  overflow: hidden;
+}
+
+/* ========== 접근성 개선 ========== */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-sidebar,
+  .sidebar-overlay,
+  .hamburger-btn span {
+    transition: none;
   }
 }

@@ -7,12 +7,27 @@ import '../css/BoardPost.css';
 export default function BoardPost({ boardId, boardName }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   const [isLoading, setIsLoading] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   let postsPerPage = 6;
- 
 
+  postsPerPage = isMobile ? 5 : 6;
+
+  const minSwipeDistance = 50;
+ 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 600);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   useEffect(() => {
     const boardPostCalling = async () => {
       try {
@@ -74,6 +89,30 @@ export default function BoardPost({ boardId, boardName }) {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
+    }
+    if (isRightSwipe && currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
   const handlePostClick = (postId) => {
     navigate(`/board/${boardId}/post/${postId}`);
   };
@@ -133,7 +172,11 @@ export default function BoardPost({ boardId, boardName }) {
       </div>
 
       {/* 게시글 목록 */}
-      <div className="board-post-list-container">
+      <div 
+      className="board-post-list-container"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}>
         <table className="board-post-table">
           <thead className="board-post-table-header">
             <tr>

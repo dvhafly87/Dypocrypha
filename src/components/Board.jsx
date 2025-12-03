@@ -195,6 +195,15 @@ export default function BoardMain() {
       localStorage.removeItem(BOARD_NAME_KEY);
       localStorage.removeItem(BOARD_PTD_KEY);
     }
+
+    if (window.innerWidth <= 600 && id !== null) {
+      setTimeout(() => {
+        document.querySelector('.board-main-container-choice')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
   };
 
   // 게시판 삭제 처리

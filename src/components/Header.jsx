@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileContainer from '../components/ProfileContainer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -10,27 +10,53 @@ import SIC from '../img/sic.jpg';
 
 export default function Header() {
   const { isLogined } = useAuth();
-
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ESC 키로 사이드바 닫기
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape' && isSidebarOpen) {
-      setIsSidebarOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
 
-  // 컴포넌트 마운트 시 이벤트 리스너 등록
-  React.useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSidebarOpen]);
+
+  // 사이드바 열릴 때 body 스크롤 방지
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isSidebarOpen]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  const topValue = windowWidth <= 900
+    ? (isLogined ? '97px' : '97px')
+    : (isLogined ? '111px' : '');
 
   return (
     <>
@@ -40,6 +66,7 @@ export default function Header() {
           className="hamburger-btn" 
           onClick={toggleSidebar}
           aria-label="메뉴 열기"
+          aria-expanded={isSidebarOpen}
         >
           <span></span>
           <span></span>
@@ -47,7 +74,7 @@ export default function Header() {
         </button>
 
         <div className="brand-box">
-          <img src={DOGE} alt="임시 이미지" />
+          <img src={DOGE} alt="Dypocrypha 로고" />
           <Link to="/">Dypocrypha</Link>
         </div>
         
@@ -63,7 +90,7 @@ export default function Header() {
         {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
       
-      <nav className="sub-nav" style={{ top: isLogined ? '111px' : '90px' }}>
+      <nav className="sub-nav" style={{ top: topValue }}>
         <Link to="/">홈</Link>
         <Link to="/board">게시판</Link>
         <Link to="/test2">프로젝트</Link>
@@ -71,22 +98,20 @@ export default function Header() {
         <Link to="/test4">AI</Link>
       </nav>
 
-      {/* 사이드바 오버레이 */}
-      {isSidebarOpen && (
-        <div className="sidebar-overlay" onClick={toggleSidebar}></div>
-      )}
+      {/* 사이드바 오버레이 - 항상 렌더링하되 클래스로 제어 */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} 
+        onClick={closeSidebar}
+        aria-hidden={!isSidebarOpen}
+      ></div>
 
-      {/* 모바일 사이드바 */}
-      <aside className={`mobile-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+      {/* 모바일 사이드바 - 항상 렌더링하되 클래스로 제어 */}
+      <aside 
+        className={`mobile-sidebar ${isSidebarOpen ? 'open' : ''}`}
+        aria-hidden={!isSidebarOpen}
+      >
         <div className="sidebar-header">
-          <h2>메뉴</h2>
-          <button 
-            className="close-btn" 
-            onClick={toggleSidebar}
-            aria-label="메뉴 닫기"
-          >
-            ✕
-          </button>
+        
         </div>
 
         {/* 모바일 로그인/프로필 영역 */}
@@ -97,7 +122,7 @@ export default function Header() {
             <Link 
               className="move-agreeAndlogin sidebar-login" 
               to="/login"
-              onClick={toggleSidebar}
+              onClick={closeSidebar}
             >
               로그인
             </Link>
@@ -114,11 +139,11 @@ export default function Header() {
 
         {/* 메뉴 항목들 */}
         <nav className="sidebar-nav">
-          <Link to="/" onClick={toggleSidebar}>홈</Link>
-          <Link to="/board" onClick={toggleSidebar}>게시판</Link>
-          <Link to="/test2" onClick={toggleSidebar}>프로젝트</Link>
-          <Link to="/test3" onClick={toggleSidebar}>아카이브</Link>
-          <Link to="/test4" onClick={toggleSidebar}>AI</Link>
+          <Link to="/" onClick={closeSidebar}>홈</Link>
+          <Link to="/board" onClick={closeSidebar}>게시판</Link>
+          <Link to="/test2" onClick={closeSidebar}>프로젝트</Link>
+          <Link to="/test3" onClick={closeSidebar}>아카이브</Link>
+          <Link to="/test4" onClick={closeSidebar}>AI</Link>
         </nav>
       </aside>
     </>
