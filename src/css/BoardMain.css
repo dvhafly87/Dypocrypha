@@ -968,27 +968,36 @@
         font-size: 0.85rem;
         padding: 0.6rem;
     }
-
     /* 게시판 리스트 스크롤 높이 조정 */
     .sidebar-boardList {
-        padding: 0.8rem 1.25rem;
+        padding: 0.8rem 1.25rem 0.8rem 1.25rem;
         max-height: 200px;
         flex-direction: row;
-        display: flex
-;
-        /* justify-content: space-between; */
-        gap: 30px;
-        overflow-x: scroll;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
+    }
+
+    .sidebar-boardList::-webkit-scrollbar {
+        display: none;
     }
 
     /* 게시판 리스트 아이템 간소화 */
     .board-list-item {
-        max-width:10vw;
-        padding: 0.5rem;
-        margin-bottom: 0.5rem;
+        position: relative;
+        min-width: calc(33.333% - 8px);
+        max-width: calc(33.333% - 8px);
+        flex-shrink: 0;
+        padding: 0.75rem 0.5rem;
+        margin-bottom: 0;
         border-radius: 10px;
+        display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        text-align: center;
     }
 
     .board-list-item:hover {
