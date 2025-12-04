@@ -78,8 +78,12 @@ export default function BoardMain() {
           navigate('/');
         }
       } catch (error) {
-        console.error('게시판 목록 조회 실패:', error);
-        addToast("게시판 목록을 불러오는데 실패했습니다", "error");
+        const toastData = {
+          status: 'warning',
+          message: "게시판 조회 불가"
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate('/');
       } finally {
         setIsLoading(false);
       }
