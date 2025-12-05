@@ -37,7 +37,7 @@ export default function BoardMain() {
     const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
     const savedBoardName = localStorage.getItem(BOARD_NAME_KEY);
     const savedBoardPtd = localStorage.getItem(BOARD_PTD_KEY);
-  
+   
     if (savedBoardId) {
       setBoardChoice(parseInt(savedBoardId, 10));
       setBoardChoiceName(savedBoardName);

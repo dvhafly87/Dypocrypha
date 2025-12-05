@@ -9,7 +9,8 @@ import Register from './components/Register.jsx'
 import Board from './components/Board.jsx'
 import TestComponents2 from './components/test2.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
-import BoardWriter from './util/BoardWriter.jsx';
+import BoardWriter from './util/BoardWriterFileUpload.jsx';
+import BoardPost from './components/Board-Post-Content.jsx'
 
 
 import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
@@ -32,6 +33,7 @@ export default function App() {
                   <Route path="/resetPassword" element={<ResetPassword />} />
                   <Route path="/token" element={<TokenWrapper />} />
                   <Route path="/boardwriter/:boardId" element={<BoardWriter />} />
+                  <Route path="/boardPost/:boardId/:postId" element={<BoardPost />} />
                 </Routes>
             </AuthProvider>
           </ToastProvider>

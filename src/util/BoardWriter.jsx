@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import '../css/BoardWriter.css';
 
+import API from '../config/apiConfig.js';
+
 function Base64UploadAdapter(editor) {
   editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
     return {
@@ -43,32 +45,40 @@ export default function BoardWrite() {
       alert("내용을 입력해주세요.");
       return;
     }
+    const MAX_IMAGES = 20;
+
+    // <img ...> 태그를 찾는 정규 표현식 (Base64 인코딩된 이미지 포함)
+    const imageTagRegex = /<img\b[^>]*>/gi;
+    const imageTags = content.match(imageTagRegex);
+    const imageCount = imageTags ? imageTags.length : 0;
+
+    if (imageCount > MAX_IMAGES) {
+      alert(`이미지는 최대 ${MAX_IMAGES}개까지만 등록할 수 있습니다. 현재: ${imageCount}개`);
+      return; // 등록 프로세스를 중단합니다.
+    }
 
     setIsSubmitting(true);
-
+    
     try {
       const postData = {
-        title: title.trim(),
-        content: content,
-        boardId: boardId,
-        createdAt: new Date().toISOString()
+        boardInputtitle: title.trim(),
+        boardInputcontent: content,
+        boardInputId: boardId,
       };
 
       console.log("등록할 데이터:", postData);
       
-      // API 호출 예시
-      // const response = await fetch('/api/posts', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(postData)
-      // });
-      // 
-      // if (!response.ok) throw new Error('등록 실패');
+      const response = await fetch(`${API.API_BASE_URL}/board/postwrite`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+      });
       
       alert("게시글이 등록되었습니다!");
-      // navigate(`/board/${boardId}`);
+      navigate(-1);
     } catch (error) {
       console.error("등록 중 오류:", error);
       alert("게시글 등록 중 오류가 발생했습니다.");

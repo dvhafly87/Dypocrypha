@@ -114,7 +114,7 @@ export default function BoardPost({ boardId, boardName }) {
   };
 
   const handlePostClick = (postId) => {
-    navigate(`/board/${boardId}/post/${postId}`);
+    navigate(`/boardPost/${boardId}/${postId}`);
   };
 
   const handleWritePost = () => {
