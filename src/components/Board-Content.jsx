@@ -70,7 +70,12 @@ export default function BoardPost({ boardId, boardName }) {
         }
 
       } catch (error) {
-        addToast("게시판 목록을 불러오는데 실패했습니다", "error");
+        const toastData = {
+          status: 'error',
+          message: "게시판 목록을 불러오는데 실패했습니다"
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate('/');
       } finally {
         setIsLoading(false);
       }
