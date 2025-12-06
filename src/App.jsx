@@ -33,7 +33,7 @@ export default function App() {
                   <Route path="/resetPassword" element={<ResetPassword />} />
                   <Route path="/token" element={<TokenWrapper />} />
                   <Route path="/boardwriter/:boardId" element={<BoardWriter />} />
-                  <Route path="/boardPost/:boardId/:postId" element={<BoardPost />} />
+                  <Route path="/boardPost/:boardName/:boardId/:postId" element={<BoardPost />} />
                 </Routes>
             </AuthProvider>
           </ToastProvider>

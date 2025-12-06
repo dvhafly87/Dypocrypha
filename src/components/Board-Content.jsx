@@ -119,7 +119,7 @@ export default function BoardPost({ boardId, boardName }) {
   };
 
   const handlePostClick = (postId) => {
-    navigate(`/boardPost/${boardId}/${postId}`);
+    navigate(`/boardPost/${boardName}/${boardId}/${postId}`);
   };
 
   const handleWritePost = () => {
@@ -224,7 +224,7 @@ export default function BoardPost({ boardId, boardName }) {
                         )}
                       </div>
                     </td>
-                    <td className="board-post-author">{post.postAuthor}</td>
+                    <td className="board-post-author">{post.postAnonymous != null ? post.postAnonymous : post.postAuthor}</td>
                     <td className="board-post-date">{formatDate(post.createdAt)}</td>
                     <td className="board-post-views">{post.postViewCount}</td>
                     <td className="board-post-images">

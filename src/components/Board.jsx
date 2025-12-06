@@ -241,6 +241,15 @@ export default function BoardMain() {
 
     if(result.deleteStatus){
       addToast(result.deleteMessage, "success");
+      
+      localStorage.removeItem(BOARD_ID_KEY);
+      localStorage.removeItem(BOARD_NAME_KEY);
+      localStorage.removeItem(BOARD_PTD_KEY);
+    
+      setBoardChoice(null);
+      setBoardChoiceName(null);
+      setBoardChoiceProtect(false);
+
       closeDeleteModal();
       const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
         method: 'POST',
