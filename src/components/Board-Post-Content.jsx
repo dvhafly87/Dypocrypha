@@ -117,8 +117,8 @@ export default function BoardPostContent() {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          deleteBoardId: boardId,
-          deletePostId: postId,
+          callingContentBoardId: boardId,
+          calliingContentPostId: postId,
         })
       });
 
@@ -129,11 +129,11 @@ export default function BoardPostContent() {
 
       const result = await response.json();
       
-      if (result.deleteStatus) {
-        addToast('게시글이 삭제되었습니다.', 'success');
-        navigate(`/board/${boardId}`);
+      if (result.deletePostStatus) {
+        addToast(result.deletePostMessage, 'success');
+        navigate(`/board`);
       } else {
-        addToast(result.deleteMessage || '삭제 실패', 'error');
+        addToast(result.deletePostMessage || '삭제 실패', 'error');
       }
     } catch (error) {
       addToast('게시글 삭제 중 오류가 발생했습니다.', 'error');
