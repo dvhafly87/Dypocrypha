@@ -95,9 +95,9 @@ export default function BoardMain() {
   const addNewBoard = () => {
     if(!isLogined) {
       addToast("로그인이 필요합니다", "warning");
-      return;
+    } else {
+      setIsModalOpen(true);
     }
-    setIsModalOpen(true);
   };
 
   const closeModal = () => {
@@ -153,9 +153,8 @@ export default function BoardMain() {
     }
   };
 
-  // 삭제 모달 열기
   const openDeleteModal = (board, e) => {
-    e.stopPropagation(); // 게시판 클릭 이벤트 방지
+    e.stopPropagation();
     if(!isLogined) {
       addToast("로그인이 필요합니다", "warning");
       return;

@@ -1,5 +1,5 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import {useToast} from '../components/ToastContext.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -45,7 +45,6 @@ function CustomUploadAdapter(loader) {
           default: `${API.API_BASE_URL}${data.url}`
         };
       } catch (error) {
-        console.error('Image upload error:', error);
         throw error;
       }
     },
@@ -63,28 +62,31 @@ export default function BoardWrite() {
   const { boardId } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
 
+  const editorRef = useRef(null);
+
   const handleSubmit = async () => {
+    const editorContent = editorRef.current ? editorRef.current.getData() : '';
+
     if (!title.trim()) {
-      alert("제목을 입력해주세요.");
+      addToast("제목을 입력해주세요.", "warning");
       return;
     }
-    if (!content.trim() || content === '<p>&nbsp;</p>') {
-      alert("내용을 입력해주세요.");
+    if (!editorContent.trim() || editorContent === '<p>&nbsp;</p>') {
+      addToast("내용을 입력해주세요.", "warning");
       return;
     }
     
     const MAX_IMAGES = 20;
     const imageTagRegex = /<img\b[^>]*>/gi;
-    const imageTags = content.match(imageTagRegex);
+    const imageTags = editorContent.match(imageTagRegex);
     const imageCount = imageTags ? imageTags.length : 0;
 
     if (imageCount > MAX_IMAGES) {
-      alert(`이미지는 최대 ${MAX_IMAGES}개까지만 등록할 수 있습니다. 현재: ${imageCount}개`);
+      addToast(`이미지는 최대 ${MAX_IMAGES}개까지만 등록할 수 있습니다. 현재: ${imageCount}개`, "warning");
       return;
     }
 
@@ -93,13 +95,11 @@ export default function BoardWrite() {
     try {
       const postData = {
         boardInputtitle: title.trim(),
-        boardInputcontent: content,
+        boardInputcontent: editorContent,
         boardInputId: boardId,
         boardInputisPinned: isPinned,
         boardInputisAnonymous: isAnonymous
       };
-      
-      console.log("등록할 데이터:", postData);
       
       const response = await fetch(`${API.API_BASE_URL}/board/postwrite`, {
         method: 'POST',
@@ -149,11 +149,13 @@ export default function BoardWrite() {
   };
 
   const handleCancel = async () => {
-    if (title.trim() || (content.trim() && content !== '<p>&nbsp;</p>')) {
+    const editorContent = editorRef.current ? editorRef.current.getData() : '';
+    
+    if (title.trim() || (editorContent.trim() && editorContent !== '<p>&nbsp;</p>')) {
       if (!window.confirm("작성 내용이 있습니다. 정말 취소하시겠습니까?"))
         return;
   
-      const filenames = extractUploadedImages(content);
+      const filenames = extractUploadedImages(editorContent);
   
       if (filenames.length > 0) {
         await fetch(`${API.API_BASE_URL}/api/upload/deleteAll`, {
@@ -279,10 +281,8 @@ export default function BoardWrite() {
           <label className="input-label">내용</label>
           <CKEditor
             editor={ClassicEditor}
-            data={content}
-            onChange={(event, editor) => {
-              const data = editor.getData();
-              setContent(data);
+            onReady={(editor) => {
+              editorRef.current = editor;
             }}
             disabled={isSubmitting}
             config={{
