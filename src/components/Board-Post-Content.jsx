@@ -1,9 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Calendar, User, Edit2, Trash2, List, Pin, MessageSquare, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '../components/ToastContext.jsx';
 import API from '../config/apiConfig.js';
 import '../css/BoardPostContent.css';
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 
 export default function BoardPostContent() {
   const { boardName, boardId, postId } = useParams();
@@ -14,10 +26,85 @@ export default function BoardPostContent() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const postContentSection = useMemo(() => {
+    if (!postData) return null;
+    
+    return (
+      <div className="post-content-main">
+        <div className="post-title-section">
+          <h1 className="post-title">
+            {postData.postIsPinned && (
+              <span className="pin-badge">
+                <Pin size={14} />
+                고정
+              </span>
+            )}
+            {postData.postTitle}
+          </h1>
+          <div className="post-meta">
+            <div className="meta-item">
+              <User size={18} />
+              <span>{postData.postAnonymous != null ? postData.postAnonymous : postData.postAuthor}</span>
+            </div>
+            <div className="meta-item">
+              <Calendar size={18} />
+              <span>{formatDate(postData.createdAt)}</span>
+            </div>
+            <div className="meta-item">
+              <Eye size={18} />
+              <span>조회 {postData.postViewCount}</span>
+            </div>
+          </div>
+        </div>
+  
+        <div 
+          className="post-body"
+          dangerouslySetInnerHTML={{ __html: postData.postContent }}
+        />
+      </div>
+    );
+  }, [postData]);
   
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 6;
+  // fetchComments 함수 수정
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await fetch(`${API.API_BASE_URL}/board/postcontent/call`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          callingContentBoardId: boardId,
+          calliingContentPostId: postId,
+        })
+      });
+  
+      if (!response.ok) {
+        addToast('댓글 목록을 불러올 수 없습니다.', 'error');
+        return [];
+      }
+  
+      const result = await response.json();
+  
+      if (result.boardPostContentStatus) {
+        const newComments = result.boardPostComment 
+          ? (Array.isArray(result.boardPostComment) 
+              ? result.boardPostComment 
+              : [result.boardPostComment])
+          : [];
+        
+        setComments(newComments);
+        return newComments; // 새 댓글 배열 반환
+      }
+      return [];
+    } catch (error) {
+      console.error('댓글 목록 조회 실패:', error);
+      return [];
+    }
+  }, [boardId, postId, addToast]);
 
   useEffect(() => {
     const boardPostContentCalling = async () => {
@@ -88,18 +175,6 @@ export default function BoardPostContent() {
     setCurrentPage(pageNumber);
     // 댓글 섹션으로 스크롤
     document.querySelector('.comments-section')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   const handleEdit = () => {
@@ -177,11 +252,10 @@ export default function BoardPostContent() {
       if (result.commentAddStatus) {
         addToast('댓글이 등록되었습니다.', 'success');
         setNewComment('');
-        // 댓글 목록 갱신
-        const updatedComments = [...comments, result.commentData];
-        setComments(updatedComments);
-        // 마지막 페이지로 이동
-        const newTotalPages = Math.ceil(updatedComments.length / commentsPerPage);
+        
+        const newComments = await fetchComments();
+        
+        const newTotalPages = Math.ceil(newComments.length / commentsPerPage);
         setCurrentPage(newTotalPages);
       } else {
         addToast(result.commentAddMessage || '댓글 등록 실패', 'error');
@@ -195,9 +269,6 @@ export default function BoardPostContent() {
 
   // 댓글 삭제
   const handleCommentDelete = async (commentId) => {
-    if (!window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
-      return;
-    }
 
     try {
       const response = await fetch(`${API.API_BASE_URL}/board/comment/delete`, {
@@ -205,9 +276,9 @@ export default function BoardPostContent() {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          boardId: boardId,
-          postId: postId,
-          commentId: commentId
+          commentoryBid: boardId,
+          commentoryPid: postId,
+          commentoryCid: commentId
         })
       });
 
@@ -219,13 +290,13 @@ export default function BoardPostContent() {
       const result = await response.json();
       
       if (result.commentDeleteStatus) {
-        addToast('댓글이 삭제되었습니다.', 'success');
-        // 댓글 목록에서 제거
-        const updatedComments = comments.filter(comment => comment.boardPostCmId !== commentId);
-        setComments(updatedComments);
+        addToast(result.commentDeleteMessage, 'success');
+        
+        // 댓글 목록 다시 불러오기
+        await fetchComments();
         
         // 현재 페이지가 비어있으면 이전 페이지로
-        const newTotalPages = Math.ceil(updatedComments.length / commentsPerPage);
+        const newTotalPages = Math.ceil(comments.length / commentsPerPage);
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(newTotalPages);
         }
@@ -280,38 +351,7 @@ export default function BoardPostContent() {
         </div>
       </div>
 
-      <div className="post-content-main">
-        <div className="post-title-section">
-          <h1 className="post-title">
-            {postData.postIsPinned && (
-              <span className="pin-badge">
-                <Pin size={14} />
-                고정
-              </span>
-            )}
-            {postData.postTitle}
-          </h1>
-          <div className="post-meta">
-            <div className="meta-item">
-              <User size={18} />
-              <span>{postData.postAnonymous != null ? postData.postAnonymous : postData.postAuthor}</span>
-            </div>
-            <div className="meta-item">
-              <Calendar size={18} />
-              <span>{formatDate(postData.createdAt)}</span>
-            </div>
-            <div className="meta-item">
-              <Eye size={18} />
-              <span>조회 {postData.postViewCount}</span>
-            </div>
-          </div>
-        </div>
-
-        <div 
-          className="post-body"
-          dangerouslySetInnerHTML={{ __html: postData.postContent }}
-        />
-      </div>
+      {postContentSection}
 
       {/* 댓글 섹션 */}
       <div className="comments-section">
