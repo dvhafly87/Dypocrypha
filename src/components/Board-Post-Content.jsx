@@ -161,9 +161,9 @@ export default function BoardPostContent() {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          boardId: boardId,
-          postId: postId,
-          commentContext: newComment
+          commentoryBid: boardId,
+          commentoryPid: postId,
+          commentoryContext: newComment
         })
       });
 
@@ -174,7 +174,7 @@ export default function BoardPostContent() {
 
       const result = await response.json();
       
-      if (result.commentCreateStatus) {
+      if (result.commentAddStatus) {
         addToast('댓글이 등록되었습니다.', 'success');
         setNewComment('');
         // 댓글 목록 갱신
@@ -184,7 +184,7 @@ export default function BoardPostContent() {
         const newTotalPages = Math.ceil(updatedComments.length / commentsPerPage);
         setCurrentPage(newTotalPages);
       } else {
-        addToast(result.commentCreateMessage || '댓글 등록 실패', 'error');
+        addToast(result.commentAddMessage || '댓글 등록 실패', 'error');
       }
     } catch (error) {
       addToast('댓글 등록 중 오류가 발생했습니다.', 'error');

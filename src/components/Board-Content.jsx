@@ -259,6 +259,17 @@ export default function BoardPost({ boardId, boardName }) {
                     </td>
                   </tr>
                 ))}
+
+                {Array.from({ 
+                  length: Math.max(0, postsPerPage - currentPosts.length) 
+                }).map((_, index) => (
+                  <tr key={`empty-${index}`} className="board-post-row-empty">
+                    <td colSpan="6" style={{ 
+                      height: isMobile ? '60px' : '70px',
+                      borderBottom: '1px solid #f0f0f0' 
+                    }}></td>
+                  </tr>
+                ))}
               </>
             )}
           </tbody>

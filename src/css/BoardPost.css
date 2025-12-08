@@ -101,6 +101,14 @@
     animation: spin 1s linear infinite;
 }
 
+.board-post-row-empty {
+    pointer-events: none; /* 클릭 방지 */
+}
+
+.board-post-row-empty:hover {
+    background-color: white !important; /* hover 효과 제거 */
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -424,10 +432,10 @@
 @media (min-width: 601px) and (max-width: 773px) {
     /* === 게시판 컨테이너 === */
     .board-post-container {
-        padding: 1.25rem 1.75rem;
+        padding: 1rem;
         gap: 1.25rem;
         min-height: 70vh;
-        max-width: 55vw;
+        max-width: 100%;
     }
 
     /* === 헤더 === */
@@ -471,6 +479,10 @@
     /* === 테이블 컨테이너 === */
     .board-post-list-container {
         border-radius: 10px;
+    }
+
+    .board-post-table {
+        min-width:100%;
     }
 
     /* === 테이블 헤더 === */

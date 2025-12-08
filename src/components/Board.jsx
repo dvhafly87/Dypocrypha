@@ -32,6 +32,20 @@ export default function BoardMain() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
+  
+  useEffect(() => {
+    const storedToastData = localStorage.getItem('redirectToast');
+    if (storedToastData) {
+        try {
+            const toastData = JSON.parse(storedToastData);
+            addToast(toastData.message, toastData.status);
+            localStorage.removeItem('redirectToast');
+        } catch (error) {
+            console.error("Failed to parse redirectToast from localStorage:", error);
+            localStorage.removeItem('redirectToast');
+        }
+    }
+}, [addToast]);
 
   useEffect(() => {
     const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
@@ -272,7 +286,6 @@ export default function BoardMain() {
           <h2>게시판</h2>
         </div>
         <div className="sidebar-actions">
-            {isLogined ? <p></p> : <p className="required-login">* 로그인 필요</p>}
             <div className="board-search-container">
               <form className="board-search-form">
                 <input type="text" placeholder="게시판 검색" name="search" />
