@@ -21,44 +21,58 @@ const extractUploadedImages = (html) => {
     return filenames;
   };
 
-function CustomUploadAdapter(loader) {
-  return {
-    upload: async () => {
-      try {
-        const file = await loader.file;
-        const formData = new FormData();
-        formData.append('image', file);
+  function CustomUploadAdapter(loader, addToast) {
+    return {
+      upload: async () => {
+        try {
+          const file = await loader.file;
+          const formData = new FormData();
+          formData.append('image', file);
 
-        const response = await fetch(`${API.API_BASE_URL}/api/upload/image`, {
-          method: 'POST',
-          credentials: 'include',
-          body: formData
-        });
+          const response = await fetch(`${API.API_BASE_URL}/api/upload/image`, {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+          });
 
-        if (!response.ok) {
-          throw new Error('Upload failed');
+          // 413 상태 코드 특별 처리
+          if (response.status === 413) {
+            addToast("파일 크기가 너무 큽니다. 더 작은 파일을 선택해주세요.", "error");
+            return Promise.reject();
+          }
+
+          const data = await response.json();
+
+          if (!data.success) {
+            addToast(data.message || "이미지 업로드에 실패했습니다.", "error");
+            return Promise.reject();
+          }
+
+          return {
+            default: `${API.API_BASE_URL}${data.url}`
+          };
+          
+        } catch (error) {
+          if (error instanceof TypeError) {
+            addToast("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.", "error");
+          }
+          return Promise.reject();
         }
-
-        const data = await response.json();
-        
-        return {
-          default: `${API.API_BASE_URL}${data.url}`
-        };
-      } catch (error) {
-        throw error;
-      }
-    },
-  };
-}
+      },
+    };
+  }
 
 function CustomUploadAdapterPlugin(editor) {
+  const addToast = editor.config.get('addToast');
+
   editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-    return CustomUploadAdapter(loader);
+    return CustomUploadAdapter(loader, addToast);
   };
 }
 
-export default function BoardWrite() {
-  const { addToast } = useToast();    
+
+export default function BoardWrite() { 
+  const { addToast } = useToast();   
   const { boardId } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -286,6 +300,7 @@ export default function BoardWrite() {
             }}
             disabled={isSubmitting}
             config={{
+              addToast: addToast,
               extraPlugins: [CustomUploadAdapterPlugin],
               placeholder: "내용을 입력하세요...",
               toolbar: [

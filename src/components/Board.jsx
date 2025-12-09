@@ -274,6 +274,7 @@ export default function BoardMain() {
         setBoardList(listResult.boardList);
       }
     } else {
+      closeDeleteModal();
       addToast(result.deleteMessage, "warning");
       return;
     }

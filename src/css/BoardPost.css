@@ -8,6 +8,7 @@
     padding: 2rem 3rem;
     gap: 2rem;
     min-height: 75vh;
+    min-width:70vw;
 }
 
 /* --- 게시판 헤더 --- */
@@ -372,6 +373,12 @@
     }
 }
 
+@media (max-width: 1100px) {
+    .board-post-container {
+        min-width: 65vw;
+    }
+}
+
 /* ========================================
    태블릿 (900px 이하)
 ======================================== */
@@ -379,7 +386,7 @@
     .board-post-container {
         padding: 1.5rem 2rem;
         gap: 1.5rem;
-        width:auto;
+        min-width:60vw;
     }
 
     .board-post-header {
@@ -652,6 +659,9 @@
     .board-post-container {
         padding: 1rem 0;
         gap: 1rem;
+        max-width:100%;
+        width:100%;
+        min-width:87.5vw;
         min-height: 60vh;
     }
 
@@ -848,6 +858,7 @@
     .board-post-container {
         padding: 0.75rem 0;
         gap: 0.75rem;
+        min-width: 82.75vw;
     }
 
     .board-post-header {
