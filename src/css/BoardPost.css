@@ -252,7 +252,49 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
+    cursor: pointer;    
 }
+
+.board-title-hidden-hover {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px); /* 셀 위쪽에 표시 */
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* 툴팁 화살표 - 아래쪽을 가리킴 */
+  .board-title-hidden-hover::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #333;
+  }
+  
+  /* 호버 시 툴팁 표시 */
+  .board-post-title-cell:hover .board-title-hidden-hover {
+    opacity: 1;
+    visibility: visible;
+  }
+
 
 .board-post-title-text {
     color: #212121;
@@ -375,14 +417,27 @@
     .board-post-title-cell {
         display:flex;
         flex-direction: column;
-        gap: 0;
         float: left;
+    }
+
+    .board-post-row td span{
+        font-size: 0.75rem;
     }
 }
 
 @media (max-width: 1100px) {
     .board-post-container {
         min-width: 65vw;
+    }
+    
+    .board-post-table-header {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .board-post-title-cell {
+        display:flex;
+        flex-direction: column;
     }
 }
 
@@ -857,6 +912,16 @@
         animation-delay: 0s !important;
     }
 }
+
+@media (min-width: 501px) and (max-width: 600px) {
+    .board-post-header {
+        width: 83.5vw;
+    }
+    .board-post-list-container {
+        width: 83.5vw;
+    }
+}
+
 @media (max-width: 500px) {
     .board-post-container {
         min-width: 85vw;
@@ -1007,3 +1072,4 @@
 .board-post-row:nth-child(5) {
     animation-delay: 0.17s;
 }
+

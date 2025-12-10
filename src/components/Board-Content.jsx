@@ -16,7 +16,7 @@ export default function BoardPost({ boardId, boardName }) {
   let postsPerPage = 6;
 
   postsPerPage = isMobile ? 5 : 6;
-
+  const maxLength = Math.floor((window.innerWidth * 0.8) / 8);
   const minSwipeDistance = 50;
  
   useEffect(() => {
@@ -204,61 +204,65 @@ export default function BoardPost({ boardId, boardName }) {
               </tr>
             ) : (
               <>
-                {/* 고정 게시글 */}
-                {pinnedPosts.map((post) => (
-                  <tr
-                    key={post.boardPostId}
-                    className="board-post-row board-post-row-pinned"
-                    onClick={() => handlePostClick(post.boardPostId)}
-                  >
-                    <td className="board-post-number">
-                      <span className="board-post-notice-badge">공지</span>
-                    </td>
-                    <td>
-                      <div className="board-post-title-cell">
-                        <span className="board-post-title-text">{post.postTitle}</span>
-                        {post.postMaxImages > 0 && (
-                          <span className="board-post-image-indicator">
-                            📷 {post.postMaxImages}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="board-post-author">{post.postAnonymous != null ? post.postAnonymous : post.postAuthor}</td>
-                    <td className="board-post-date">{formatDate(post.createdAt)}</td>
-                    <td className="board-post-views">{post.postViewCount}</td>
-                    <td className="board-post-images">
-                      {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                    </td>
-                  </tr>
-                ))}
+              {/* 고정 게시글 */}
+              {pinnedPosts.map((post) => (
+                <tr
+                  key={post.boardPostId}
+                  className="board-post-row board-post-row-pinned"
+                  onClick={() => handlePostClick(post.boardPostId)}
+                >
+                  <td className="board-post-number">
+                    <span className="board-post-notice-badge">공지</span>
+                  </td>
+                  <td>
+                    <div className="board-post-title-cell">
+                      {post.postTitle.length > 5 && (
+                        <p className="board-title-hidden-hover">{post.postTitle}</p>
+                      )}
+                      <span className="board-post-title-text">
+                        {post.postTitle.length > 5 
+                          ? post.postTitle.substring(0, 5) + "..."
+                          : post.postTitle}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="board-post-author">{post.postAnonymous != null ? post.postAnonymous : post.postAuthor}</td>
+                  <td className="board-post-date">{formatDate(post.createdAt)}</td>
+                  <td className="board-post-views">{post.postViewCount}</td>
+                  <td className="board-post-images">
+                    {post.postMaxImages > 0 ? post.postMaxImages : '-'}
+                  </td>
+                </tr>
+              ))}
 
-                {/* 일반 게시글 */}
-                {currentPosts.map((post) => (
-                  <tr
-                    key={post.boardPostId}
-                    className="board-post-row"
-                    onClick={() => handlePostClick(post.boardPostId)}
-                  >
-                    <td className="board-post-number">{post.boardPostId}</td>
-                    <td>
-                      <div className="board-post-title-cell">
-                        <span className="board-post-title-text">{post.postTitle}</span>
-                        {post.postMaxImages > 0 && (
-                          <span className="board-post-image-indicator">
-                            📷 {post.postMaxImages}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="board-post-author">{post.postAuthor}</td>
-                    <td className="board-post-date">{formatDate(post.createdAt)}</td>
-                    <td className="board-post-views">{post.postViewCount}</td>
-                    <td className="board-post-images">
-                      {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                    </td>
-                  </tr>
-                ))}
+              {/* 일반 게시글 */}
+              {currentPosts.map((post) => (
+                <tr
+                  key={post.boardPostId}
+                  className="board-post-row"
+                  onClick={() => handlePostClick(post.boardPostId)}
+                >
+                  <td className="board-post-number">{post.boardPostId}</td>
+                  <td>
+                    <div className="board-post-title-cell">
+                      {post.postTitle.length > 5 && (
+                        <p className="board-title-hidden-hover">{post.postTitle}</p>
+                      )}
+                      <span className="board-post-title-text">
+                        {post.postTitle.length > 5
+                          ? post.postTitle.substring(0, 5) + "..." 
+                          : post.postTitle}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="board-post-author">{post.postAuthor}</td>
+                  <td className="board-post-date">{formatDate(post.createdAt)}</td>
+                  <td className="board-post-views">{post.postViewCount}</td>
+                  <td className="board-post-images">
+                    {post.postMaxImages > 0 ? post.postMaxImages : '-'}
+                  </td>
+                </tr>
+              ))}
 
                 {Array.from({ 
                   length: Math.max(0, postsPerPage - currentPosts.length) 
