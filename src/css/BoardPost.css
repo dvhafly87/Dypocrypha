@@ -371,6 +371,13 @@
         width:auto;
         max-width: 70vw;
     }
+
+    .board-post-title-cell {
+        display:flex;
+        flex-direction: column;
+        gap: 0;
+        float: left;
+    }
 }
 
 @media (max-width: 1100px) {
@@ -848,6 +855,19 @@
     /* 애니메이션 지연 조정 */
     .board-post-row {
         animation-delay: 0s !important;
+    }
+}
+@media (max-width: 500px) {
+    .board-post-container {
+        min-width: 85vw;
+    }
+
+    .board-post-header {
+        max-width: 82.35vw;
+    }
+    
+    .board-post-list-container {
+        max-width: 82.35vw;
     }
 }
 
