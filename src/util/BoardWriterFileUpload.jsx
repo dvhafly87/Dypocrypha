@@ -145,7 +145,7 @@ export default function BoardWrite() {
             message: result.boardPostWriteMessage
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/');
+        navigate('/board');
         return;
       }
     } catch (error) {

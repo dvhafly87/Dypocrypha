@@ -691,6 +691,7 @@
         padding: 1.5rem;
     }
 }
+
 @media (min-width: 601px) and (max-width: 773px) {
     /* === 전체 레이아웃 === */
     .board-wrapper {

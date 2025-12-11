@@ -8,7 +8,6 @@ export default function BoardPost({ boardId, boardName }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
-  const [isLoading, setIsLoading] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -31,7 +30,6 @@ export default function BoardPost({ boardId, boardName }) {
   useEffect(() => {
     const boardPostCalling = async () => {
       try {
-        setIsLoading(true);
         const response = await fetch(`${API.API_BASE_URL}/board/postcalling`, {
           method: 'POST',
           credentials: 'include',
@@ -76,8 +74,6 @@ export default function BoardPost({ boardId, boardName }) {
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate('/');
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -131,17 +127,6 @@ export default function BoardPost({ boardId, boardName }) {
     navigate('/board');
   };
 
-  if (isLoading) {
-    return (
-      <div className="board-post-container">
-        <div className="board-post-loading">
-          <div className="board-post-loading-spinner"></div>
-          <p className="board-post-loading-text">게시판을 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
-
   // 고정 게시글과 일반 게시글 분리
   const pinnedPosts = posts.filter(post => post.postIsPinned);
   const normalPosts = posts.filter(post => !post.postIsPinned);
@@ -191,7 +176,7 @@ export default function BoardPost({ boardId, boardName }) {
               <th>작성자</th>
               <th>작성일</th>
               <th>조회</th>
-              <th>이미지</th>
+              {/* <th>이미지</th> */}
             </tr>
           </thead>
           <tbody>
@@ -229,9 +214,9 @@ export default function BoardPost({ boardId, boardName }) {
                   <td className="board-post-author">{post.postAnonymous != null ? post.postAnonymous : post.postAuthor}</td>
                   <td className="board-post-date">{formatDate(post.createdAt)}</td>
                   <td className="board-post-views">{post.postViewCount}</td>
-                  <td className="board-post-images">
+                  {/* <td className="board-post-images">
                     {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
 
@@ -258,9 +243,9 @@ export default function BoardPost({ boardId, boardName }) {
                   <td className="board-post-author">{post.postAuthor}</td>
                   <td className="board-post-date">{formatDate(post.createdAt)}</td>
                   <td className="board-post-views">{post.postViewCount}</td>
-                  <td className="board-post-images">
+                  {/* <td className="board-post-images">
                     {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
 

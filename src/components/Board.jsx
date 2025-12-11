@@ -19,7 +19,6 @@ export default function BoardMain() {
   const [boardChoiceName, setBoardChoiceName] = useState();
   const [boardChoiceProtect, setBoardChoiceProtect] = useState(false);
   const [boardList, setBoardList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { addToast } = useToast();
   const { isLogined } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,7 +61,6 @@ export default function BoardMain() {
   useEffect(() => {
     const boardListCalling = async () => {
       try {
-        setIsLoading(true);
         const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
           method: 'POST',
           credentials: 'include',
@@ -98,8 +96,6 @@ export default function BoardMain() {
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate('/');
-      } finally {
-        setIsLoading(false);
       }
     };
     
@@ -301,12 +297,7 @@ export default function BoardMain() {
         </div>
         
         <div className="sidebar-boardList">
-          {isLoading ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">게시판 목록을 불러오는 중...</p>
-            </div>
-          ) : boardList.length > 0 ? (
+          {boardList.length > 0 ? (
             boardList.map((board) => (
               <div 
                 key={board.boardPriId} 
