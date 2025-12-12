@@ -460,6 +460,9 @@
         max-width: 70vw;
     }
 
+    .board-post-notice-badge {
+        
+    }
     .board-post-title-cell {
         flex-direction: row !important;
         align-items: center;

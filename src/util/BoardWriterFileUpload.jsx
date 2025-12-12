@@ -71,6 +71,7 @@ function CustomUploadAdapterPlugin(editor) {
 }
 
 
+
 export default function BoardWrite() { 
   const { addToast } = useToast();   
   const { boardId } = useParams();

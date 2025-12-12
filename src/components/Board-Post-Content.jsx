@@ -177,8 +177,36 @@ export default function BoardPostContent() {
     document.querySelector('.comments-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleEdit = () => {
-    navigate(`/board/${boardId}/edit/${postId}`);
+  const handleEdit = async () => {
+
+    const response = await fetch(`${API.API_BASE_URL}/board/postcontent/authorcheck`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        callingContentBoardId: boardId,
+        calliingContentPostId: postId,
+      })
+    });
+
+    if (!response.ok) {
+      const toastData = {
+        status: 'warning',
+        message: "서버 통신 불가"
+      };
+      localStorage.setItem('redirectToast', JSON.stringify(toastData));
+      navigate('/');
+      return;
+    }
+
+    const result = await response.json();
+
+    if(result.AuthorChecker) {
+      navigate(`/boardEdit/${boardId}/${postId}`);
+    } else {
+      addToast(result.AuthorCheckerMessage, "warning");
+      return;
+    }
   };
 
   const handleDelete = async () => {
