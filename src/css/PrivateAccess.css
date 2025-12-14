@@ -1,0 +1,606 @@
+/* --- 비공개 게시판 접근 컨테이너 --- */
+.private-board-access-container {
+    flex: 8;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 2rem 3rem;
+    gap: 2rem;
+    min-height: 75vh;
+    min-width: 70vw;
+}
+
+/* --- 헤더 --- */
+.private-access-header {
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: white;
+    border-radius: 20px;
+    width: 70vw;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.private-access-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.private-access-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.lock-icon {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.private-access-meta {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* --- 폼 컨테이너 --- */
+.private-access-form-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.private-access-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+}
+
+/* --- 카드 헤더 --- */
+.private-access-card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.private-access-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.private-access-icon-wrapper svg {
+    width: 40px;
+    height: 40px;
+    color: #2e7d32;
+}
+
+.private-access-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem 0;
+}
+
+.private-access-card-description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* --- 폼 --- */
+.private-access-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.private-access-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.private-access-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.private-access-label svg {
+    width: 16px;
+    height: 16px;
+}
+
+.private-access-input-wrapper {
+    position: relative;
+}
+
+.private-access-input {
+    width: 100%;
+    padding: 0.875rem 3rem 0.875rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.private-access-input:focus {
+    border-color: #4caf50;
+}
+
+.private-access-input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.private-access-toggle-btn {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.private-access-toggle-btn:hover:not(:disabled) {
+    opacity: 1;
+}
+
+.private-access-toggle-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.private-access-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* --- 버튼 그룹 --- */
+.private-access-button-group {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-private-back,
+.btn-private-submit {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-private-back {
+    background-color: white;
+    color: #616161;
+    border: 2px solid #e0e0e0;
+}
+
+.btn-private-back:hover:not(:disabled) {
+    background-color: #f5f5f5;
+    border-color: #bdbdbd;
+}
+
+.btn-private-back:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-private-submit {
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: white;
+}
+
+.btn-private-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-private-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-private-submit svg,
+.btn-private-back svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* --- 로딩 스피너 --- */
+.loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- 애니메이션 --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.private-access-card {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ========================================
+   미디어 쿼리 - 1345px 이하
+======================================== */
+@media (max-width: 1345px) {
+    .private-access-header {
+        width: auto;
+        max-width: 70vw;
+    }
+}
+
+/* ========================================
+   미디어 쿼리 - 1100px 이하
+======================================== */
+@media (max-width: 1100px) {
+    .private-board-access-container {
+        min-width: 65vw;
+    }
+}
+
+/* ========================================
+   태블릿 (900px 이하)
+======================================== */
+@media (max-width: 900px) {
+    .private-board-access-container {
+        padding: 1.5rem 2rem;
+        gap: 1.5rem;
+        min-width: 60vw;
+    }
+
+    .private-access-header {
+        padding: 1.25rem 1.75rem;
+        width: auto;
+    }
+
+    .private-access-title {
+        font-size: 1.5rem;
+    }
+
+    .lock-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .private-access-meta {
+        font-size: 0.85rem;
+    }
+
+    .private-access-card {
+        padding: 2rem;
+    }
+
+    .private-access-card-title {
+        font-size: 1.3rem;
+    }
+
+    .private-access-card-description {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 850px) {
+    .private-board-access-container {
+        width: 475px;
+    }
+}
+
+/* ========================================
+   태블릿 (773px 이하)
+======================================== */
+@media (min-width: 601px) and (max-width: 775px) {
+    .private-board-access-container {
+        padding: 1rem;
+        gap: 1.25rem;
+        min-height: 70vh;
+        width: auto;
+    }
+
+    .private-access-header {
+        padding: 1.15rem 1.6rem;
+        width: auto;
+        border-radius: 16px;
+    }
+
+    .private-access-title {
+        font-size: 1.4rem;
+        letter-spacing: -0.4px;
+    }
+
+    .lock-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .private-access-meta {
+        font-size: 0.83rem;
+    }
+
+    .private-access-card {
+        padding: 1.8rem;
+    }
+
+    .private-access-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 1.3rem;
+    }
+
+    .private-access-icon-wrapper svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .private-access-card-title {
+        font-size: 1.25rem;
+    }
+
+    .private-access-card-description {
+        font-size: 0.88rem;
+    }
+
+    .private-access-input {
+        padding: 0.8rem 3rem 0.8rem 0.95rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-private-back,
+    .btn-private-submit {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* ========================================
+   모바일 (600px 이하)
+======================================== */
+@media (max-width: 600px) {
+    .private-board-access-container {
+        padding: 1rem 0;
+        gap: 1rem;
+        max-width: 100%;
+        width: 100%;
+        min-width: 87.5vw;
+        min-height: 60vh;
+    }
+
+    .private-access-header {
+        padding: 1rem 1.25rem;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+
+    .private-access-title {
+        font-size: 1.25rem;
+        letter-spacing: -0.3px;
+    }
+
+    .lock-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .private-access-meta {
+        font-size: 0.8rem;
+    }
+
+    .private-access-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .private-access-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1rem;
+    }
+
+    .private-access-icon-wrapper svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .private-access-card-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .private-access-card-title {
+        font-size: 1.15rem;
+    }
+
+    .private-access-card-description {
+        font-size: 0.85rem;
+    }
+
+    .private-access-form {
+        gap: 1.25rem;
+    }
+
+    .private-access-label {
+        font-size: 0.85rem;
+    }
+
+    .private-access-input {
+        padding: 0.75rem 2.75rem 0.75rem 0.875rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-private-back,
+    .btn-private-submit {
+        padding: 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-private-submit svg,
+    .btn-private-back svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 600px) {
+    .private-access-card {
+        max-width: 450px;
+    }
+}
+
+@media (max-width: 500px) {
+    .private-board-access-container {
+        min-width: 85vw;
+    }
+
+    .private-access-header {
+        max-width: 82.35vw;
+    }
+}
+
+/* ========================================
+   초소형 모바일 (400px 이하)
+======================================== */
+@media (max-width: 400px) {
+    .private-board-access-container {
+        padding: 0.75rem 0;
+        gap: 0.75rem;
+        min-width: 82.75vw;
+    }
+
+    .private-access-header {
+        padding: 0.875rem 1rem;
+        border-radius: 10px;
+    }
+
+    .private-access-title {
+        font-size: 1.1rem;
+    }
+
+    .lock-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .private-access-meta {
+        font-size: 0.75rem;
+    }
+
+    .private-access-card {
+        padding: 1.25rem;
+    }
+
+    .private-access-icon-wrapper {
+        width: 55px;
+        height: 55px;
+    }
+
+    .private-access-icon-wrapper svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .private-access-card-title {
+        font-size: 1.05rem;
+    }
+
+    .private-access-card-description {
+        font-size: 0.8rem;
+    }
+
+    .private-access-label {
+        font-size: 0.8rem;
+    }
+
+    .private-access-input {
+        padding: 0.7rem 2.5rem 0.7rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-private-back,
+    .btn-private-submit {
+        padding: 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-private-submit svg,
+    .btn-private-back svg {
+        width: 15px;
+        height: 15px;
+    }
+}
+
+/* ========================================
+   가로모드 모바일 최적화
+======================================== */
+@media (max-width: 900px) and (orientation: landscape) {
+    .private-board-access-container {
+        min-height: 50vh;
+    }
+
+    .private-access-form-container {
+        padding: 1rem 0;
+    }
+
+    .private-access-card {
+        max-width: 450px;
+    }
+}
