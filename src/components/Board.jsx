@@ -32,75 +32,83 @@ export default function BoardMain() {
   const [boardToDelete, setBoardToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
   
-  useEffect(() => {
-    const storedToastData = localStorage.getItem('redirectToast');
-    if (storedToastData) {
-        try {
-            const toastData = JSON.parse(storedToastData);
-            addToast(toastData.message, toastData.status);
-            localStorage.removeItem('redirectToast');
-        } catch (error) {
-            console.error("Failed to parse redirectToast from localStorage:", error);
-            localStorage.removeItem('redirectToast');
-        }
-    }
+useEffect(() => {
+  const storedToastData = localStorage.getItem('redirectToast');
+  if (storedToastData) {
+      try {
+          const toastData = JSON.parse(storedToastData);
+          addToast(toastData.message, toastData.status);
+          localStorage.removeItem('redirectToast');
+      } catch (error) {
+          console.error("Failed to parse redirectToast from localStorage:", error);
+          localStorage.removeItem('redirectToast');
+      }
+  }
 }, [addToast]);
 
-  useEffect(() => {
-    const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
-    const savedBoardName = localStorage.getItem(BOARD_NAME_KEY);
-    const savedBoardPtd = localStorage.getItem(BOARD_PTD_KEY);
-   
-    if (savedBoardId) {
-      setBoardChoice(parseInt(savedBoardId, 10));
-      setBoardChoiceName(savedBoardName);
-      setBoardChoiceProtect(savedBoardPtd ? parseInt(savedBoardPtd, 10) : false);
-    }
-  }, []);
+useEffect(() => {
+  const boardListCalling = async () => {
+    try {
 
-  useEffect(() => {
-    const boardListCalling = async () => {
-      try {
-        const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        });
+      const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-        if(!response.ok){
-          const toastData = {
-            status: 'warning',
-            message: "서버 통신 불가"
-          };
-          localStorage.setItem('redirectToast', JSON.stringify(toastData));
-          navigate('/');
-          return;
-        }
-
-        const result = await response.json();
-
-        if(result.boardListresult){
-          setBoardList(result.boardList);
-        } else {
-          const toastData = {
-            status: 'warning',
-            message: "게시판 조회 에러"
-          };
-          localStorage.setItem('redirectToast', JSON.stringify(toastData));
-          navigate('/');
-        }
-      } catch (error) {
+      if(!response.ok){
         const toastData = {
           status: 'warning',
-          message: "게시판 조회 불가"
+          message: "서버 통신 불가"
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate('/');
+        return;
+      }
+
+      const result = await response.json();
+
+      if(result.boardListresult){
+        setBoardList(result.boardList);
+        
+        const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
+        const savedBoardName = localStorage.getItem(BOARD_NAME_KEY);
+        const savedBoardPtd = localStorage.getItem(BOARD_PTD_KEY);
+       
+        if (savedBoardId) {
+          setBoardChoice(parseInt(savedBoardId, 10));
+          setBoardChoiceName(savedBoardName);
+          
+          let protectValue = false;
+          if (savedBoardPtd === 'true' || savedBoardPtd === '1') {
+            protectValue = true;
+          } else if (savedBoardPtd === 'false' || savedBoardPtd === '0') {
+            protectValue = false;
+          } else {
+            protectValue = parseInt(savedBoardPtd, 10) === 1;
+          }
+          setBoardChoiceProtect(protectValue);
+        }
+      } else {
+        const toastData = {
+          status: 'warning',
+          message: "게시판 조회 에러"
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate('/');
       }
-    };
-    
-    boardListCalling();
-  }, [navigate, addToast]);
+    } catch (error) {
+      console.error('에러 발생:', error);
+      const toastData = {
+        status: 'warning',
+        message: "게시판 조회 불가"
+      };
+      localStorage.setItem('redirectToast', JSON.stringify(toastData));
+      navigate('/');
+    }
+  };
+  boardListCalling();
+}, [navigate, addToast]);
 
   const addNewBoard = () => {
     if(!isLogined) {
