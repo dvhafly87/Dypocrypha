@@ -602,8 +602,11 @@
     transform: translateY(-1px);
 }
 
-/* 기존 스타일은 그대로 유지하고, 파일 맨 아래에 추가 */
-
+@media (min-width:601px) and (max-width: 1100px) {
+    .sidebar-boardList {
+        min-height: 448px;
+    }
+}
 /* ========================================
    태블릿 (900px 이하)
 ======================================== */
@@ -1195,7 +1198,8 @@
     }
 
     .board-name {
-        font-size: 0.85rem;
+        font-size: 0.475rem;
+        flex-wrap: nowrap;
     }
 
     .modal-header h2 {

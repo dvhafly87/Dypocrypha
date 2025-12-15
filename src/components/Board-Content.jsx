@@ -7,11 +7,19 @@ import '../css/BoardPost.css';
 export default function BoardPost({ boardId, boardName }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const [isComport, setIsComport] = useState(window.innerWidth <= 1300);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const isPostEdited = (createdAt, updatedAt) => {
+    const created = new Date(createdAt).getTime();
+    const updated = new Date(updatedAt).getTime();
+    return (updated - created) > 1000;
+  };
+
   let postsPerPage = 6;
 
   postsPerPage = isMobile ? 5 : 6;
@@ -21,6 +29,7 @@ export default function BoardPost({ boardId, boardName }) {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 600);
+      setIsComport(window.innerWidth <= 1300); 
     };
     
     window.addEventListener('resize', handleResize);
@@ -80,14 +89,37 @@ export default function BoardPost({ boardId, boardName }) {
     boardPostCalling();
   }, [boardId, boardName, navigate, addToast]);
 
+  const getPostTitleDisplay = (title) => {
+    if (isComport && title.length > 5) {
+      return title.substring(0, 5) + "...";
+    }
+    return title;
+  };
+  
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
+    // Z를 제거하고 한국 시간으로 파싱
+    const dateWithoutZ = dateString.replace('Z', '');
+    const date = new Date(dateWithoutZ);
+    const today = new Date();
+    
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+    const dateDay = date.getDate();
+    
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
+    
+    if (dateYear === todayYear && dateMonth === todayMonth && dateDay === todayDay) {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } else {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
   };
 
   const onTouchStart = (e) => {
@@ -174,9 +206,8 @@ export default function BoardPost({ boardId, boardName }) {
               <th>번호</th>
               <th>제목</th>
               <th>작성자</th>
-              <th>작성일</th>
+              <th>작성일</th> 
               <th>조회</th>
-              {/* <th>이미지</th> */}
             </tr>
           </thead>
           <tbody>
@@ -189,65 +220,89 @@ export default function BoardPost({ boardId, boardName }) {
               </tr>
             ) : (
               <>
-              {/* 고정 게시글 */}
-              {pinnedPosts.map((post) => (
-                <tr
-                  key={post.boardPostId}
-                  className="board-post-row board-post-row-pinned"
-                  onClick={() => handlePostClick(post.boardPostId)}
-                >
-                  <td className="board-post-number">
-                    <span className="board-post-notice-badge">공지</span>
-                  </td>
-                  <td>
-                    <div className="board-post-title-cell">
-                      {post.postTitle.length > 5 && (
-                        <p className="board-title-hidden-hover">{post.postTitle}</p>
-                      )}
-                      <span className="board-post-title-text">
-                        {post.postTitle.length > 5 
-                          ? post.postTitle.substring(0, 5) + "..."
-                          : post.postTitle}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="board-post-author">{post.postAnonymous != null ? post.postAnonymous : post.postAuthor}</td>
-                  <td className="board-post-date">{formatDate(post.createdAt)}</td>
-                  <td className="board-post-views">{post.postViewCount}</td>
-                  {/* <td className="board-post-images">
-                    {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                  </td> */}
-                </tr>
-              ))}
+                {/* 고정 게시글 */}
+                {pinnedPosts.map((post) => {
+                  const edited = isPostEdited(post.createdAt, post.updatedAt);
+                  return (
+                    <tr key={post.boardPostId} className="board-post-row board-post-row-pinned" onClick={() => handlePostClick(post.boardPostId)}>
+                      <td className="board-post-number">
+                        <span className="board-post-notice-badge">공지</span>
+                      </td>
+                      <td>
+                        <div className="board-post-title-cell">
+                          {post.postTitle.length > 5 && (
+                            <p className="board-title-hidden-hover">{post.postTitle}</p>
+                          )}
+                          <span className="board-post-title-text">
+                            {getPostTitleDisplay(post.postTitle)}
+                          </span>
+                          {edited && (
+                            <span className="board-post-edited-badge">수정됨</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="board-post-author">
+                        {post.postAnonymous != null ? post.postAnonymous : post.postAuthor}
+                      </td>
+                      <td className="board-post-date">
+                        {edited && (
+                          <span className="date-label">
+                            {(() => {
+                              const date = new Date(post.updatedAt.replace('Z', ''));
+                              const today = new Date();
+                              const isToday = date.getFullYear() === today.getFullYear() && 
+                                            date.getMonth() === today.getMonth() && 
+                                            date.getDate() === today.getDate();
+                              return isToday ? '수정됨 ' : '수정일 ';
+                            })()}
+                          </span>
+                        )}
+                        {formatDate(edited ? post.updatedAt : post.createdAt)}
+                      </td>
+                      <td className="board-post-views">{post.postViewCount}</td>
+                    </tr>
+                  );
+                })}
 
-              {/* 일반 게시글 */}
-              {currentPosts.map((post) => (
-                <tr
-                  key={post.boardPostId}
-                  className="board-post-row"
-                  onClick={() => handlePostClick(post.boardPostId)}
-                >
-                  <td className="board-post-number">{post.boardPostId}</td>
-                  <td>
-                    <div className="board-post-title-cell">
-                      {post.postTitle.length > 5 && (
-                        <p className="board-title-hidden-hover">{post.postTitle}</p>
-                      )}
-                      <span className="board-post-title-text">
-                        {post.postTitle.length > 5
-                          ? post.postTitle.substring(0, 5) + "..." 
-                          : post.postTitle}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="board-post-author">{post.postAuthor}</td>
-                  <td className="board-post-date">{formatDate(post.createdAt)}</td>
-                  <td className="board-post-views">{post.postViewCount}</td>
-                  {/* <td className="board-post-images">
-                    {post.postMaxImages > 0 ? post.postMaxImages : '-'}
-                  </td> */}
-                </tr>
-              ))}
+                {/* 일반 게시글 - 동일한 패턴 적용 */}
+                {currentPosts.map((post) => {
+                  const edited = isPostEdited(post.createdAt, post.updatedAt);
+                  return (
+                    <tr key={post.boardPostId} className="board-post-row" onClick={() => handlePostClick(post.boardPostId)}>
+                      <td className="board-post-number">{post.boardPostId}</td>
+                      <td>
+                        <div className="board-post-title-cell">
+                          {post.postTitle.length > 5 && (
+                            <p className="board-title-hidden-hover">{post.postTitle}</p>
+                          )}
+                          <span className="board-post-title-text">
+                            {getPostTitleDisplay(post.postTitle)}
+                          </span>
+                          {edited && (
+                            <span className="board-post-edited-badge">수정됨</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="board-post-author">{post.postAuthor}</td>
+                      <td className="board-post-date">
+                        {edited && (
+                          <span className="date-label">
+                            {(() => {
+                              const date = new Date(post.updatedAt.replace('Z', ''));
+                              const today = new Date();
+                              const isToday = date.getFullYear() === today.getFullYear() && 
+                                            date.getMonth() === today.getMonth() && 
+                                            date.getDate() === today.getDate();
+                              return isToday ? '수정됨 ' : '수정일 ';
+                            })()}
+                          </span>
+                        )}
+                        {formatDate(edited ? post.updatedAt : post.createdAt)}
+                      </td>
+                      <td className="board-post-views">{post.postViewCount}</td>
+                    </tr>
+                  );
+                })}
 
                 {Array.from({ 
                   length: Math.max(0, postsPerPage - currentPosts.length) 

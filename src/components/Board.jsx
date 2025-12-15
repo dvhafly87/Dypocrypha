@@ -10,6 +10,40 @@ import SIC from '../img/sic.jpg';
 
 import '../css/BoardMain.css';
 
+const storageWithExpiry = {
+  setItem: (key, value) => {
+    const now = new Date();
+    const item = {
+      value: value,
+      expiry: now.getTime() + (2 * 60 * 60 * 1000) //2시간 게시판 선택요소 지정
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  },
+  
+  getItem: (key) => {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) return null;
+    
+    try {
+      const item = JSON.parse(itemStr);
+      const now = new Date();
+      
+      if (now.getTime() > item.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      
+      return item.value;
+    } catch (e) {
+      return itemStr;
+    }
+  },
+  
+  removeItem: (key) => {
+    localStorage.removeItem(key);
+  }
+};
+
 export default function BoardMain() {
   const BOARD_ID_KEY = 'selectedBoardId';
   const BOARD_NAME_KEY = 'selectedBoardName';
@@ -26,6 +60,9 @@ export default function BoardMain() {
   const [boardDescription, setBoardDescription] = useState('');
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [boardPassword, setBoardPassword] = useState('');
+  
+  // 반응형 너비 체크
+  const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth <= 1300);
   
   // 삭제 모달 상태
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -45,6 +82,16 @@ useEffect(() => {
       }
   }
 }, [addToast]);
+
+// 화면 크기 변경 감지
+useEffect(() => {
+  const handleResize = () => {
+    setIsNarrowScreen(window.innerWidth <= 1300);
+  };
+
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
 useEffect(() => {
   const boardListCalling = async () => {
@@ -71,9 +118,9 @@ useEffect(() => {
       if(result.boardListresult){
         setBoardList(result.boardList);
         
-        const savedBoardId = localStorage.getItem(BOARD_ID_KEY);
-        const savedBoardName = localStorage.getItem(BOARD_NAME_KEY);
-        const savedBoardPtd = localStorage.getItem(BOARD_PTD_KEY);
+        const savedBoardId = storageWithExpiry.getItem(BOARD_ID_KEY);
+        const savedBoardName = storageWithExpiry.getItem(BOARD_NAME_KEY);
+        const savedBoardPtd = storageWithExpiry.getItem(BOARD_PTD_KEY);
        
         if (savedBoardId) {
           setBoardChoice(parseInt(savedBoardId, 10));
@@ -208,13 +255,13 @@ useEffect(() => {
 
     // localStorage 업데이트
     if (newId !== null) {
-      localStorage.setItem(BOARD_ID_KEY, newId.toString());
-      localStorage.setItem(BOARD_NAME_KEY, newName);
-      localStorage.setItem(BOARD_PTD_KEY, newPtd.toString());
+      storageWithExpiry.setItem(BOARD_ID_KEY, newId.toString());
+      storageWithExpiry.setItem(BOARD_NAME_KEY, newName);
+      storageWithExpiry.setItem(BOARD_PTD_KEY, newPtd.toString());
     } else {
-      localStorage.removeItem(BOARD_ID_KEY);
-      localStorage.removeItem(BOARD_NAME_KEY);
-      localStorage.removeItem(BOARD_PTD_KEY);
+      storageWithExpiry.removeItem(BOARD_ID_KEY);
+      storageWithExpiry.removeItem(BOARD_NAME_KEY);
+      storageWithExpiry.removeItem(BOARD_PTD_KEY);
     }
 
     if (window.innerWidth <= 600 && id !== null) {
@@ -258,10 +305,11 @@ useEffect(() => {
 
     if(result.deleteStatus){
       addToast(result.deleteMessage, "success");
-      
-      localStorage.removeItem(BOARD_ID_KEY);
-      localStorage.removeItem(BOARD_NAME_KEY);
-      localStorage.removeItem(BOARD_PTD_KEY);
+
+      //게시판 삭제 이후 남아있는 로컬 스토리지 청소
+      storageWithExpiry.removeItem(BOARD_ID_KEY);
+      storageWithExpiry.removeItem(BOARD_NAME_KEY);
+      storageWithExpiry.removeItem(BOARD_PTD_KEY);
     
       setBoardChoice(null);
       setBoardChoiceName(null);
@@ -282,6 +330,14 @@ useEffect(() => {
       addToast(result.deleteMessage, "warning");
       return;
     }
+  };
+
+  // 게시판 이름 표시 헬퍼 함수
+  const getBoardDisplayName = (name) => {
+    if (isNarrowScreen && name.length > 5) {
+      return name.substring(0, 4) + "...";
+    }
+    return name;
   };
 
   return (
@@ -333,7 +389,9 @@ useEffect(() => {
                           </svg>
                         </span>
                       )}
-                      <span className="board-name">{board.boardName}</span>
+                      <span className="board-name" title={board.boardName}>
+                        {getBoardDisplayName(board.boardName)}
+                      </span>
                     </div>
                     {isLogined && board.boardPriId !== 1 && board.boardName !== '자유게시판' && (
                       <button 

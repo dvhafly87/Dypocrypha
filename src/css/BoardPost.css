@@ -1100,3 +1100,51 @@
         max-height: calc(100vh - 250px);
     }
 }
+
+/* 수정됨 뱃지 */
+.board-post-edited-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.5rem;
+    background-color: #ff9800;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-left: 0.35rem;
+    flex-shrink: 0;
+}
+
+/* 날짜 라벨 */
+.date-label {
+    color: #ff9800;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* 반응형 - 1300px 이하 */
+@media (max-width: 1300px) {
+    .board-post-edited-badge {
+        font-size: 0.6rem;
+        padding: 0.12rem 0.4rem;
+        margin-left: 0.3rem;
+    }
+    
+    .date-label {
+        font-size: 0.75rem;
+    }
+}
+
+/* 모바일 - 600px 이하 */
+@media (max-width: 600px) {
+    .board-post-edited-badge {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.35rem;
+        margin-left: 0.25rem;
+    }
+    
+    .date-label {
+        font-size: 0.7rem;
+    }
+}
