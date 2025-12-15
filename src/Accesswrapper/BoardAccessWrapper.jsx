@@ -66,9 +66,9 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    boardId: boardId,
-                    boardName: boardName,
-                    password: password
+                    privateBoardId: boardId,
+                    privateBoardName: boardName,
+                    privatePassword: password
                 })
             });
 
