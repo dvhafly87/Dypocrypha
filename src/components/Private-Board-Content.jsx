@@ -147,11 +147,11 @@ export default function PrivateBoardPost({ boardId, boardName }) {
   };
 
   const handlePostClick = (postId) => {
-    navigate(`/boardPost/${boardName}/${boardId}/${postId}`);
+    navigate(`/privatePost/${boardName}/${boardId}/${postId}`);
   };
 
   const handleWritePost = () => {
-    navigate(`/boardwriter/${boardId}`);
+    navigate(`/privatewriter/${boardId}`);
   };
 
   const handleBack = () => {

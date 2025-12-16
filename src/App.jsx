@@ -10,8 +10,15 @@ import Board from './components/Board.jsx'
 import TestComponents2 from './components/test2.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 import BoardWriter from './util/BoardWriterFileUpload.jsx';
+
+import PrivatePost from './components/Private-Post-Content.jsx';
 import BoardPost from './components/Board-Post-Content.jsx';
+
 import PostEdit from './components/Post-Edit.jsx';
+import PrivEdit from './components/Priv-Edit.jsx';
+
+
+import PrivateWriter from './util/Private-Board-Content.jsx';
 
 
 import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
@@ -33,9 +40,16 @@ export default function App() {
                   <Route path="/test2" element={<TestComponents2 />} />
                   <Route path="/resetPassword" element={<ResetPassword />} />
                   <Route path="/token" element={<TokenWrapper />} />
+
                   <Route path="/boardwriter/:boardId" element={<BoardWriter />} />
+                  <Route path="/privatewriter/:boardId" element={<PrivateWriter />} />
+
                   <Route path="/boardPost/:boardName/:boardId/:postId" element={<BoardPost />} />
+                  <Route path="/privatePost/:boardName/:boardId/:postId" element={<PrivatePost />} />
+
                   <Route path="/boardEdit/:boardId/:postId" element={<PostEdit /> } />
+                  <Route path="/privateEdit/:boardId/:postId" element={<PrivEdit /> } />
+
                 </Routes>
             </AuthProvider>
           </ToastProvider>
