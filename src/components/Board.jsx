@@ -277,19 +277,36 @@ useEffect(() => {
   // 게시판 삭제 처리
   const handleDelete = async (e) => {
     e.preventDefault();
+
+    let response;
     
-    const response = await fetch(`${API.API_BASE_URL}/board/deleteBoard`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        deleteBoardId: boardToDelete.boardPriId,
-        deleteBoardName: boardToDelete.boardName,
-        deleteBoardCreator: boardToDelete.boardCreator,
-        deleteBoardProtected: boardToDelete.boardProtected,
-        deleteBoardPassword: deletePassword
-      }) 
-    });
+    if(boardToDelete.boardProtected) {
+      response = await fetch(`${API.API_BASE_URL}/private/deleteBoard`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deleteBoardId: boardToDelete.boardPriId,
+          deleteBoardName: boardToDelete.boardName,
+          deleteBoardCreator: boardToDelete.boardCreator,
+          deleteBoardProtected: boardToDelete.boardProtected,
+          deleteBoardPassword: deletePassword
+        }) 
+      });
+    } else {
+      response = await fetch(`${API.API_BASE_URL}/board/deleteBoard`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deleteBoardId: boardToDelete.boardPriId,
+          deleteBoardName: boardToDelete.boardName,
+          deleteBoardCreator: boardToDelete.boardCreator,
+          deleteBoardProtected: boardToDelete.boardProtected,
+          deleteBoardPassword: deletePassword
+        }) 
+      });
+    }
 
     if(!response.ok){
       const toastData = {
