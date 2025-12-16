@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
+
+import PrivateBoardPage from '../components/Private-Board-Content.jsx';
 import API from '../config/apiConfig';
 import '../css/PrivateAccess.css';
 
 export default function BoardPrivatePostAccess({ boardId, boardName }) {
     const navigate = useNavigate();
     const { addToast } = useToast();
+    const [verifyResult, setVerifyResult] = useState(false);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +48,12 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
                 navigate('/');
                 return;
             }
+
+            if(result.boardAlreadyVerifyChecked) {
+                setVerifyResult(true);
+            } else {
+                setVerifyResult(false);
+            }
         }
 
         thisPageIsOnlyPrivateBoardPage();
@@ -82,9 +91,10 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
 
             if (result.verifyStatus) {
                 addToast('인증되었습니다.', 'success');
-                navigate(`/board/${boardName}/${boardId}`);
+                setVerifyResult(true);
+                setPassword("");
             } else {
-                addToast(result.verifyMessage || '비밀번호가 올바르지 않습니다.', 'warning');
+                addToast(result.verifyMessage, 'warning');
                 setPassword('');
             }
             
@@ -100,6 +110,13 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
     };
 
     return (
+        <>
+        {verifyResult ? 
+        <PrivateBoardPage 
+            boardId={boardId} 
+            boardName={boardName}
+        />
+        : 
         <div className="private-board-access-container">
             {/* 헤더 */}
             <div className="private-access-header">
@@ -205,5 +222,8 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
                 </div>
             </div>
         </div>
+        }
+         
+        </>
     );
 }
