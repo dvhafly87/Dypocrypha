@@ -461,7 +461,7 @@
     }
 
     .board-post-notice-badge {
-        
+        font-size: 0.6rem;
     }
     .board-post-title-cell {
         flex-direction: row !important;
@@ -470,7 +470,7 @@
     }
 
     .board-post-row td span {
-        font-size: 0.75rem;
+        font-size: 0.6rem;
     }
     
     .board-post-table-header th:nth-child(2) {
@@ -675,7 +675,7 @@
 
     .board-post-notice-badge {
         padding: 0.22rem 0.68rem;
-        font-size: 0.72rem;
+        font-size: 0.5rem;
     }
 
     .board-post-title-cell {
