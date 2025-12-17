@@ -15,7 +15,7 @@ const storageWithExpiry = {
     const now = new Date();
     const item = {
       value: value,
-      expiry: now.getTime() + (2 * 60 * 60 * 1000) //2시간 게시판 선택요소 지정
+      expiry: now.getTime() + (2 * 60 * 60 * 1000)
     };
     localStorage.setItem(key, JSON.stringify(item));
   },
@@ -53,6 +53,8 @@ export default function BoardMain() {
   const [boardChoiceName, setBoardChoiceName] = useState();
   const [boardChoiceProtect, setBoardChoiceProtect] = useState(false);
   const [boardList, setBoardList] = useState([]);
+  const [filteredBoardList, setFilteredBoardList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { addToast } = useToast();
   const { isLogined } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,10 +63,8 @@ export default function BoardMain() {
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [boardPassword, setBoardPassword] = useState('');
   
-  // 반응형 너비 체크
   const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth <= 1300);
   
-  // 삭제 모달 상태
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
@@ -83,7 +83,6 @@ useEffect(() => {
   }
 }, [addToast]);
 
-// 화면 크기 변경 감지
 useEffect(() => {
   const handleResize = () => {
     setIsNarrowScreen(window.innerWidth <= 1300);
@@ -117,6 +116,7 @@ useEffect(() => {
 
       if(result.boardListresult){
         setBoardList(result.boardList);
+        setFilteredBoardList(result.boardList);
         
         const savedBoardId = storageWithExpiry.getItem(BOARD_ID_KEY);
         const savedBoardName = storageWithExpiry.getItem(BOARD_NAME_KEY);
@@ -156,6 +156,39 @@ useEffect(() => {
   };
   boardListCalling();
 }, [navigate, addToast]);
+
+  // 검색 필터링 로직
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredBoardList(boardList);
+    } else {
+      const filtered = boardList.filter(board => 
+        board.boardName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (board.boardDescription && board.boardDescription.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        board.boardCreator.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredBoardList(filtered);
+    }
+  }, [searchQuery, boardList]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    
+    if (filteredBoardList.length === 0) {
+      addToast("검색 결과가 없습니다", "warning");
+    } else if (filteredBoardList.length === 1) {
+      const board = filteredBoardList[0];
+      boardChoicer(board.boardPriId, board.boardName, board.boardProtected);
+      addToast(`"${board.boardName}" 게시판으로 이동합니다`, "success");
+    } else {
+      addToast(`${filteredBoardList.length}개의 게시판을 찾았습니다`, "success");
+    }
+  };
+
+  const handleSearchClear = () => {
+    setSearchQuery('');
+    setFilteredBoardList(boardList);
+  };
 
   const addNewBoard = () => {
     if(!isLogined) {
@@ -202,7 +235,6 @@ useEffect(() => {
     if(result.boardStatus){
       addToast(result.boardMessage, "success");
       closeModal();
-      // 게시판 목록 새로고침
       const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
         method: 'POST',
         credentials: 'include',
@@ -211,6 +243,7 @@ useEffect(() => {
       const listResult = await listResponse.json();
       if(listResult.boardListresult){
         setBoardList(listResult.boardList);
+        setFilteredBoardList(listResult.boardList);
       }
     } else {
       addToast(result.boardMessage, "warning");
@@ -228,7 +261,6 @@ useEffect(() => {
     setIsDeleteModalOpen(true);
   };
 
-  // 삭제 모달 닫기
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setBoardToDelete(null);
@@ -248,12 +280,10 @@ useEffect(() => {
       newPtd = ptd;
     }
 
-    // 상태 업데이트 (localStorage가 아닌 계산된 값 사용)
     setBoardChoice(newId);
     setBoardChoiceName(newName);
     setBoardChoiceProtect(newPtd); 
 
-    // localStorage 업데이트
     if (newId !== null) {
       storageWithExpiry.setItem(BOARD_ID_KEY, newId.toString());
       storageWithExpiry.setItem(BOARD_NAME_KEY, newName);
@@ -274,7 +304,6 @@ useEffect(() => {
     }
   };
 
-  // 게시판 삭제 처리
   const handleDelete = async (e) => {
     e.preventDefault();
 
@@ -323,7 +352,6 @@ useEffect(() => {
     if(result.deleteStatus){
       addToast(result.deleteMessage, "success");
 
-      //게시판 삭제 이후 남아있는 로컬 스토리지 청소
       storageWithExpiry.removeItem(BOARD_ID_KEY);
       storageWithExpiry.removeItem(BOARD_NAME_KEY);
       storageWithExpiry.removeItem(BOARD_PTD_KEY);
@@ -341,6 +369,7 @@ useEffect(() => {
       const listResult = await listResponse.json();
       if(listResult.boardListresult){
         setBoardList(listResult.boardList);
+        setFilteredBoardList(listResult.boardList);
       }
     } else {
       closeDeleteModal();
@@ -349,7 +378,6 @@ useEffect(() => {
     }
   };
 
-  // 게시판 이름 표시 헬퍼 함수
   const getBoardDisplayName = (name) => {
     if (isNarrowScreen && name.length > 5) {
       return name.substring(0, 4) + "...";
@@ -365,12 +393,33 @@ useEffect(() => {
         </div>
         <div className="sidebar-actions">
             <div className="board-search-container">
-              <form className="board-search-form">
-                <input type="text" placeholder="게시판 검색" name="search" />
-                <button type="submit" className="board-search-button">
+              <form className="board-search-form" onSubmit={handleSearchSubmit}>
+                <input 
+                  type="text" 
+                  placeholder="게시판 검색" 
+                  name="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button 
+                    type="button" 
+                    className="board-search-clear"
+                    onClick={handleSearchClear}
+                    title="검색어 지우기"
+                  >
+                    ×
+                  </button>
+                )}
+                <button type="submit" className="board-search-button" title="검색">
                   <img src={SIC} alt="검색" className="search-icon" />
                 </button>
               </form>
+              {searchQuery && (
+                <div className="search-result-info">
+                  {filteredBoardList.length}개 발견
+                </div>
+              )}
             </div>
             <button className="sidebar-actions-button" onClick={addNewBoard}>
               + 새 게시판 생성
@@ -378,8 +427,8 @@ useEffect(() => {
         </div>
         
         <div className="sidebar-boardList">
-          {boardList.length > 0 ? (
-            boardList.map((board) => (
+          {filteredBoardList.length > 0 ? (
+            filteredBoardList.map((board) => (
               <div 
                 key={board.boardPriId} 
                 className={boardChoice == board.boardPriId ? "board-list-item item-activate" : "board-list-item"}
@@ -446,13 +495,17 @@ useEffect(() => {
             ))
           ) : (
             <div className="no-board-container">
-              <div className="no-board-icon">📋</div>
-              <p className="no-board-message">
-                등록된 게시판이 없습니다
-              </p>
-              <p className="no-board-submessage">
-                새 게시판을 생성해 보세요!
-              </p>
+              <div className="no-board-icon">
+                {searchQuery ? '🔍' : '📋'}
+              </div>
+              <div className="no-board-result">
+                <p className="no-board-message">
+                  {searchQuery ? '검색 결과가 없습니다' : '등록된 게시판이 없습니다'}
+                </p>
+                <p className="no-board-submessage">
+                  {searchQuery ? '다른 검색어를 입력해 보세요' : '새 게시판을 생성해 보세요!'}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -489,7 +542,6 @@ useEffect(() => {
           }
       </div>
 
-      {/* 생성 모달 */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -565,7 +617,6 @@ useEffect(() => {
         </div>
       )}
 
-      {/* 삭제 모달 */}
       {isDeleteModalOpen && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
           <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
