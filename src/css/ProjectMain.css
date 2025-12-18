@@ -1,1 +1,9 @@
 /* -- 프로젝트 페이지 메인 css -- */
+.project-main-container {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 3rem;
+    gap: 2rem;
+}

@@ -37,6 +37,7 @@
   flex-direction: column;
   gap: 0.5rem;
   min-width: 0;
+  flex: 1;
 }
 
 .profile-nickname {
@@ -54,6 +55,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .profile-mypage-link,
@@ -69,6 +71,8 @@
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .profile-logout-btn {
@@ -87,7 +91,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* 사이드바 로그인 버튼 */
 .sidebar-login {
   display: block;
   width: 100%;
@@ -95,16 +98,80 @@
   padding: 0.9rem 1rem;
 }
 
-/* ========== 태블릿 (900px 이하) ========== */
-@media (max-width: 900px) {
+/* ========== 대형 데스크톱 (1400px 이상) ========== */
+@media (min-width: 1400px) {
   .profile-container {
-    padding: 0.4rem 0.8rem;
-    gap: 0.8rem;
+    gap: 1.5rem;
+    padding: 0.8rem 1.5rem;
   }
 
   .profile-image-wrapper {
-    width: 48px;
-    height: 48px;
+    width: 70px;
+    height: 70px;
+  }
+
+  .profile-nickname {
+    font-size: 1.2rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+/* ========== 중형 데스크톱 (1101px ~ 1399px) ========== */
+@media (min-width: 1101px) and (max-width: 1399px) {
+  .profile-container {
+    gap: 1.2rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .profile-image-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .profile-nickname {
+    font-size: 1.1rem;
+  }
+}
+
+/* ========== 소형 데스크톱 (901px ~ 1100px) ========== */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .profile-container {
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    max-width: 280px;
+  }
+
+  .profile-image-wrapper {
+    width: 52px;
+    height: 52px;
+  }
+
+  .profile-nickname {
+    font-size: 1rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+  }
+}
+
+/* ========== 태블릿 가로 (774px ~ 900px) ========== */
+@media (min-width: 774px) and (max-width: 900px) {
+  .profile-container {
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+  }
+
+  .profile-image-wrapper {
+    width: 50px;
+    height: 50px;
   }
 
   .profile-nickname {
@@ -113,15 +180,103 @@
 
   .profile-mypage-link,
   .profile-logout-btn {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.65rem;
   }
 }
 
+/* ========== 태블릿 세로 (601px ~ 773px) ========== */
 @media (min-width: 601px) and (max-width: 773px) {
   .profile-container {
-      width: auto;
-      max-width: 35vw;    
+    width: auto;
+    max-width: 400px;
+    padding: 0.5rem 0.9rem;
+    gap: 0.9rem;
+  }
+
+  .profile-image-wrapper {
+    width: 48px;
+    height: 48px;
+  }
+
+  .profile-nickname {
+    font-size: 0.9rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.7rem;
+    padding: 0.28rem 0.6rem;
+  }
+}
+
+/* ========== 모바일 가로 (481px ~ 600px) ========== */
+@media (min-width: 481px) and (max-width: 600px) {
+  .profile-container {
+    padding: 0.45rem 0.8rem;
+    gap: 0.8rem;
+    max-width: 100%;
+  }
+
+  .profile-image-wrapper {
+    width: 46px;
+    height: 46px;
+  }
+
+  .profile-nickname {
+    font-size: 0.85rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.7rem;
+    padding: 0.28rem 0.6rem;
+  }
+}
+
+/* ========== 모바일 세로 (376px ~ 480px) ========== */
+@media (min-width: 376px) and (max-width: 480px) {
+  .profile-container {
+    padding: 0.4rem 0.7rem;
+    gap: 0.7rem;
+  }
+
+  .profile-image-wrapper {
+    width: 44px;
+    height: 44px;
+  }
+
+  .profile-nickname {
+    font-size: 0.85rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.55rem;
+  }
+}
+
+/* ========== 소형 모바일 (375px 이하) ========== */
+@media (max-width: 375px) {
+  .profile-container {
+    padding: 0.4rem 0.6rem;
+    gap: 0.6rem;
+  }
+
+  .profile-image-wrapper {
+    width: 42px;
+    height: 42px;
+  }
+
+  .profile-nickname {
+    font-size: 0.8rem;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
   }
 }
 
@@ -150,3 +305,34 @@
     padding: 0.4rem 0.8rem;
   }
 }
+
+/* ========== 초소형 디바이스 (320px 이하) ========== */
+@media (max-width: 375px) {
+  .profile-container {
+    padding: 0.3rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .profile-image-wrapper {
+    width: 38px;
+    height: 38px;
+  }
+
+  .profile-nickname {
+    font-size: 0.75rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+  }
+
+  .profile-mypage-link,
+  .profile-logout-btn {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.4rem;
+    width: 100%;
+  }
+}
+

@@ -54,9 +54,9 @@ export default function Header() {
     setIsSidebarOpen(false);
   };
 
-  const topValue = windowWidth <= 900
-    ? (isLogined ? '97px' : '97px')
-    : (isLogined ? '111px' : '');
+  // const topValue = windowWidth <= 900
+  //   ? (isLogined ? '97px' : '97px')
+  //   : (isLogined ? '111px' : '');
 
   return (
     <>
@@ -90,10 +90,11 @@ export default function Header() {
         {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
       
-      <nav className="sub-nav" style={{ top: topValue }}>
+      {/* <nav className="sub-nav" style={{ top: topValue }}> */}
+      <nav className="sub-nav">
         <Link to="/">홈</Link>
         <Link to="/board">게시판</Link>
-        <Link to="/test2">프로젝트</Link>
+        <Link to="/project">프로젝트</Link>
         <Link to="/test3">아카이브</Link>
         <Link to="/test4">AI</Link>
       </nav>
@@ -141,7 +142,7 @@ export default function Header() {
         <nav className="sidebar-nav">
           <Link to="/" onClick={closeSidebar}>홈</Link>
           <Link to="/board" onClick={closeSidebar}>게시판</Link>
-          <Link to="/test2" onClick={closeSidebar}>프로젝트</Link>
+          <Link to="/project" onClick={closeSidebar}>프로젝트</Link>
           <Link to="/test3" onClick={closeSidebar}>아카이브</Link>
           <Link to="/test4" onClick={closeSidebar}>AI</Link>
         </nav>
