@@ -80,7 +80,7 @@ export default function Header() {
         
         {/* 데스크톱 검색창 */}
         <form className="search-box desktop-search">
-          <input type="text" placeholder="키워드 입력" name="search" />
+          <input type="text" placeholder="키워드 입력" name="search" autoComplete='off'/>
           <button type="submit" className="search-btn">
             <img src={SIC} alt="검색" className="search-icon" />
           </button>
@@ -132,7 +132,7 @@ export default function Header() {
 
         {/* 사이드바 검색창 */}
         <form className="search-box mobile-search">
-          <input type="text" placeholder="키워드 입력" name="search" />
+          <input type="text" placeholder="키워드 입력" name="search" autoComplete="off"/>
           <button type="submit" className="search-btn">
             <img src={SIC} alt="검색" className="search-icon" />
           </button>
