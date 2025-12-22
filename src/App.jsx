@@ -7,7 +7,6 @@ import MainHome from './components/MainHome.jsx'
 import Login from './components/AccountService.jsx'
 import Register from './components/Register.jsx'
 import Board from './components/Board.jsx'
-import ProjectHome from './components/ProjectHome.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 import BoardWriter from './util/BoardWriterFileUpload.jsx';
 
@@ -17,6 +16,8 @@ import BoardPost from './components/Board-Post-Content.jsx';
 import PostEdit from './components/Post-Edit.jsx';
 import PrivEdit from './components/Priv-Edit.jsx';
 
+import ProjectHome from './components/ProjectHome.jsx'
+import ProjectManage from './components/ProjectManage.jsx'
 
 import PrivateWriter from './util/Private-Board-Content.jsx';
 
@@ -37,7 +38,6 @@ export default function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/board" element={<Board />} />
-                  <Route path="/project" element={<ProjectHome />} />
                   <Route path="/resetPassword" element={<ResetPassword />} />
                   <Route path="/token" element={<TokenWrapper />} />
 
@@ -49,6 +49,9 @@ export default function App() {
 
                   <Route path="/boardEdit/:boardId/:postId" element={<PostEdit /> } />
                   <Route path="/privateEdit/:boardId/:postId" element={<PrivEdit /> } />
+
+                  <Route path="/project" element={<ProjectHome />} />
+                  <Route path="/project/manage/:projectId" element={<ProjectManage />} />
 
                 </Routes>
             </AuthProvider>

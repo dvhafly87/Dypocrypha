@@ -9,20 +9,24 @@ import API from '../config/apiConfig.js';
 
 export default function ProjectMain() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [projectArea, setProjectArea] = useState(false);
   const [nonProjectArea, setNonProjectArea] = useState(false);
   const { isLogined } = useAuth();
-  const { addToast } = useToast();
   const [addProjectModalOpen, setAddProjectModalOpen] = useState(false);
 
   // 프로젝트 폼 상태
   const [projectTitle, setProjectTitle] = useState("");
   const [projectSummary, setProjectSummary] = useState("");
+  const [projectCategory, setProjectCategory] = useState("개발");
   const [teamValue, setTeamValue] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [skillStack, setSkillStack] = useState("");
   const [projectThumb, setProjectThumb] = useState(null);
   const [thumbPreview, setThumbPreview] = useState(null);
+
+  // 카테고리 목록
+  const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
 
   const addNewProject = () => {
     if(!isLogined) {
@@ -85,6 +89,7 @@ export default function ProjectMain() {
     const formData = new FormData();
     formData.append('title', projectTitle);
     formData.append('summary', projectSummary);
+    formData.append('category', projectCategory);
     formData.append('teamValue', teamValue);
     if (teamValue && teamName) {
       formData.append('teamName', teamName);
@@ -140,6 +145,7 @@ export default function ProjectMain() {
   const resetForm = () => {
     setProjectTitle("");
     setProjectSummary("");
+    setProjectCategory("개발");
     setTeamValue(false);
     setTeamName("");
     setSkillStack("");
@@ -205,6 +211,7 @@ export default function ProjectMain() {
 
   // 검색 필터링된 프로젝트
   const filteredProjects = projectInfo.filter(project => {
+    if (project.status === 'C') return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -222,7 +229,7 @@ export default function ProjectMain() {
 
   // 프로젝트 클릭 핸들러
   const handleProjectClick = (projectId) => {
-    navigate(`/project/${projectId}`);
+    navigate(`/project/manage/${projectId}`);
   };
 
   // 상태 라벨 가져오기
@@ -419,7 +426,18 @@ export default function ProjectMain() {
                               <div className="project-card-content">
                                 <h3 className="project-card-title">{project.title}</h3>
                                 <p className="project-card-summary">{project.summary}</p>
-                                
+
+                                {!project.teamValue && (
+                                  <div className="project-card-team">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <circle cx="12" cy="7" r="4" />
+                                      <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2" />
+                                    </svg>
+                                    <span>{project.starter}</span>
+                                  </div>
+                                )}
+
                                 {project.teamValue && project.teamName && (
                                   <div className="project-card-team">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -443,6 +461,13 @@ export default function ProjectMain() {
                                 )}
                                 
                                 <div className="project-card-footer">
+                                <span className="project-card-category-text">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                  </svg>
+                                  {project.pjCategory}
+                                </span>
                                   <span className="project-card-date">
                                     {formatDate(project.created)}
                                   </span>
@@ -490,6 +515,25 @@ export default function ProjectMain() {
                                 <p className="project-list-summary">{project.summary}</p>
                                 
                                 <div className="project-list-meta">
+
+                                <div className="project-list-category">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                  </svg>
+                                  <span>{project.pjCategory}</span>
+                                </div>
+
+                                {!project.teamValue && (
+                                    <div className="project-list-team">
+                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <circle cx="12" cy="7" r="4" />
+                                      <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2" />
+                                    </svg>
+                                      <span>{project.starter}</span>
+                                    </div>
+                                  )}
                                   {project.teamValue && project.teamName && (
                                     <div className="project-list-team">
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -565,7 +609,7 @@ export default function ProjectMain() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor='projectSummary'>프로젝트 요약 <span className="required">*</span></label>
+                  <label htmlFor='projectSummary'>프로젝트 요약</label>
                   <textarea 
                     id="projectSummary"
                     value={projectSummary}
@@ -573,8 +617,23 @@ export default function ProjectMain() {
                     placeholder="프로젝트에 대한 간단한 설명을 입력하세요"
                     rows={3}
                     maxLength={255}
-                    required
                   />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor='projectCategory'>프로젝트 카테고리 <span className="required">*</span></label>
+                  <select 
+                    id="projectCategory"
+                    value={projectCategory}
+                    onChange={(e) => setProjectCategory(e.target.value)}
+                    required
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="form-group checkbox-group">
@@ -608,13 +667,13 @@ export default function ProjectMain() {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor='skillStack'>기술 스택</label>
+                    <label htmlFor='skillStack'>사용 스킬 / 툴</label>
                     <input 
                       type="text"
                       id="skillStack"
                       value={skillStack}
                       onChange={(e) => setSkillStack(e.target.value)}
-                      placeholder="Spring, React, python, Vue ... 등"
+                      placeholder="언어, 프레임워크, 프로그램, 툴 등"
                       maxLength={255}
                     />
                   </div>
@@ -641,7 +700,7 @@ export default function ProjectMain() {
                           <polyline points="21 15 16 10 5 21" />
                         </svg>
                         <span>이미지를 선택하세요</span>
-                        <span className="file-upload-hint">JPG, PNG, GIF (최대 5MB)</span>
+                        <span className="file-upload-hint">JPG, JPEG, PNG(최대 5MB)</span>
                       </label>
                     )}
                     <input 
