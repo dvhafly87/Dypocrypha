@@ -1,0 +1,22 @@
+.project-manage-container {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 3rem;
+    gap: 2rem;
+}
+
+.project-manage-header {
+    border-radius: 15px;
+    background-color: white;
+}
+
+.project-manage-thumbnail {
+    width: auto;
+    box-sizing: border-box;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    height: 250px;
+
+}

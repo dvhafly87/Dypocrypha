@@ -218,7 +218,8 @@ export default function ProjectMain() {
       project.title?.toLowerCase().includes(query) ||
       project.summary?.toLowerCase().includes(query) ||
       project.skillStack?.toLowerCase().includes(query) ||
-      project.teamName?.toLowerCase().includes(query)
+      project.teamName?.toLowerCase().includes(query) ||
+      project.pjCategory?.toLowerCase().includes(query)
     );
   });
 
