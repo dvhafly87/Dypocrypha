@@ -10,86 +10,140 @@ export default function ProjectManage() {
     const { addToast } = useToast();
     const [projectBasic, setProjectBasic] = useState([]);
     const [projectMember, setProjectMember] = useState([]);
+    const [teamNameInput, setTeamNameInput] = useState('');
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [newMemberName, setNewMemberName] = useState('');
 
     const getMemberGradeLabel = (grade) => {
-    return grade === 'L' ? '관리자' : '팀원';
-};
-
-const getMemberStatLabel = (stat) => {
-    const statMap = {
-        'H': '대기',
-        'I': '참여중'
+        return grade === 'L' ? '관리자' : '팀원';
     };
-    return statMap[stat] || '알 수 없음';
-};
 
-const getMemberStatColor = (stat) => {
-    const colorMap = {
-        'H': '#f59e0b',
-        'I': '#10b981'
+    const getMemberStatLabel = (stat) => {
+        const statMap = {
+            'H': '대기',
+            'I': '참여중'
+        };
+        return statMap[stat] || '알 수 없음';
     };
-    return colorMap[stat] || '#6b7280';
-};
 
-// 3. 팀원 추가 핸들러
-const handleAddMember = async () => {
-    if (!newMemberName.trim()) {
-        addToast('팀원 이름을 입력해주세요.', 'warning');
-        return;
-    }
+    const getMemberStatColor = (stat) => {
+        const colorMap = {
+            'H': '#f59e0b',
+            'I': '#10b981'
+        };
+        return colorMap[stat] || '#6b7280';
+    };
 
-    try {
-        const response = await fetch(`${API.API_BASE_URL}/project/member/add`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                projectId: projectId,
-                memberName: newMemberName
-            })
-        });
-
-        if (response.ok) {
-            addToast('팀원이 추가되었습니다.', 'success');
-            setNewMemberName('');
-            setShowAddMemberModal(false);
-            // 프로젝트 정보 다시 불러오기
-            window.location.reload();
-        } else {
-            addToast('팀원 추가에 실패했습니다.', 'error');
-        }
-    } catch (error) {
-        addToast('팀원 추가 중 오류가 발생했습니다.', 'error');
-    }
-};
-
-// 4. 팀원 삭제 핸들러
-const handleRemoveMember = async (memberId) => {
-    if (window.confirm('이 팀원을 제거하시겠습니까?')) {
-        try {
-            const response = await fetch(`${API.API_BASE_URL}/project/member/remove`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    memberId: memberId
-                })
-            });
-
-            if (response.ok) {
-                addToast('팀원이 제거되었습니다.', 'success');
-                window.location.reload();
-            } else {
-                addToast('팀원 제거에 실패했습니다.', 'error');
+    // 3. 팀원 추가 핸들러 (개인→팀 프로젝트 전환 포함)
+    const handleAddMember = async () => {
+        // 개인 프로젝트에서 팀 프로젝트로 전환하는 경우
+        if (!projectBasic.teamValue) {
+            if (!teamNameInput.trim()) {
+                addToast('팀 이름을 입력해주세요.', 'warning');
+                return;
             }
-        } catch (error) {
-            addToast('팀원 제거 중 오류가 발생했습니다.', 'error');
+            if (!newMemberName.trim()) {
+                addToast('팀원 이름을 입력해주세요.', 'warning');
+                return;
+            }
+
+            try {
+                // 1단계: 프로젝트를 팀 프로젝트로 전환
+                const convertResponse = await fetch(`${API.API_BASE_URL}/project/convert-to-team`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        teamName: teamNameInput
+                    })
+                });
+
+                if (!convertResponse.ok) {
+                    addToast('팀 프로젝트 전환에 실패했습니다.', 'error');
+                    return;
+                }
+
+                // 2단계: 팀원 추가
+                const addMemberResponse = await fetch(`${API.API_BASE_URL}/project/member/add`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        memberName: newMemberName
+                    })
+                });
+
+                if (addMemberResponse.ok) {
+                    addToast('팀 프로젝트로 전환되고 팀원이 추가되었습니다.', 'success');
+                    setNewMemberName('');
+                    setTeamNameInput('');
+                    setShowAddMemberModal(false);
+                    window.location.reload();
+                } else {
+                    addToast('팀원 추가에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                addToast('처리 중 오류가 발생했습니다.', 'error');
+            }
+        } else {
+            // 이미 팀 프로젝트인 경우 - 기존 로직
+            if (!newMemberName.trim()) {
+                addToast('팀원 이름을 입력해주세요.', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API.API_BASE_URL}/project/member/add`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        memberName: newMemberName
+                    })
+                });
+
+                if (response.ok) {
+                    addToast('팀원이 추가되었습니다.', 'success');
+                    setNewMemberName('');
+                    setShowAddMemberModal(false);
+                    window.location.reload();
+                } else {
+                    addToast('팀원 추가에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                addToast('팀원 추가 중 오류가 발생했습니다.', 'error');
+            }
         }
-    }
-};
+    };
+
+    // 4. 팀원 삭제 핸들러
+    const handleRemoveMember = async (memberId) => {
+        if (window.confirm('이 팀원을 제거하시겠습니까?')) {
+            try {
+                const response = await fetch(`${API.API_BASE_URL}/project/member/remove`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        memberId: memberId
+                    })
+                });
+
+                if (response.ok) {
+                    addToast('팀원이 제거되었습니다.', 'success');
+                    window.location.reload();
+                } else {
+                    addToast('팀원 제거에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                addToast('팀원 제거 중 오류가 발생했습니다.', 'error');
+            }
+        }
+    };
 
 
     const statusMenuRef = useRef(null);
@@ -153,12 +207,14 @@ const handleRemoveMember = async (memberId) => {
                     } else {
                         setProjectBasic([]);
                     }
+
                     //팀원 정보 엔티티 => 리스트로 넣음
                     if (result.projectMemberInformation != null) {
                         setProjectMember(result.projectMemberInformation);
                     } else {
                         setProjectMember([]);
                     }
+
                 } else {
                     const toastData = {
                         status: 'warning',
@@ -357,72 +413,127 @@ const handleRemoveMember = async (memberId) => {
                             </div>
                         </section>
                     </div>
-
                     {/* 프로젝트 인원수 컨테이너  */}
                     <div className="project-manage-teamValue-area">
                         <div className="project-manage-teamValue">
                             {projectBasic.teamValue ? "팀 프로젝트" : "개인 프로젝트"}
                         </div>
 
-                        <div className="project-manage-teamName">
-                            {projectBasic.teamValue ? projectBasic.teamName : projectBasic.starter}
+                        <div className="team-info-section">
+                            <span className="team-info-label">
+                                {projectBasic.teamValue ? "팀명" : "진행자"}
+                            </span>
+                            <div className="project-manage-teamName">
+                                {projectBasic.teamValue ? projectBasic.teamName : projectBasic.starter}
+                            </div>
                         </div>
 
-                        <div>
-                            {/* 이제 여기다가 팀원 정보 표시 물론 없으면 없다고 하고 팀원추가 기능 만들거임  */}
+                        {projectMember.length > 0 && (
+                            <div className="team-member-information">
+                                {projectMember.map(member => (
+                                    <div key={member.id} className="member-card">
+                                        <div className="member-name">{member.pjMemberName}</div>
 
-                            {/* package com.dypocrypha.entity; 멤버 엔티티는 이럼
-                            import jakarta.persistence.*;
-                            import lombok.Getter;
-                            import lombok.NoArgsConstructor;
-                            import lombok.AccessLevel;
+                                        <div className="member-detail">
+                                            <span className="member-detail-label">권한:</span>
+                                            <span className="member-grade-badge">
+                                                {getMemberGradeLabel(member.pjMemberGrade)}
+                                            </span>
+                                        </div>
 
-                            @Entity
-                            @Getter
-                            @NoArgsConstructor(access = AccessLevel.PROTECTED)
-                            @Table(name = "dy_project_member")
-                            public class ProjectMemberEntity {
+                                        <div className="member-detail">
+                                            <span className="member-detail-label">상태:</span>
+                                            <span
+                                                className="member-stat-badge"
+                                                style={{
+                                                    backgroundColor: getMemberStatColor(member.pjMemberStat) + '20',
+                                                    color: getMemberStatColor(member.pjMemberStat)
+                                                }}
+                                            >
+                                                {getMemberStatLabel(member.pjMemberStat)}
+                                            </span>
+                                        </div>
 
-                                @Id
-                                @GeneratedValue(strategy = GenerationType.IDENTITY)
-                                @Column(name = "dy_pj_team_member_id")
-                                private Long id;
+                                        {member.pjMemberGrade !== 'L' && (
+                                            <div className="member-actions">
+                                                <button
+                                                    className="member-action-btn remove"
+                                                    onClick={() => handleRemoveMember(member.id)}
+                                                >
+                                                    제거
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
-                                //프로젝트 메인 테이블의 아이디
-                                @Column(name = "dy_pj_main_id", nullable = false, length = 255)
-                                private Long pjMainId;
-
-                                //프로젝트에 참여하는 팀원의 이름
-                                @Column(name = "dy_pj_team_member_name", nullable = false, length = 255)
-                                private String pjMemberName;
-
-                                //프로젝트의 상태 개인 / 팀 || 개인 이면 L 1명 starter가 프로젝트 관리자로 표시됨 {P 개인, T 팀 프로젝트}
-                                @Column(name = "dy_pj_project_status", nullable = false, length = 1)
-                                private String pjStatus;
-
-                                //현재 멤버 참여 상태 {H 대기 or 중단, I 참여 중}
-                                @Column(name = "dy_pj_team_member_stat", nullable = false, length = 1)
-                                private String pjMemberStat;
-
-                                //현재 참여한 멤버의 등급 권한 {L 관리자, M 팀원}
-                                @Column(name = "dy_pj_team_member_grade", nullable = false, length = 1)
-                                private String pjMemberGrade;
-
-                                private ProjectMemberEntity (Long pjMainId, String pjMemberName, String pjStatus, String pjMemberStat, String pjMemberGrade){
-                                    this.pjMainId = pjMainId;
-                                    this.pjMemberName = pjMemberName;
-                                    this.pjStatus = pjStatus;
-                                    this.pjMemberStat = pjMemberStat;
-                                    this.pjMemberGrade = pjMemberGrade;
-                                }
-
-                                public static ProjectMemberEntity create (Long pjMainId, String pjMemberName, String pjStatus, String pjMemberStat, String pjMemberGrade) {
-                                    return new ProjectMemberEntity(pjMainId, pjMemberName, pjStatus, pjMemberStat, pjMemberGrade);
-                                }
-                            } */}
-
-                        </div>
+                        <button
+                            className="add-member-btn"
+                            onClick={() => setShowAddMemberModal(true)}
+                        >
+                            + 팀원 추가
+                        </button>
                     </div>
+
+                    {/* 팀원 추가 모달 */}
+                    {showAddMemberModal && (
+                        <div className="modal-overlay" onClick={() => setShowAddMemberModal(false)}>
+                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="modal-title">팀원 추가</h3>
+
+                                {!projectBasic.teamValue && (
+                                    <>
+                                        <div className="modal-notice">
+                                            개인 프로젝트에서 팀원을 추가하면 팀 프로젝트로 전환됩니다.
+                                        </div>
+
+                                        <div className="modal-input-group">
+                                            <label className="modal-label">팀 이름</label>
+                                            <input
+                                                type="text"
+                                                className="modal-input"
+                                                placeholder="팀 이름을 입력하세요"
+                                                value={teamNameInput}
+                                                onChange={(e) => setTeamNameInput(e.target.value)}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="modal-input-group">
+                                    <label className="modal-label">팀원 이름</label>
+                                    <input
+                                        type="text"
+                                        className="modal-input"
+                                        placeholder="팀원 이름을 입력하세요"
+                                        value={newMemberName}
+                                        onChange={(e) => setNewMemberName(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button
+                                        className="modal-btn cancel"
+                                        onClick={() => {
+                                            setShowAddMemberModal(false);
+                                            setNewMemberName('');
+                                            setTeamNameInput('');
+                                        }}
+                                    >
+                                        취소
+                                    </button>
+                                    <button
+                                        className="modal-btn confirm"
+                                        onClick={handleAddMember}
+                                    >
+                                        추가
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>
