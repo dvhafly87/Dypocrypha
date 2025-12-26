@@ -1,66 +1,71 @@
-import React, { useEffect, useState} from 'react'; // React import 추가
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // 👈 AuthContext 파일 경로에 맞게 수정 필요
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 import '../css/ProfileContainer.css';
-
 import API from '../config/apiConfig';
 import Doge from '../img/doge.jpeg';
 
 export default function ProfileContainer() {
     const [userNickname, setUserNickname] = useState('');
-    const { logout, isLogined } = useAuth(); 
-    const handleLogout = () => {
-    logout();
-    };
+    const { logout, isLogined } = useAuth();
 
     useEffect(() => {
-       const profileInformationCalling = async () => {
+        const profileInformationCalling = async () => {
             try {
                 const response = await fetch(`${API.API_BASE_URL}/member/profileInformation`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                 });
+                
+                if (!response.ok) {
+                    logout();
+                    return;
+                }
+
                 const result = await response.json();
-                if(!result.getProfileInfo){
-                    handleLogout();
+                
+                if (!result.getProfileInfo) {
+                    logout();
                 } else {
                     setUserNickname(result.nickname);
                 }
             } catch (error) {
-                console.error("로그인 상태 확인 실패:", error);
-                setIsLogined(false); 
+                console.error("프로필 정보 로드 실패:", error);
+                logout();
             }
-       }
-       profileInformationCalling();
-    }, []);
+        };
 
-  return (
-    <div className="profile-container">
-      {isLogined && ( 
-        <>
-          <div className="profile-image-wrapper">
-            <img 
-              src={Doge} 
-              alt={`사용자의 프로필`} 
-              className="profile-image"
-            />
-          </div>
-          <div className="profile-info">
-            <span className="profile-nickname">{userNickname} 님</span>
-            <div className="profile-actions">
-              <Link to="/mypage" className="profile-mypage-link">
-                마이페이지
-              </Link>
-              <button onClick={handleLogout} className="profile-logout-btn">
-                로그아웃
-              </button>
+        if (isLogined) {
+            profileInformationCalling();
+        }
+    }, [isLogined, logout]);
+
+    if (!isLogined) {
+        return null;
+    }
+
+    return (
+        <div className="profile-container">
+            <div className="profile-image-wrapper">
+                <img 
+                    src={Doge} 
+                    alt={`${userNickname}의 프로필`} 
+                    className="profile-image"
+                />
             </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
+            <div className="profile-info">
+                <span className="profile-nickname">{userNickname || '사용자'} 님</span>
+                <div className="profile-actions">
+                    <Link to="/mypage" className="profile-mypage-link">
+                        마이페이지
+                    </Link>
+                    <button onClick={logout} className="profile-logout-btn">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 }

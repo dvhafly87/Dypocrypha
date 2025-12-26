@@ -14,6 +14,7 @@ export default function ProjectManage() {
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [newMemberName, setNewMemberName] = useState('');
+    const [newMemberGrade, setNewMemberGrade] = useState('M'); // 기본값: 팀원
 
     const getMemberGradeLabel = (grade) => {
         return grade === 'L' ? '관리자' : '팀원';
@@ -35,6 +36,35 @@ export default function ProjectManage() {
         return colorMap[stat] || '#6b7280';
     };
 
+    // 팀원 역할 변경 핸들러
+    const handleChangeGrade = async (memberId, currentGrade) => {
+        const newGrade = currentGrade === 'L' ? 'M' : 'L';
+        const gradeLabel = newGrade === 'L' ? '관리자' : '팀원';
+
+        if (window.confirm(`이 팀원의 역할을 ${gradeLabel}로 변경하시겠습니까?`)) {
+            try {
+                const response = await fetch(`${API.API_BASE_URL}/project/member/grade/update`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        memberId: memberId,
+                        newGrade: newGrade
+                    })
+                });
+
+                if (response.ok) {
+                    addToast(`역할이 ${gradeLabel}로 변경되었습니다.`, 'success');
+                    window.location.reload();
+                } else {
+                    addToast('역할 변경에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                addToast('역할 변경 중 오류가 발생했습니다.', 'error');
+            }
+        }
+    };
+
     // 3. 팀원 추가 핸들러 (개인→팀 프로젝트 전환 포함)
     const handleAddMember = async () => {
         // 개인 프로젝트에서 팀 프로젝트로 전환하는 경우
@@ -49,36 +79,36 @@ export default function ProjectManage() {
             }
 
             try {
-                // 1단계: 프로젝트를 팀 프로젝트로 전환
-                const convertResponse = await fetch(`${API.API_BASE_URL}/project/convert-to-team`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        projectId: projectId,
-                        teamName: teamNameInput
-                    })
-                });
-
-                if (!convertResponse.ok) {
-                    addToast('팀 프로젝트 전환에 실패했습니다.', 'error');
-                    return;
-                }
-
-                // 2단계: 팀원 추가
+                // 팀원 추가 (Grade, TeamName 포함)
                 const addMemberResponse = await fetch(`${API.API_BASE_URL}/project/member/add`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         projectId: projectId,
-                        memberName: newMemberName
+                        projectMemberName: newMemberName,
+                        projectMemberGrade: newMemberGrade,
+                        projectTeamName: teamNameInput
                     })
                 });
 
-                if (addMemberResponse.ok) {
+                if (!addMemberResponse.ok) {
+                    const toastData = {
+                        status: 'warning',
+                        message: "서버 통신 불가"
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    navigate('/');
+                    return;
+                }
+
+                const result = await addMemberResponse.json();
+
+
+                if (result.insertAddStatus) {
                     addToast('팀 프로젝트로 전환되고 팀원이 추가되었습니다.', 'success');
                     setNewMemberName('');
+                    setNewMemberGrade('M');
                     setTeamNameInput('');
                     setShowAddMemberModal(false);
                     window.location.reload();
@@ -89,7 +119,7 @@ export default function ProjectManage() {
                 addToast('처리 중 오류가 발생했습니다.', 'error');
             }
         } else {
-            // 이미 팀 프로젝트인 경우 - 기존 로직
+            // 이미 팀 프로젝트인 경우 - Grade 포함
             if (!newMemberName.trim()) {
                 addToast('팀원 이름을 입력해주세요.', 'warning');
                 return;
@@ -102,17 +132,21 @@ export default function ProjectManage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         projectId: projectId,
-                        memberName: newMemberName
+                        projectMemberName: newMemberName,
+                        projectMemberGrade: newMemberGrade,
+                        projectTeamName: teamNameInput
                     })
                 });
+                const result = await response.json();
 
-                if (response.ok) {
+                if (result.insertAddStatus) {
                     addToast('팀원이 추가되었습니다.', 'success');
                     setNewMemberName('');
+                    setNewMemberGrade('M');
                     setShowAddMemberModal(false);
                     window.location.reload();
                 } else {
-                    addToast('팀원 추가에 실패했습니다.', 'error');
+                    addToast(result.insertAddMessage, 'error');
                 }
             } catch (error) {
                 addToast('팀원 추가 중 오류가 발생했습니다.', 'error');
@@ -435,7 +469,7 @@ export default function ProjectManage() {
                                         <div className="member-name">{member.pjMemberName}</div>
 
                                         <div className="member-detail">
-                                            <span className="member-detail-label">권한:</span>
+                                            <span className="member-detail-label">역할:</span>
                                             <span className="member-grade-badge">
                                                 {getMemberGradeLabel(member.pjMemberGrade)}
                                             </span>
@@ -454,16 +488,22 @@ export default function ProjectManage() {
                                             </span>
                                         </div>
 
-                                        {member.pjMemberGrade !== 'L' && (
-                                            <div className="member-actions">
+                                        <div className="member-actions">
+                                            <button
+                                                className="member-action-btn change-grade"
+                                                onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
+                                            >
+                                                {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
+                                            </button>
+                                            {member.pjMemberGrade !== 'L' && (
                                                 <button
                                                     className="member-action-btn remove"
                                                     onClick={() => handleRemoveMember(member.id)}
                                                 >
                                                     제거
                                                 </button>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -513,12 +553,25 @@ export default function ProjectManage() {
                                     />
                                 </div>
 
+                                <div className="modal-input-group">
+                                    <label className="modal-label">역할</label>
+                                    <select
+                                        className="modal-input"
+                                        value={newMemberGrade}
+                                        onChange={(e) => setNewMemberGrade(e.target.value)}
+                                    >
+                                        <option value="M">팀원</option>
+                                        <option value="L">관리자</option>
+                                    </select>
+                                </div>
+
                                 <div className="modal-actions">
                                     <button
                                         className="modal-btn cancel"
                                         onClick={() => {
                                             setShowAddMemberModal(false);
                                             setNewMemberName('');
+                                            setNewMemberGrade('M');
                                             setTeamNameInput('');
                                         }}
                                     >

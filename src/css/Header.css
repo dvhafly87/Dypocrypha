@@ -153,6 +153,7 @@
   box-sizing: border-box;
   position: sticky;
   z-index: 100;
+  /* top: 115px; */
   top: 90px;
 }
 
