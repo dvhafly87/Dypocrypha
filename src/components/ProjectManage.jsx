@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ToastContext';
+import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
 import '../css/ProjectManage.css';
 
 export default function ProjectManage() {
+    const { isLogined, loginSuccess } = useAuth();
     const { projectId } = useParams();
     const navigate = useNavigate();
     const { addToast } = useToast();
@@ -64,6 +66,14 @@ export default function ProjectManage() {
             }
         }
     };
+    const navigatedLoginPage = () => {
+        const toastData = {
+            status: 'warning',
+            message: "로그인이 필요합니다."
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate("/login");
+    }
 
     // 3. 팀원 추가 핸들러 (개인→팀 프로젝트 전환 포함)
     const handleAddMember = async () => {
@@ -511,7 +521,8 @@ export default function ProjectManage() {
 
                         <button
                             className="add-member-btn"
-                            onClick={() => setShowAddMemberModal(true)}
+                            onClick={() => isLogined && loginSuccess
+                                ? setShowAddMemberModal(true) : navigatedLoginPage()}
                         >
                             + 팀원 추가
                         </button>

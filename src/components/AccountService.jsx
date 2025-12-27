@@ -13,6 +13,20 @@ export default function AccountService() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordView, setPasswordView] = useState(false);
+    
+    useEffect(() => {
+        const storedToastData = localStorage.getItem('redirectToast');
+        if (storedToastData) {
+            try {
+                const toastData = JSON.parse(storedToastData);
+                addToast(toastData.message, toastData.status);
+                localStorage.removeItem('redirectToast');
+            } catch (error) {
+                console.error("Failed to parse redirectToast from localStorage:", error);
+                localStorage.removeItem('redirectToast');
+            }
+        }
+    }, [addToast]);
 
 
     useEffect(() => {
