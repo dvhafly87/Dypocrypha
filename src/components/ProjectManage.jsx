@@ -498,22 +498,24 @@ export default function ProjectManage() {
                                             </span>
                                         </div>
 
-                                        <div className="member-actions">
-                                            <button
-                                                className="member-action-btn change-grade"
-                                                onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
-                                            >
-                                                {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
-                                            </button>
-                                            {member.pjMemberGrade !== 'L' && (
+                                        {isLogined && loginSuccess && member.pjMemberGrade === 'L' &&(
+                                            <div className="member-actions">
                                                 <button
-                                                    className="member-action-btn remove"
-                                                    onClick={() => handleRemoveMember(member.id)}
+                                                    className="member-action-btn change-grade"
+                                                    onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
                                                 >
-                                                    제거
+                                                    {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
                                                 </button>
-                                            )}
-                                        </div>
+                                                {member.pjMemberGrade !== 'L' && (
+                                                    <button
+                                                        className="member-action-btn remove"
+                                                        onClick={() => handleRemoveMember(member.id)}
+                                                    >
+                                                        제거
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
