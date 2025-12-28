@@ -13,6 +13,7 @@ export default function ProjectManage() {
     const [projectBasic, setProjectBasic] = useState([]);
     const [projectMember, setProjectMember] = useState([]);
     const [teamNameInput, setTeamNameInput] = useState('');
+    const [permissionGrade, setPermissionGrade] = useState('');
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [newMemberName, setNewMemberName] = useState('');
@@ -74,44 +75,6 @@ export default function ProjectManage() {
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate("/login");
-    }
-
-    const loginUserPermissionCheck = async () => {
-        try {
-            const response = await fetch(`${API.API_BASE_URL}/project/member/permission/check`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    projectId: projectId
-                })
-            });
-
-            if (!response.ok) {
-                const toastData = {
-                    status: 'warning',
-                    message: '현재 서버가 실행중이 아니라 프로젝트 권한 확인이 불가능합니다 나중에 다시 시도해주십시오.'
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate("/");
-            }
-
-            const result = await response.json();
-
-            if (result.permissionCheckStatus) {
-                setShowAddMemberModal(true);
-            } else {
-                setShowAddMemberModal(false);
-                addToast("프로젝트 접근 또는 멤버 추가 권한이 없습니다", "error");
-            }
-        } catch (error) {
-            const toastData = {
-                status: 'warning',
-                message: '현재 서버가 실행중이 아니라 프로젝트 권한 확인이 불가능합니다 나중에 다시 시도해주십시오.'
-            };
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate("/");
-        }
     }
 
     // 3. 팀원 추가 핸들러 (개인→팀 프로젝트 전환 포함)
@@ -260,6 +223,32 @@ export default function ProjectManage() {
         };
     }, [showStatusMenu]);
     // ------------------------------------------------------------------------------------
+    useEffect(() => {
+        const fetchPermission = async () => {
+            if (!isLogined || !loginSuccess) return;
+
+            try {
+                const res = await fetch(`${API.API_BASE_URL}/project/member/permission/check`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ projectId })
+                });
+
+                const result = await res.json();
+
+                if (result.permissionCheckStatus) {
+                    setPermissionGrade(result.permissionGrade); // 'L' or 'M'
+                } else {
+                    setPermissionGrade('');
+                }
+            } catch {
+                setPermissionGrade('');
+            }
+        };
+
+        fetchPermission();
+    }, [projectId, isLogined, loginSuccess]);
 
     useEffect(() => {
         const getThisProjectInformation = async () => {
@@ -524,7 +513,7 @@ export default function ProjectManage() {
                                                     {getMemberGradeLabel(member.pjMemberGrade)}
                                                 </span>
                                             </div>
-                                            
+
                                             <div className="member-detail">
                                                 <span className="member-detail-label">상태:</span>
                                                 <span
@@ -539,20 +528,20 @@ export default function ProjectManage() {
                                             </div>
 
                                         </div>
-
                                         <div className="member-actions">
-                                            <button
+                                            {permissionGrade === 'L' ? (<button
                                                 className="member-action-btn change-grade"
                                                 onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
                                             >
-                                                {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
-                                            </button>
+                                                {member.pjMemberGrade !== 'L' ? "관리자로 변경" : "팀원으로 변경"}
+                                            </button>) : ""}
+
                                             {member.pjMemberGrade !== 'L' && (
                                                 <button
                                                     className="member-action-btn remove"
                                                     onClick={() => handleRemoveMember(member.id)}
                                                 >
-                                                    제거
+                                                    {permissionGrade === 'L' ? "제거" : "탈퇴"}
                                                 </button>
                                             )}
                                         </div>
@@ -563,8 +552,19 @@ export default function ProjectManage() {
 
                         <button
                             className="add-member-btn"
-                            onClick={() => isLogined && loginSuccess
-                                ? loginUserPermissionCheck() : navigatedLoginPage()}
+                            onClick={() => {
+                                if (!isLogined || !loginSuccess) {
+                                    navigatedLoginPage();
+                                    return;
+                                }
+
+                                if (permissionGrade !== 'L') {
+                                    addToast('관리자만 팀원을 추가할 수 있습니다.', 'error');
+                                    return;
+                                }
+
+                                setShowAddMemberModal(true);
+                            }}
                         >
                             + 팀원 추가
                         </button>
