@@ -66,6 +66,7 @@ export default function ProjectManage() {
             }
         }
     };
+
     const navigatedLoginPage = () => {
         const toastData = {
             status: 'warning',
@@ -73,6 +74,44 @@ export default function ProjectManage() {
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate("/login");
+    }
+
+    const loginUserPermissionCheck = async () => {
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/member/permission/check`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectId: projectId
+                })
+            });
+
+            if (!response.ok) {
+                const toastData = {
+                    status: 'warning',
+                    message: '현재 서버가 실행중이 아니라 프로젝트 권한 확인이 불가능합니다 나중에 다시 시도해주십시오.'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate("/");
+            }
+
+            const result = await response.json();
+
+            if (result.permissionCheckStatus) {
+                setShowAddMemberModal(true);
+            } else {
+                setShowAddMemberModal(false);
+                addToast("프로젝트 접근 또는 멤버 추가 권한이 없습니다", "error");
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'warning',
+                message: '현재 서버가 실행중이 아니라 프로젝트 권한 확인이 불가능합니다 나중에 다시 시도해주십시오.'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate("/");
+        }
     }
 
     // 3. 팀원 추가 핸들러 (개인→팀 프로젝트 전환 포함)
@@ -478,44 +517,45 @@ export default function ProjectManage() {
                                     <div key={member.id} className="member-card">
                                         <div className="member-name">{member.pjMemberName}</div>
 
-                                        <div className="member-detail">
-                                            <span className="member-detail-label">역할:</span>
-                                            <span className="member-grade-badge">
-                                                {getMemberGradeLabel(member.pjMemberGrade)}
-                                            </span>
-                                        </div>
-
-                                        <div className="member-detail">
-                                            <span className="member-detail-label">상태:</span>
-                                            <span
-                                                className="member-stat-badge"
-                                                style={{
-                                                    backgroundColor: getMemberStatColor(member.pjMemberStat) + '20',
-                                                    color: getMemberStatColor(member.pjMemberStat)
-                                                }}
-                                            >
-                                                {getMemberStatLabel(member.pjMemberStat)}
-                                            </span>
-                                        </div>
-
-                                        {isLogined && loginSuccess && member.pjMemberGrade === 'L' &&(
-                                            <div className="member-actions">
-                                                <button
-                                                    className="member-action-btn change-grade"
-                                                    onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
-                                                >
-                                                    {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
-                                                </button>
-                                                {member.pjMemberGrade !== 'L' && (
-                                                    <button
-                                                        className="member-action-btn remove"
-                                                        onClick={() => handleRemoveMember(member.id)}
-                                                    >
-                                                        제거
-                                                    </button>
-                                                )}
+                                        <div className="member-detail-wrapper">
+                                            <div className="member-detail">
+                                                <span className="member-detail-label">역할:</span>
+                                                <span className="member-grade-badge">
+                                                    {getMemberGradeLabel(member.pjMemberGrade)}
+                                                </span>
                                             </div>
-                                        )}
+                                            
+                                            <div className="member-detail">
+                                                <span className="member-detail-label">상태:</span>
+                                                <span
+                                                    className="member-stat-badge"
+                                                    style={{
+                                                        backgroundColor: getMemberStatColor(member.pjMemberStat) + '20',
+                                                        color: getMemberStatColor(member.pjMemberStat)
+                                                    }}
+                                                >
+                                                    {getMemberStatLabel(member.pjMemberStat)}
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <div className="member-actions">
+                                            <button
+                                                className="member-action-btn change-grade"
+                                                onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
+                                            >
+                                                {member.pjMemberGrade === 'L' ? '팀원으로 변경' : '관리자로 변경'}
+                                            </button>
+                                            {member.pjMemberGrade !== 'L' && (
+                                                <button
+                                                    className="member-action-btn remove"
+                                                    onClick={() => handleRemoveMember(member.id)}
+                                                >
+                                                    제거
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -524,7 +564,7 @@ export default function ProjectManage() {
                         <button
                             className="add-member-btn"
                             onClick={() => isLogined && loginSuccess
-                                ? setShowAddMemberModal(true) : navigatedLoginPage()}
+                                ? loginUserPermissionCheck() : navigatedLoginPage()}
                         >
                             + 팀원 추가
                         </button>
