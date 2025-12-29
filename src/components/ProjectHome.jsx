@@ -583,11 +583,11 @@ export default function ProjectMain() {
 
       {addProjectModalOpen && (
         <>
-          <div className="modal-overlay" onClick={closeModal}></div>
+          <div className="project-home-modal-overlay" onClick={closeModal}></div>
           <div className="add-new-project-modal">
-            <div className="modal-header">
+            <div className="project-home-modal-header">
               <h3>새 프로젝트 생성</h3>
-              <button className="modal-close-btn" onClick={closeModal}>
+              <button className="project-home-modal-close-btn" onClick={closeModal}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
@@ -596,7 +596,7 @@ export default function ProjectMain() {
             </div>
 
             <form onSubmit={handleProjectSubmit}>
-              <div className="project-modal-body">
+              <div className="project-project-home-modal-body">
                 <div className="form-group">
                   <label htmlFor='projectTitle'>프로젝트 타이틀 <span className="required">*</span></label>
                   <input
@@ -716,7 +716,7 @@ export default function ProjectMain() {
                 </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="project-home-modal-footer">
                 <button type="button" className="btn-cancel" onClick={closeModal}>
                   취소
                 </button>

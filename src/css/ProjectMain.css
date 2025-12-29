@@ -420,7 +420,7 @@
 /* ==================== 모달 스타일 ==================== */
 
 /* 모달 오버레이 */
-.modal-overlay {
+.project-home-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -472,7 +472,7 @@
 }
 
 /* 모달 헤더 */
-.modal-header {
+.project-home-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -485,14 +485,14 @@
     z-index: 10;
 }
 
-.modal-header h3 {
+.project-home-modal-header h3 {
     font-size: 1.4rem;
     font-weight: 700;
     color: #2e7d32;
     margin: 0;
 }
 
-.modal-close-btn {
+.project-home-modal-close-btn {
     width: 36px;
     height: 36px;
     display: flex;
@@ -506,13 +506,13 @@
     transition: all 0.2s ease;
 }
 
-.modal-close-btn:hover {
+.project-home-modal-close-btn:hover {
     background: #f5f5f5;
     color: #2e7d32;
 }
 
 /* 모달 바디 */
-.project-modal-body {
+.project-project-home-modal-body {
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -617,7 +617,7 @@
 }
 
 /* 모달 푸터 */
-.modal-footer {
+.project-home-modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -629,7 +629,7 @@
     border-radius: 0 0 16px 16px;
 }
 
-.modal-footer button {
+.project-home-modal-footer button {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 10px;
@@ -1369,12 +1369,12 @@
     }
 
     /* 모달 */
-    .modal-header,
-    .modal-footer {
+    .project-home-modal-header,
+    .project-home-modal-footer {
         padding: 1.25rem 1.5rem;
     }
 
-    .project-modal-body {
+    .project-project-home-modal-body {
         padding: 1.5rem;
     }
 }
@@ -1588,16 +1588,16 @@
         border-radius: 12px;
     }
 
-    .modal-header {
+    .project-home-modal-header {
         padding: 1rem 1.25rem;
         border-radius: 12px 12px 0 0;
     }
 
-    .modal-header h3 {
+    .project-home-modal-header h3 {
         font-size: 1.2rem;
     }
 
-    .project-modal-body {
+    .project-project-home-modal-body {
         padding: 1.25rem;
         gap: 1.25rem;
     }
@@ -1635,12 +1635,12 @@
         height: 200px;
     }
 
-    .modal-footer {
+    .project-home-modal-footer {
         padding: 1rem 1.25rem;
         border-radius: 0 0 12px 12px;
     }
 
-    .modal-footer button {
+    .project-home-modal-footer button {
         padding: 0.65rem 1.25rem;
         font-size: 0.9rem;
         min-width: 85px;
@@ -1903,26 +1903,26 @@
         border-radius: 10px;
     }
 
-    .modal-header {
+    .project-home-modal-header {
         padding: 0.85rem 1rem;
         border-radius: 10px 10px 0 0;
     }
 
-    .modal-header h3 {
+    .project-home-modal-header h3 {
         font-size: 1.1rem;
     }
 
-    .modal-close-btn {
+    .project-home-modal-close-btn {
         width: 32px;
         height: 32px;
     }
 
-    .modal-close-btn svg {
+    .project-home-modal-close-btn svg {
         width: 20px;
         height: 20px;
     }
 
-    .project-modal-body {
+    .project-project-home-modal-body {
         padding: 1rem;
         gap: 1rem;
     }
@@ -1987,12 +1987,12 @@
         height: 18px;
     }
 
-    .modal-footer {
+    .project-home-modal-footer {
         padding: 0.85rem 1rem;
         border-radius: 0 0 10px 10px;
     }
 
-    .modal-footer button {
+    .project-home-modal-footer button {
         padding: 0.6rem 1rem;
         font-size: 0.85rem;
         min-width: 75px;

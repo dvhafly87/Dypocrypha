@@ -12,7 +12,6 @@
 /* ===== 헤더 영역 ===== */
 .project-manage-header {
     border-radius: 20px;
-    overflow: hidden;
     position: relative;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
 }
@@ -305,6 +304,16 @@
     padding-right: 0.5rem;
 }
 
+
+.team-member-information-non-leader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 115px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
 .team-member-information::-webkit-scrollbar {
     width: 6px;
 }
@@ -446,13 +455,27 @@
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.non-log-add-member-btn {
+    width: 100%;
+    padding: 1rem;
+    background: gray;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
 .add-member-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 /* ===== 모달 스타일 ===== */
-.modal-overlay {
+.project-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -472,7 +495,7 @@
     to { opacity: 1; }
 }
 
-.modal-content {
+.project-modal-content {
     background: white;
     border-radius: 20px;
     padding: 2.5rem;
@@ -493,7 +516,7 @@
     }
 }
 
-.modal-title {
+.project-modal-title {
     font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
@@ -501,7 +524,7 @@
     letter-spacing: -0.3px;
 }
 
-.modal-notice {
+.project-modal-notice {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 1px solid #fbbf24;
     border-radius: 12px;
@@ -512,11 +535,11 @@
     font-weight: 500;
 }
 
-.modal-input-group {
+.project-modal-input-group {
     margin-bottom: 1.5rem;
 }
 
-.modal-label {
+.project-modal-label {
     display: block;
     font-size: 0.9rem;
     font-weight: 700;
@@ -525,7 +548,7 @@
     letter-spacing: -0.1px;
 }
 
-.modal-input {
+.project-modal-input {
     width: 100%;
     padding: 0.9rem 1.1rem;
     border: 2px solid #e5e7eb;
@@ -536,19 +559,19 @@
     font-weight: 500;
 }
 
-.modal-input:focus {
+.project-modal-input:focus {
     outline: none;
     border-color: #10b981;
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
-.modal-actions {
+.project-modal-actions {
     display: flex;
     gap: 1rem;
     margin-top: 2rem;
 }
 
-.modal-btn {
+.project-modal-btn {
     flex: 1;
     padding: 0.95rem;
     border-radius: 12px;
@@ -559,23 +582,23 @@
     border: none;
 }
 
-.modal-btn.cancel {
+.project-modal-btn.cancel {
     background: #f3f4f6;
     color: #374151;
 }
 
-.modal-btn.cancel:hover {
+.project-modal-btn.cancel:hover {
     background: #e5e7eb;
     transform: translateY(-1px);
 }
 
-.modal-btn.confirm {
+.project-modal-btn.confirm {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.modal-btn.confirm:hover {
+.project-modal-btn.confirm:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
@@ -687,11 +710,11 @@
         width: 100%;
     }
 
-    .modal-content {
+    .project-modal-content {
         padding: 2rem;
     }
 
-    .modal-title {
+    .project-modal-title {
         font-size: 1.3rem;
     }
 }
@@ -718,7 +741,7 @@
         padding: 1.5rem;
     }
 
-    .modal-content {
+    .project-modal-content {
         padding: 1.75rem;
         border-radius: 16px;
     }
