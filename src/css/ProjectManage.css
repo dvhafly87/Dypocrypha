@@ -380,7 +380,8 @@
     font-weight: 500;
 }
 
-.member-grade-badge {
+.member-grade-badge,
+.member-role-badge {
     background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
     color: #065f46;
     padding: 0.25rem 0.7rem;

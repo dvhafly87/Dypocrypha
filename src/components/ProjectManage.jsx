@@ -325,7 +325,7 @@ export default function ProjectManage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     projectId: projectId,
-                    status: newStatus
+                    projectStatus: newStatus
                 })
             });
 
@@ -338,6 +338,20 @@ export default function ProjectManage() {
                 window.location.href = '/';
             }
 
+            const result = await response.json();
+
+            if (result.updateReturnStatus) {
+                // 업데이트 성공 - 로컬 상태 업데이트
+                setProjectBasic(prev => ({
+                    ...prev,
+                    status: newStatus
+                }));
+
+                addToast('프로젝트 상태가 변경되었습니다.', 'success');
+                setShowStatusMenu(false);
+            } else {
+                addToast(result.updateReturnMessage, "error");
+            }
         } catch (error) {
             const toastData = {
                 status: 'warning',
@@ -519,7 +533,7 @@ export default function ProjectManage() {
                                                 </button>
                                             )}
 
-                                            {permissionGrade === 'L' && member.pjStatus === 'T' &&(
+                                            {permissionGrade === 'L' && member.pjStatus === 'T' && (
                                                 <button
                                                     className="member-action-btn remove"
                                                     onClick={() => handleRemoveMember(member.id)}
@@ -546,7 +560,7 @@ export default function ProjectManage() {
                             >
                                 + 팀원 추가
                             </button>
-                        :
+                            :
                             <button
                                 className="non-log-add-member-btn"
                                 disabled
