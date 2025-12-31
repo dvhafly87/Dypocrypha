@@ -49,10 +49,6 @@ export default function ProjectMain() {
   const hold = statusCount.H || 0;
   const dropped = statusCount.D || 0;
 
-  const navigateCompleteProject = () => {
-    navigate("/completeproject");
-  }
-
   const handleThumbChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -212,7 +208,6 @@ export default function ProjectMain() {
 
   // 검색 필터링된 프로젝트
   const filteredProjects = projectInfo.filter(project => {
-    if (project.status === 'C') return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -290,39 +285,6 @@ export default function ProjectMain() {
           </div>
         </div>
         <div className="project-content-container">
-          <div className="project-complete-navigate-container">
-            <div className="project-commentors">
-              <div className="project-complete-svg-container">
-                <svg
-                  width="36"
-                  height="36"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M4 4.5A2.5 2.5 0 0 1 6.5 7H20" />
-                  <path d="M6.5 7v10" />
-                </svg>
-              </div>
-              <div className="pj-comment">
-                <div className="complete-icon">✓</div>
-                <span>완성된 프로젝트를 한곳에서</span>
-              </div>
-              <div className="pj-comment">
-                <div className="complete-icon">✓</div>
-                <span>프로젝트 아카이브</span>
-              </div>
-              <div className="pj-comment">
-                <div className="complete-icon">✓</div>
-                <span>프로젝트의 결과를 정리</span>
-              </div>
-            </div>
-            <button onClick={navigateCompleteProject}>완성된 프로젝트</button>
-          </div>
           <div className="project-main-content-container">
             <div className="project-main-content-header">
               <div className="project-search-container">
@@ -470,8 +432,11 @@ export default function ProjectMain() {
                                     </svg>
                                     {project.pjCategory}
                                   </span>
+
                                   <span className="project-card-date">
-                                    {formatDate(project.created)}
+                                    {project.status === 'C' ?
+                                      formatDate(project.endDay) : formatDate(project.created)
+                                    }
                                   </span>
                                 </div>
                               </div>

@@ -9,6 +9,35 @@ export default function ProjectManage() {
     const { isLogined, loginSuccess } = useAuth();
     const { projectId } = useParams();
     const navigate = useNavigate();
+
+    const getDurationDays = (startDate, endDate) => {
+        if (!startDate || !endDate) return 0;
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+
+        const diffTime = end - start;
+        return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    };
+
+    const getProjectDays = (project) => {
+        if (!project?.created) return 0;
+
+        if (project.status === 'I') {
+            return getDurationDays(project.created, new Date());
+        }
+
+        if (project.status === 'C' || project.status === 'D') {
+            return getDurationDays(project.created, project.endDay);
+        }
+
+        return 0;
+    };
+
+
     const { addToast } = useToast();
     const [projectBasic, setProjectBasic] = useState([]);
     const [newMemberRole, setNewMemberRole] = useState('');
@@ -23,6 +52,16 @@ export default function ProjectManage() {
 
     const getMemberGradeLabel = (grade) => {
         return grade === 'L' ? '관리자' : '팀원';
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
     };
 
     const handleChangeGrade = async (memberId, currentGrade) => {
@@ -470,6 +509,11 @@ export default function ProjectManage() {
                                     style={{ color: getStatusColor(projectBasic.status) }}
                                 >
                                     {getStatusLabel(projectBasic.status)}
+                                    <span className="status-duration">
+                                        {projectBasic.status === 'I' && ` · ${getProjectDays(projectBasic)}일째`}
+                                        {projectBasic.status === 'C' && ` · 총 ${getProjectDays(projectBasic)}일`}
+                                        {projectBasic.status === 'D' && ` · ${getProjectDays(projectBasic)}일 만에 중단`}
+                                    </span>
                                 </span>
                             </div>
                         </section>
@@ -485,6 +529,24 @@ export default function ProjectManage() {
                                     </span>
                                 ))}
                             </div>
+                        </section>
+
+                        <div className="summary-divider" />
+
+                        <section className="summary-section">
+                            <h3>진행 기간</h3>
+
+                            {projectBasic.status === "I" && (
+                                <div className="project-duration-container">
+                                    {formatDate(projectBasic.created)} ~
+                                </div>
+                            )}
+
+                            {projectBasic.status === "D" || projectBasic.status === "C" && (
+                                <div className="project-duration-container">
+                                    {formatDate(projectBasic.created)} ~ {formatDate(projectBasic.endDay)}
+                                </div>
+                            )}
                         </section>
                     </div>
                     <div className="project-manage-teamValue-area">
@@ -558,7 +620,7 @@ export default function ProjectManage() {
                                     setShowAddMemberModal(true);
                                 }}
                             >
-                                + 팀원 추가
+                                {projectBasic.teamValue ? "+ 팀원 추가" : "팀 프로젝트 전환"}
                             </button>
                             :
                             <button
