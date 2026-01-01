@@ -403,6 +403,22 @@ export default function ProjectManage() {
     };
 
     const handleDeleteProject = async () => {
+        if (!loginSuccess || !isLogined) {
+            addToast("로그인이 필요합니다.", "error");
+            return;
+        }
+
+        if (projectBasic.status === 'H') {
+            addToast("진행되지 않은 프로젝트는 삭제하실 수 없습니다", "error");
+            return;
+        }
+
+        if (permissionGrade === "L") {
+            addToast("프로젝트 삭제 권한이 없습니다.", "error");
+            return;
+        }
+
+
         if (window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) {
             try {
                 const response = await fetch(`${API.API_BASE_URL}/project/delete`, {
