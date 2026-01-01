@@ -297,7 +297,7 @@ export default function ProjectManage() {
                         message: '프로젝트 목록을 불러올 수 없습니다.'
                     };
                     localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    window.location.href = '/';
+                    navigate('/');
                 }
 
                 const result = await response.json();
@@ -321,7 +321,7 @@ export default function ProjectManage() {
                         message: result.projectOneInfoMessage
                     };
                     localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    window.location.href = '/';
+                    navigate('/');
                 }
 
             } catch (error) {
@@ -330,7 +330,7 @@ export default function ProjectManage() {
                     message: '프로젝트 페이지 useEffect API 에러'
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                window.location.href = '/';
+                navigate('/');
             }
         };
         getThisProjectInformation();
@@ -374,7 +374,7 @@ export default function ProjectManage() {
                     message: '현재 서버가 실행중이 아니라 프로젝트 상태 변경이 불가능합니다 나중에 다시 시도해주십시오.'
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                window.location.href = '/';
+                navigate('/');
             }
 
             const result = await response.json();
@@ -397,12 +397,13 @@ export default function ProjectManage() {
                 message: '에러 발생' + error.message
             };
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            window.location.href = '/';
+            navigate('/');
         }
         setShowStatusMenu(false);
     };
 
     const handleDeleteProject = async () => {
+
         if (!loginSuccess || !isLogined) {
             addToast("로그인이 필요합니다.", "error");
             return;
@@ -413,7 +414,7 @@ export default function ProjectManage() {
             return;
         }
 
-        if (permissionGrade === "L") {
+        if (permissionGrade !== 'L') {
             addToast("프로젝트 삭제 권한이 없습니다.", "error");
             return;
         }
@@ -430,10 +431,15 @@ export default function ProjectManage() {
                     })
                 });
 
-                if (response.ok) {
-                    addToast('프로젝트가 삭제되었습니다.', 'success');
+                if (!response.ok) {
+                    const toastData = {
+                        status: 'warning',
+                        message: '현재 서버에 문제가 생겨 프로젝트의 삭제가 불가능합니다 잠시후 다시 시도해주십시오'
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
                     navigate('/');
                 }
+
             } catch (error) {
                 addToast('프로젝트 삭제에 실패했습니다.', 'error');
             }
