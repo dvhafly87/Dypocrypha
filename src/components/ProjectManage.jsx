@@ -440,8 +440,27 @@ export default function ProjectManage() {
                     navigate('/');
                 }
 
+                const result = await response.json();
+
+                if (result.deleteStatus) {
+                    const toastData = {
+                        status: 'success',
+                        message: '삭제되었습니다.'
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    navigate('/project');
+                } else {
+                    addToast(result.deleteMessage, "error");
+                    return;
+                }
+
             } catch (error) {
-                addToast('프로젝트 삭제에 실패했습니다.', 'error');
+                const toastData = {
+                    status: 'warning',
+                    message: '현재 서버에 문제가 생겨 프로젝트의 삭제가 불가능합니다 잠시후 다시 시도해주십시오'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
             }
         }
     };

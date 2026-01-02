@@ -24,7 +24,20 @@ export default function ProjectMain() {
   const [skillStack, setSkillStack] = useState("");
   const [projectThumb, setProjectThumb] = useState(null);
   const [thumbPreview, setThumbPreview] = useState(null);
-
+  
+  useEffect(() => {
+    const storedToastData = localStorage.getItem('redirectToast');
+    if (storedToastData) {
+      try {
+        const toastData = JSON.parse(storedToastData);
+        addToast(toastData.message, toastData.status);
+        localStorage.removeItem('redirectToast');
+      } catch (error) {
+        console.error("Failed to parse redirectToast from localStorage:", error);
+        localStorage.removeItem('redirectToast');
+      }
+    }
+  }, [addToast]);
 
   // 카테고리 목록
   const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
