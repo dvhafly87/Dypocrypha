@@ -794,6 +794,7 @@ export default function ProjectManage() {
                     )}
                 </div>
                 <div className="project-callender-area">
+                    <h3 className="calendar-title">프로젝트 작업 일지</h3>
                     <div className="calendar-grid">
                         {Array.from({ length: firstDay }).map((_, i) => (
                             <div key={`empty-${i}`} className="calendar-cell empty" />
