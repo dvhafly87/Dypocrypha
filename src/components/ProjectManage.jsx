@@ -6,6 +6,22 @@ import API from '../config/apiConfig.js';
 import '../css/ProjectManage.css';
 
 export default function ProjectManage() {
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    // 더미: 기록 있는 날짜
+    const logDates = [
+        '2026-01-03',
+        '2026-01-10',
+        '2026-01-15'
+    ];
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth(); // 0-based
+
+    const firstDay = new Date(year, month, 1).getDay(); // 요일
+    const lastDate = new Date(year, month + 1, 0).getDate(); // 말일
+
     const { isLogined, loginSuccess } = useAuth();
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -583,7 +599,7 @@ export default function ProjectManage() {
                                 </div>
                             )}
 
-                            {projectBasic.status === "D" || projectBasic.status === "C" && (
+                            {(projectBasic.status === "D" || projectBasic.status === "C") && (
                                 <div className="project-duration-container">
                                     {formatDate(projectBasic.created)} ~ {formatDate(projectBasic.endDay)}
                                 </div>
@@ -776,6 +792,30 @@ export default function ProjectManage() {
                             </div>
                         </div>
                     )}
+                </div>
+                <div className="project-callender-area">
+                    <div className="calendar-grid">
+                        {Array.from({ length: firstDay }).map((_, i) => (
+                            <div key={`empty-${i}`} className="calendar-cell empty" />
+                        ))}
+
+                        {Array.from({ length: lastDate }).map((_, i) => {
+                            const day = i + 1;
+                            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const hasLog = logDates.includes(dateStr);
+
+                            return (
+                                <div
+                                    key={day}
+                                    className={`calendar-cell ${hasLog ? 'has-log' : ''}`}
+                                    onClick={() => setSelectedDate(dateStr)}
+                                >
+                                    {day}
+                                </div>
+                            );
+                        })}
+                    </div>
+
                 </div>
             </div>
         </>
