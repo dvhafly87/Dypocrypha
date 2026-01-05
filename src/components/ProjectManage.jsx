@@ -9,10 +9,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 export default function ProjectManage() {
+
     const [projectBasic, setProjectBasic] = useState([]);
     const [newMemberRole, setNewMemberRole] = useState('');
     const [customRole, setCustomRole] = useState('');
-    const [projectMember, setProjectMember] = useState([]);
+    const [projectMember, setProjectMember] = useState([]);ㄴ
     const [teamNameInput, setTeamNameInput] = useState('');
     const [permissionGrade, setPermissionGrade] = useState('');
     const [newMemberName, setNewMemberName] = useState('');
@@ -37,7 +38,7 @@ export default function ProjectManage() {
 
     const updateSubmitProjectInformation = async () => {
         try {
-            const response = await fetch(`${API.API_BASE_URL}/project/update`, {
+            const response = await fetch(`${API.API_BASE_URL}/project/info/update`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -105,7 +106,7 @@ export default function ProjectManage() {
         const tempSkillTool = skillTool;
 
         try {
-            const response = await fetch(`${API.API_BASE_URL}/project/skillstack/update`, {
+            const response = await fetch(`${API.API_BASE_URL}/project/info/update`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
