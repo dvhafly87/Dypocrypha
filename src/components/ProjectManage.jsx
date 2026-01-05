@@ -4,27 +4,146 @@ import { useToast } from '../components/ToastContext';
 import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
 import '../css/ProjectManage.css';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 export default function ProjectManage() {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [projectBasic, setProjectBasic] = useState([]);
+    const [newMemberRole, setNewMemberRole] = useState('');
+    const [customRole, setCustomRole] = useState('');
+    const [projectMember, setProjectMember] = useState([]);
+    const [teamNameInput, setTeamNameInput] = useState('');
+    const [permissionGrade, setPermissionGrade] = useState('');
+    const [newMemberName, setNewMemberName] = useState('');
+    const [newMemberGrade, setNewMemberGrade] = useState('M');
 
-    // 더미: 기록 있는 날짜
-    const logDates = [
-        '2026-01-03',
-        '2026-01-10',
-        '2026-01-15'
-    ];
+    const [summary, setSummary] = useState('');
+    const [skillTool, setSkillTool] = useState('');
+    const [selectCategory, setSelectCategory] = useState('');
 
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth(); // 0-based
+    const [showCategorySelect, setShowCategorySelect] = useState(false);
+    const [showStatusMenu, setShowStatusMenu] = useState(false);
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const [showEditSummary, setShowEditSummary] = useState(false);
+    const [showEditSkillTool, setShowEditSkillTool] = useState(false);
 
-    const firstDay = new Date(year, month, 1).getDay(); // 요일
-    const lastDate = new Date(year, month + 1, 0).getDate(); // 말일
-
-    const { isLogined, loginSuccess } = useAuth();
     const { projectId } = useParams();
+    const { addToast } = useToast();
+    const { isLogined, loginSuccess } = useAuth();
     const navigate = useNavigate();
+
+    const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
+
+    const updateSubmitProjectInformation = async () => {
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/update`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    updateProjectId: projectId,
+                    updateProjectSkillTool: skillTool,
+                    updateProjectCategory: selectCategory,
+                    updateProjectSummary: summary
+                })
+            });
+
+            if (!response.ok) {
+                const toastData = {
+                    status: 'warning',
+                    message: '서버 통신 불가'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+            }
+
+            const result = await response.json();
+
+            if (result.updateProjectInformationStatus) {
+                
+            } else {
+                addToast(result.updateProjectInformationMessage, "error");
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'warning',
+                message: '서버 통신 불가'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+        }
+    };
+
+    // 개요 수정 핸들러
+    const handleUpdateSummary = async () => {
+        const success = await updateSubmitProjectInformation();
+        if (success) {
+            addToast('프로젝트 개요가 수정되었습니다.', 'success');
+            setShowEditSummary(false);
+            window.location.reload();
+        }
+    };
+
+    // 스킬/툴 수정 핸들러
+    const handleUpdateSkillTool = async () => {
+        const success = await updateSubmitProjectInformation();
+        if (success) {
+            addToast('스킬/툴이 수정되었습니다.', 'success');
+            setShowEditSkillTool(false);
+            window.location.reload();
+        }
+    };
+
+    // 카테고리 수정 핸들러
+    const handleUpdateCategory = async (category) => {
+        setSelectCategory(category);
+        setShowCategorySelect(false);
+
+        // 카테고리만 업데이트하기 위해 임시로 설정
+        const tempSummary = summary;
+        const tempSkillTool = skillTool;
+
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/skillstack/update`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    updateProjectId: projectId,
+                    updateProjectSkillTool: tempSkillTool,
+                    updateProjectCategory: category,
+                    updateProjectSummary: tempSummary
+                })
+            });
+
+            if (!response.ok) {
+                const toastData = {
+                    status: 'warning',
+                    message: '서버 통신 불가'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            }
+
+            const result = await response.json();
+
+            if (result.updateProjectInformationStatus) {
+                addToast('카테고리가 수정되었습니다.', 'success');
+                window.location.reload();
+            } else {
+                addToast(result.updateProjectInformationMessage, "error");
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'warning',
+                message: '서버 통신 불가'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+        }
+    };
 
     const getDurationDays = (startDate, endDate) => {
         if (!startDate || !endDate) return 0;
@@ -52,19 +171,6 @@ export default function ProjectManage() {
 
         return 0;
     };
-
-
-    const { addToast } = useToast();
-    const [projectBasic, setProjectBasic] = useState([]);
-    const [newMemberRole, setNewMemberRole] = useState('');
-    const [customRole, setCustomRole] = useState('');
-    const [projectMember, setProjectMember] = useState([]);
-    const [teamNameInput, setTeamNameInput] = useState('');
-    const [permissionGrade, setPermissionGrade] = useState('');
-    const [showStatusMenu, setShowStatusMenu] = useState(false);
-    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-    const [newMemberName, setNewMemberName] = useState('');
-    const [newMemberGrade, setNewMemberGrade] = useState('M');
 
     const getMemberGradeLabel = (grade) => {
         return grade === 'L' ? '관리자' : '팀원';
@@ -115,7 +221,7 @@ export default function ProjectManage() {
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate("/login");
-    }
+    };
 
     const handleAddMember = async () => {
         if (!projectBasic.teamValue) {
@@ -129,7 +235,6 @@ export default function ProjectManage() {
             }
 
             try {
-                // 최종 담당 역할 결정
                 const finalRole = newMemberRole === '직접입력' ? customRole : newMemberRole;
 
                 const addMemberResponse = await fetch(`${API.API_BASE_URL}/project/member/add`, {
@@ -179,7 +284,6 @@ export default function ProjectManage() {
             }
 
             try {
-                // 최종 담당 역할 결정
                 const finalRole = newMemberRole === '직접입력' ? customRole : newMemberRole;
 
                 const response = await fetch(`${API.API_BASE_URL}/project/member/add`, {
@@ -352,6 +456,15 @@ export default function ProjectManage() {
         getThisProjectInformation();
     }, []);
 
+    // projectBasic 로드 후 state 초기화
+    useEffect(() => {
+        if (projectBasic && Object.keys(projectBasic).length > 0) {
+            setSummary(projectBasic.summary || '');
+            setSkillTool(projectBasic.skillStack || '');
+            setSelectCategory(projectBasic.pjCategory || '');
+        }
+    }, [projectBasic]);
+
     const getStatusLabel = (status) => {
         const statusMap = {
             'H': '대기',
@@ -396,7 +509,6 @@ export default function ProjectManage() {
             const result = await response.json();
 
             if (result.updateReturnStatus) {
-                // 업데이트 성공 - 로컬 상태 업데이트
                 setProjectBasic(prev => ({
                     ...prev,
                     status: newStatus
@@ -434,7 +546,6 @@ export default function ProjectManage() {
             addToast("프로젝트 삭제 권한이 없습니다.", "error");
             return;
         }
-
 
         if (window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) {
             try {
@@ -480,6 +591,19 @@ export default function ProjectManage() {
             }
         }
     };
+
+    const [calendarEvents, setCalendarEvents] = useState([
+        {
+            title: '프로젝트 시작',
+            date: projectBasic.created,
+            color: '#10b981'
+        },
+        ...(projectBasic.endDay ? [{
+            title: '프로젝트 종료',
+            date: projectBasic.endDay,
+            color: '#3b82f6'
+        }] : [])
+    ]);
 
     return (
         <>
@@ -546,17 +670,65 @@ export default function ProjectManage() {
                     <div className="project-manage-summary-area">
                         <section className="summary-section">
                             <h3>프로젝트 개요</h3>
-                            <p className="summary-text">
-                                {projectBasic.summary || '프로젝트 설명이 없습니다.'}
-                            </p>
+                            {showEditSummary ? (
+                                <p className="summary-text">
+                                    <textarea
+                                        value={summary}
+                                        onChange={(e) => setSummary(e.target.value)}
+                                        autoComplete="off"
+                                        placeholder={projectBasic.summary || '프로젝트 설명을 입력해주세요'}
+                                    />
+                                    <button onClick={handleUpdateSummary}>수정</button>
+                                    <button onClick={() => {
+                                        setSummary(projectBasic.summary || '');
+                                        setShowEditSummary(false);
+                                    }}>취소</button>
+                                </p>
+                            ) : (
+                                <p className="summary-text">
+                                    {projectBasic.summary || '프로젝트 설명이 없습니다.'}
+                                    {permissionGrade === 'L' && (
+                                        <button onClick={() => setShowEditSummary(true)}>수정하기</button>
+                                    )}
+                                </p>
+                            )}
                         </section>
 
                         <div className="summary-divider" />
 
                         <section className="summary-section inline">
-                            <div>
+                            <div className="category-select-wrapper">
                                 <span className="summary-label">카테고리</span>
-                                <span className="summary-value">{projectBasic.pjCategory}</span>
+
+                                <div className="category-select">
+                                    <span className="summary-value">
+                                        {projectBasic.pjCategory}
+                                    </span>
+
+                                    {permissionGrade === 'L' && (
+                                        <button
+                                            className="category-update-select-button"
+                                            onClick={() => setShowCategorySelect(!showCategorySelect)}
+                                        >
+                                            ▼
+                                        </button>
+                                    )}
+
+                                    {showCategorySelect && (
+                                        <ul className="category-dropdown">
+                                            {categories
+                                                .filter(category => category !== projectBasic.pjCategory)
+                                                .map(category => (
+                                                    <li
+                                                        key={category}
+                                                        onClick={() => handleUpdateCategory(category)}
+                                                    >
+                                                        {category}
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
 
                             <div>
@@ -579,13 +751,32 @@ export default function ProjectManage() {
 
                         <section className="summary-section">
                             <h3>사용 스킬 / 툴</h3>
-                            <div className="skill-inline">
-                                {projectBasic.skillStack?.split(',').map((skill, idx) => (
-                                    <span key={idx} className="skill-badge">
-                                        {skill.trim()}
-                                    </span>
-                                ))}
-                            </div>
+                            {showEditSkillTool ? (
+                                <div className="skill-inline">
+                                    <input
+                                        value={skillTool}
+                                        onChange={(e) => setSkillTool(e.target.value)}
+                                        autoComplete="off"
+                                        placeholder={projectBasic.skillStack}
+                                    />
+                                    <button onClick={handleUpdateSkillTool}>수정</button>
+                                    <button onClick={() => {
+                                        setSkillTool(projectBasic.skillStack || '');
+                                        setShowEditSkillTool(false);
+                                    }}>취소</button>
+                                </div>
+                            ) : (
+                                <div className="skill-inline">
+                                    {projectBasic.skillStack?.split(',').map((skill, idx) => (
+                                        <span key={idx} className="skill-badge">
+                                            {skill.trim()}
+                                        </span>
+                                    ))}
+                                    {permissionGrade === 'L' && (
+                                        <button onClick={() => setShowEditSkillTool(true)}>수정하기</button>
+                                    )}
+                                </div>
+                            )}
                         </section>
 
                         <div className="summary-divider" />
@@ -793,30 +984,22 @@ export default function ProjectManage() {
                         </div>
                     )}
                 </div>
-                <div className="project-callender-area">
-                    <h3 className="calendar-title">프로젝트 작업 일지</h3>
-                    <div className="calendar-grid">
-                        {Array.from({ length: firstDay }).map((_, i) => (
-                            <div key={`empty-${i}`} className="calendar-cell empty" />
-                        ))}
-
-                        {Array.from({ length: lastDate }).map((_, i) => {
-                            const day = i + 1;
-                            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                            const hasLog = logDates.includes(dateStr);
-
-                            return (
-                                <div
-                                    key={day}
-                                    className={`calendar-cell ${hasLog ? 'has-log' : ''}`}
-                                    onClick={() => setSelectedDate(dateStr)}
-                                >
-                                    {day}
-                                </div>
-                            );
-                        })}
-                    </div>
-
+                <div className="project-calendar-section">
+                    <FullCalendar
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        locale="ko"
+                        headerToolbar={{
+                            left: 'prev',
+                            center: 'title',
+                            right: 'next'
+                        }}
+                        events={calendarEvents}
+                        height="auto"
+                        dateClick={(info) => {
+                            console.log('날짜 클릭:', info.dateStr);
+                        }}
+                    />
                 </div>
             </div>
         </>
