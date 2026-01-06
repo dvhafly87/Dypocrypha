@@ -13,7 +13,7 @@ export default function ProjectManage() {
     const [projectBasic, setProjectBasic] = useState([]);
     const [newMemberRole, setNewMemberRole] = useState('');
     const [customRole, setCustomRole] = useState('');
-    const [projectMember, setProjectMember] = useState([]);ㄴ
+    const [projectMember, setProjectMember] = useState([]);
     const [teamNameInput, setTeamNameInput] = useState('');
     const [permissionGrade, setPermissionGrade] = useState('');
     const [newMemberName, setNewMemberName] = useState('');
@@ -62,7 +62,7 @@ export default function ProjectManage() {
             const result = await response.json();
 
             if (result.updateProjectInformationStatus) {
-                
+                window.location.reload();
             } else {
                 addToast(result.updateProjectInformationMessage, "error");
             }
@@ -130,8 +130,7 @@ export default function ProjectManage() {
 
             const result = await response.json();
 
-            if (result.updateProjectInformationStatus) {
-                addToast('카테고리가 수정되었습니다.', 'success');
+           if (result.updateProjectInformationStatus) {
                 window.location.reload();
             } else {
                 addToast(result.updateProjectInformationMessage, "error");
