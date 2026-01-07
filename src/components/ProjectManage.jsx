@@ -18,11 +18,14 @@ export default function ProjectManage() {
     const [permissionGrade, setPermissionGrade] = useState('');
     const [newMemberName, setNewMemberName] = useState('');
     const [newMemberGrade, setNewMemberGrade] = useState('M');
+    const [newProjectThumb, setNewProjectThumb] = useState(null);
+    const [thumbPreview, setThumbPreview] = useState(null);
 
     const [summary, setSummary] = useState('');
     const [skillTool, setSkillTool] = useState('');
     const [selectCategory, setSelectCategory] = useState('');
 
+    const [showEditProjectThumbModal, setShowEditProjectThumbModal] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -36,6 +39,90 @@ export default function ProjectManage() {
 
     const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
 
+    // 파일 선택 시 미리보기 처리
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        
+        if (!file) {
+            setNewProjectThumb(null);
+            setThumbPreview(null);
+            return;
+        }
+
+        // 파일 유효성 검사
+        if (file.size > 5 * 1024 * 1024) {
+            addToast('파일 크기는 5MB를 초과할 수 없습니다.', 'warning');
+            e.target.value = '';
+            return;
+        }
+
+        if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+            addToast('지원되는 파일 형식은 PNG, JPEG, JPG 입니다.', 'warning');
+            e.target.value = '';
+            return;
+        }
+
+        // 파일 저장
+        setNewProjectThumb(file);
+
+        // 미리보기 생성
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setThumbPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleUpdateProjectThumb = async () => {
+        if (!newProjectThumb) {
+            addToast('변경할 파일을 선택해주세요.', 'warning');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('projectId', projectId);
+        formData.append('projectThumbFile', newProjectThumb);
+
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/thumb/update`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const toastData = {
+                    status: 'warning',
+                    message: '서버 통신 불가'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            }
+
+            const result = await response.json();
+
+            if (result.updateThumbStatus) {
+                addToast('프로젝트 썸네일이 변경되었습니다.', 'success');
+                setShowEditProjectThumbModal(false);
+                setNewProjectThumb(null);
+                setThumbPreview(null);
+                window.location.reload();
+            } else {
+                addToast(result.updateThumbMessage, "error");
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'warning',
+                message: '서버 통신 불가'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+        }
+    };
+
+
+    // 프로젝트 정보(개요, 스킬/툴, 카테고리) 수정 공통 함수
     const updateSubmitProjectInformation = async () => {
         try {
             const response = await fetch(`${API.API_BASE_URL}/project/info/update`, {
@@ -130,7 +217,7 @@ export default function ProjectManage() {
 
             const result = await response.json();
 
-           if (result.updateProjectInformationStatus) {
+            if (result.updateProjectInformationStatus) {
                 window.location.reload();
             } else {
                 addToast(result.updateProjectInformationMessage, "error");
@@ -656,12 +743,16 @@ export default function ProjectManage() {
                                 </div>
                             </div>
                             {permissionGrade === 'L' && (
-                                <button
-                                    className="project-delete-btn"
-                                    onClick={handleDeleteProject}
-                                >
-                                    삭제
-                                </button>
+                                <div className="button-wrapper">
+                                    <button className="project-thumb-edit-btn" onClick={() => setShowEditProjectThumbModal(true)}>
+                                        프로젝트 썸네일 변경
+                                    </button>
+                                    <button className="project-delete-btn"
+                                        onClick={handleDeleteProject}
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -984,6 +1075,109 @@ export default function ProjectManage() {
                         </div>
                     )}
                 </div>
+
+                {showEditProjectThumbModal && (
+                    <div className="project-thumb-edit-modal-overlay" onClick={() => {
+                        setShowEditProjectThumbModal(false);
+                        setNewProjectThumb(null);
+                        setThumbPreview(null);
+                    }}>
+                        <div className="project-thumb-edit-modal-content" onClick={(e) => e.stopPropagation()}>
+                            <h3 className="project-thumb-edit-modal-title">프로젝트 썸네일 변경</h3>
+
+                            <div className="project-thumb-preview-section">
+                                <label className="project-thumb-preview-label">
+                                    {thumbPreview ? '새 썸네일 미리보기' : '현재 썸네일'}
+                                </label>
+                                <div className="project-thumb-preview">
+                                    {thumbPreview ? (
+                                        <img
+                                            className="project-thumb-image"
+                                            src={thumbPreview}
+                                            alt="새 썸네일 미리보기"
+                                        />
+                                    ) : projectBasic.projectThumb ? (
+                                        <img
+                                            className="project-thumb-image"
+                                            src={`${API.API_BASE_URL}/projectThumb/${projectBasic.projectThumb}`}
+                                            alt="현재 썸네일"
+                                        />
+                                    ) : (
+                                        <div className="project-thumb-placeholder">
+                                            <svg
+                                                width="48"
+                                                height="48"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="gray"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                                <polyline points="21 15 16 10 5 21" />
+                                            </svg>
+                                            <span>썸네일 없음</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="project-thumb-upload-section">
+                                <label className="project-thumb-upload-label">
+                                    새 썸네일 업로드
+                                    <span className="file-format-info">(PNG, JPEG, JPG / 최대 5MB)</span>
+                                </label>
+                                <div className="file-input-wrapper">
+                                    <input
+                                        type="file"
+                                        id="projectThumbFile"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onChange={handleFileSelect}
+                                        className="file-input-hidden"
+                                    />
+                                    <label htmlFor="projectThumbFile" className="file-input-label">
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                            <polyline points="17 8 12 3 7 8" />
+                                            <line x1="12" y1="3" x2="12" y2="15" />
+                                        </svg>
+                                        {newProjectThumb ? newProjectThumb.name : '파일 선택'}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="project-thumb-edit-modal-actions">
+                                <button
+                                    className="project-thumb-edit-modal-btn cancel"
+                                    onClick={() => {
+                                        setShowEditProjectThumbModal(false);
+                                        setNewProjectThumb(null);
+                                        setThumbPreview(null);
+                                    }}
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    className="project-thumb-edit-modal-btn confirm"
+                                    onClick={handleUpdateProjectThumb}
+                                >
+                                    변경
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div className="project-calendar-section">
                     <FullCalendar
                         plugins={[dayGridPlugin, interactionPlugin]}

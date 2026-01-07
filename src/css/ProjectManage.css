@@ -145,6 +145,28 @@
     background-color: #f3f4f6;
     padding-left: 1.5rem;
 }
+.button-wrapper {
+    display: flex;
+    gap: 1rem;
+}
+.project-thumb-edit-btn {
+    padding: 0.85rem 2.5rem;
+    background-color: rgba(59, 130, 246, 0.95);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.project-thumb-edit-btn:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
 
 .project-delete-btn {
     padding: 0.85rem 2.5rem;
@@ -1064,4 +1086,238 @@
         padding: 0.35rem 0.7rem;
         font-size: 0.7rem;
     }
-}s
+}
+
+/* ===== 프로젝트 썸네일 수정 모달 ===== */
+.project-thumb-edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+.project-thumb-edit-modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 550px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+.project-thumb-edit-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2rem;
+    letter-spacing: -0.3px;
+}
+
+.project-thumb-preview-section {
+    margin-bottom: 2rem;
+}
+
+.project-thumb-preview-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.1px;
+}
+
+.project-thumb-preview {
+    width: 100%;
+    height: 280px;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+.project-thumb-preview:hover {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.project-thumb-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.project-thumb-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: #9ca3af;
+}
+
+.project-thumb-placeholder span {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.project-thumb-upload-section {
+    margin-bottom: 2rem;
+}
+
+.project-thumb-upload-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.1px;
+}
+
+.file-format-info {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #9ca3af;
+    margin-left: 0.5rem;
+}
+
+.file-input-wrapper {
+    position: relative;
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-input-label:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #10b981;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.file-input-label svg {
+    transition: transform 0.3s ease;
+}
+
+.file-input-label:hover svg {
+    transform: translateY(-2px);
+}
+
+.project-thumb-edit-modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.project-thumb-edit-modal-btn {
+    flex: 1;
+    padding: 0.95rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.project-thumb-edit-modal-btn.cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.project-thumb-edit-modal-btn.cancel:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.project-thumb-edit-modal-btn.confirm {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.project-thumb-edit-modal-btn.confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* ===== 반응형: 썸네일 수정 모달 ===== */
+@media (max-width: 600px) {
+    .project-thumb-edit-modal-content {
+        padding: 2rem;
+        max-width: 95%;
+    }
+
+    .project-thumb-edit-modal-title {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .project-thumb-preview {
+        height: 220px;
+    }
+
+    .file-input-label {
+        padding: 0.85rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .project-thumb-edit-modal-btn {
+        padding: 0.85rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .project-thumb-edit-modal-content {
+        padding: 1.75rem;
+    }
+
+    .project-thumb-preview {
+        height: 180px;
+    }
+
+    .project-thumb-edit-modal-actions {
+        flex-direction: column;
+    }
+
+    .project-thumb-edit-modal-btn {
+        width: 100%;
+    }
+}

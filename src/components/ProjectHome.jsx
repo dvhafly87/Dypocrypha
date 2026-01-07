@@ -24,7 +24,7 @@ export default function ProjectMain() {
   const [skillStack, setSkillStack] = useState("");
   const [projectThumb, setProjectThumb] = useState(null);
   const [thumbPreview, setThumbPreview] = useState(null);
-  
+
   useEffect(() => {
     const storedToastData = localStorage.getItem('redirectToast');
     if (storedToastData) {
