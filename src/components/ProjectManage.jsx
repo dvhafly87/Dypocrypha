@@ -42,7 +42,7 @@ export default function ProjectManage() {
     // 파일 선택 시 미리보기 처리
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
-        
+
         if (!file) {
             setNewProjectThumb(null);
             setThumbPreview(null);
@@ -289,14 +289,36 @@ export default function ProjectManage() {
                     })
                 });
 
-                if (response.ok) {
-                    addToast(`역할이 ${gradeLabel}로 변경되었습니다.`, 'success');
+                if (!response.ok) {
+                    const toastData = {
+                        status: 'warning',
+                        message: "서버 통신 불가"
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    navigate('/');
+                }
+
+                const result = await response.json();
+
+                if (result.updateMemberGradeStatus) {
+                    const toastData = {
+                        status: 'success',
+                        message: "변경되었습니다."
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
                     window.location.reload();
                 } else {
-                    addToast('역할 변경에 실패했습니다.', 'error');
+                    addToast(result.updateMemberGradeMessage, "error");
+                    return;
                 }
+
             } catch (error) {
-                addToast('역할 변경 중 오류가 발생했습니다.', 'error');
+                const toastData = {
+                    status: 'warning',
+                    message: "서버 통신 불가"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
             }
         }
     };
@@ -416,19 +438,53 @@ export default function ProjectManage() {
                     })
                 });
 
-                if (response.ok) {
-                    addToast('팀원이 제거되었습니다.', 'success');
+                if (!response.ok) {
+                    const toastData = {
+                        status: 'warning',
+                        message: "서버 통신 불가"
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    navigate('/');
+                }
+
+                const result = await response.json();
+
+                if (result.removeMemberStatus) {
+                    const toastData = {
+                        status: 'success',
+                        message: "삭제되었습니다."
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
                     window.location.reload();
                 } else {
-                    addToast('팀원 제거에 실패했습니다.', 'error');
+                    addToast(result.removeProjectMemberMessage, "error");
                 }
             } catch (error) {
-                addToast('팀원 제거 중 오류가 발생했습니다.', 'error');
+                const toastData = {
+                    status: 'warning',
+                    message: "서버 통신 불가 fetch 에러"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
             }
         }
     };
 
     const statusMenuRef = useRef(null);
+
+    useEffect(() => {
+        const storedToastData = localStorage.getItem('redirectToast');
+        if (storedToastData) {
+            try {
+                const toastData = JSON.parse(storedToastData);
+                addToast(toastData.message, toastData.status);
+                localStorage.removeItem('redirectToast');
+            } catch (error) {
+                console.error("Failed to parse redirectToast from localStorage:", error);
+                localStorage.removeItem('redirectToast');
+            }
+        }
+    }, [addToast]);
 
     useEffect(() => {
         const handleEsc = (e) => {
