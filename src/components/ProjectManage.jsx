@@ -50,8 +50,8 @@ export default function ProjectManage() {
         }
 
         // 파일 유효성 검사
-        if (file.size > 5 * 1024 * 1024) {
-            addToast('파일 크기는 5MB를 초과할 수 없습니다.', 'warning');
+        if (file.size > 10 * 1024 * 1024) {
+            addToast('파일 크기는 10MB를 초과할 수 없습니다.', 'warning');
             e.target.value = '';
             return;
         }
@@ -734,20 +734,6 @@ export default function ProjectManage() {
             }
         }
     };
-
-    const [calendarEvents, setCalendarEvents] = useState([
-        {
-            title: '프로젝트 시작',
-            date: projectBasic.created,
-            color: '#10b981'
-        },
-        ...(projectBasic.endDay ? [{
-            title: '프로젝트 종료',
-            date: projectBasic.endDay,
-            color: '#3b82f6'
-        }] : [])
-    ]);
-
     return (
         <>
             <div className="project-manage-container">
@@ -1183,7 +1169,7 @@ export default function ProjectManage() {
                             <div className="project-thumb-upload-section">
                                 <label className="project-thumb-upload-label">
                                     새 썸네일 업로드
-                                    <span className="file-format-info">(PNG, JPEG, JPG / 최대 5MB)</span>
+                                    <span className="file-format-info">(PNG, JPEG, JPG / 최대 10MB)</span>
                                 </label>
                                 <div className="file-input-wrapper">
                                     <input
@@ -1235,21 +1221,41 @@ export default function ProjectManage() {
                     </div>
                 )}
                 <div className="project-calendar-section">
-                    <FullCalendar
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        locale="ko"
-                        headerToolbar={{
-                            left: 'prev',
-                            center: 'title',
-                            right: 'next'
-                        }}
-                        events={calendarEvents}
-                        height="auto"
-                        dateClick={(info) => {
-                            console.log('날짜 클릭:', info.dateStr);
-                        }}
-                    />
+                    {projectBasic.created && projectBasic.status === 'C' && (
+                        <FullCalendar
+                            plugins={[dayGridPlugin, interactionPlugin]}
+                            initialView="dayGridMonth"
+                            initialDate={projectBasic.created}
+                            locale="ko"
+                            headerToolbar={{
+                                left: 'prev',
+                                center: 'title',
+                                right: 'next'
+                            }}
+                            // events={calendarEvents}
+                            height="auto"
+                            dateClick={(info) => {
+                                console.log('날짜 클릭:', info.dateStr);
+                            }}
+                        />
+                    )}
+                    {projectBasic.status !== 'C' && projectBasic.status !== 'D' && (
+                        <FullCalendar
+                            plugins={[dayGridPlugin, interactionPlugin]}
+                            initialView="dayGridMonth"
+                            locale="ko"
+                            headerToolbar={{
+                                left: 'prev',
+                                center: 'title',
+                                right: 'next'
+                            }}
+                            // events={calendarEvents}
+                            height="auto"
+                            dateClick={(info) => {
+                                console.log('날짜 클릭:', info.dateStr);
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </>

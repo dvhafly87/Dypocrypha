@@ -72,8 +72,8 @@ export default function ProjectMain() {
       }
 
       // 파일 크기 체크 (5MB 제한)
-      if (file.size > 5 * 1024 * 1024) {
-        addToast('파일 크기는 5MB 이하여야 합니다.', 'warning');
+      if (file.size > 10 * 1024 * 1024) {
+        addToast('파일 크기는 10MB 이하여야 합니다.', 'warning');
         return;
       }
 
@@ -680,7 +680,7 @@ export default function ProjectMain() {
                           <polyline points="21 15 16 10 5 21" />
                         </svg>
                         <span>이미지를 선택하세요</span>
-                        <span className="file-upload-hint">JPG, JPEG, PNG(최대 5MB)</span>
+                        <span className="file-upload-hint">JPG, JPEG, PNG(최대 10MB)</span>
                       </label>
                     )}
                     <input
