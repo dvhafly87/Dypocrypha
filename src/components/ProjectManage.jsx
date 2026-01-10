@@ -734,6 +734,37 @@ export default function ProjectManage() {
             }
         }
     };
+
+    const [calendarEvents, setCalendarEvents] = useState([
+        {
+            title: '프로젝트 시작',
+            date: projectBasic.created,
+            color: '#10b981'
+        },
+        ...(projectBasic.endDay ? [{
+            title: '프로젝트 종료',
+            date: projectBasic.endDay,
+            color: '#3b82f6'
+        }] : [])
+    ]);
+    
+    useEffect(() => {
+        if (!projectBasic.created) return;
+
+        setCalendarEvents([
+            {
+                title: '프로젝트 시작',
+                date: projectBasic.created,
+                color: '#10b981'
+            },
+            ...(projectBasic.endDay ? [{
+                title: '프로젝트 종료',
+                date: projectBasic.endDay,
+                color: '#3b82f6'
+            }] : [])
+        ]);
+    }, [projectBasic]);
+    
     return (
         <>
             <div className="project-manage-container">
@@ -1232,7 +1263,7 @@ export default function ProjectManage() {
                                 center: 'title',
                                 right: 'next'
                             }}
-                            // events={calendarEvents}
+                            events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
                                 console.log('날짜 클릭:', info.dateStr);
@@ -1249,7 +1280,7 @@ export default function ProjectManage() {
                                 center: 'title',
                                 right: 'next'
                             }}
-                            // events={calendarEvents}
+                            events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
                                 console.log('날짜 클릭:', info.dateStr);
