@@ -735,36 +735,34 @@ export default function ProjectManage() {
         }
     };
 
-    const [calendarEvents, setCalendarEvents] = useState([
-        {
-            title: '프로젝트 시작',
-            date: projectBasic.created,
-            color: '#10b981'
-        },
-        ...(projectBasic.endDay ? [{
-            title: '프로젝트 종료',
-            date: projectBasic.endDay,
-            color: '#3b82f6'
-        }] : [])
-    ]);
-    
+    const [calendarEvents, setCalendarEvents] = useState([]);
+
     useEffect(() => {
         if (!projectBasic.created) return;
-
-        setCalendarEvents([
-            {
-                title: '프로젝트 시작',
-                date: projectBasic.created,
-                color: '#10b981'
-            },
-            ...(projectBasic.endDay ? [{
-                title: '프로젝트 종료',
-                date: projectBasic.endDay,
-                color: '#3b82f6'
-            }] : [])
-        ]);
+        if (projectBasic.status === 'C' && projectBasic.status === 'D') {
+            setCalendarEvents([
+                {
+                    title: '프로젝트 시작',
+                    date: projectBasic.created,
+                    color: '#10b981'
+                },
+                ...(projectBasic.endDay ? [{
+                    title: '프로젝트 종료',
+                    date: projectBasic.endDay,
+                    color: '#3b82f6'
+                }] : [])
+            ]);
+        } else {
+            setCalendarEvents([
+                {
+                    title: '프로젝트 시작',
+                    date: projectBasic.created,
+                    color: '#10b981'
+                }
+            ])
+        }
     }, [projectBasic]);
-    
+
     return (
         <>
             <div className="project-manage-container">
