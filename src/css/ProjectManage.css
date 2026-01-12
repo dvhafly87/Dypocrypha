@@ -1323,3 +1323,23 @@
         width: 100%;
     }
 }
+.project-modal-log-header {
+    display:flex;
+    flex-direction: row;
+}
+
+.project-log-container {
+    display:flex;
+    flex-direction: column;
+}
+
+.project-modal-log-bottom-wrapper {
+    display:flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.project-daily-log-slider{
+    display:flex;
+    flex-direction: column;
+}

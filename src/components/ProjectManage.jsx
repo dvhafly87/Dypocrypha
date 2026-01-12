@@ -9,8 +9,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 export default function ProjectManage() {
-
     const [projectBasic, setProjectBasic] = useState([]);
+    const [projectLog, setProjectLog] = useState([]);
     const [newMemberRole, setNewMemberRole] = useState('');
     const [customRole, setCustomRole] = useState('');
     const [projectMember, setProjectMember] = useState([]);
@@ -20,11 +20,15 @@ export default function ProjectManage() {
     const [newMemberGrade, setNewMemberGrade] = useState('M');
     const [newProjectThumb, setNewProjectThumb] = useState(null);
     const [thumbPreview, setThumbPreview] = useState(null);
+    const [selectedDate, setSelectedDate] = useState("");
 
     const [summary, setSummary] = useState('');
     const [skillTool, setSkillTool] = useState('');
     const [selectCategory, setSelectCategory] = useState('');
 
+    const [clickCreated, setClickCreated] = useState(false);
+    const [showInputCallendarLogModal,setShowInputCallendarLogModal] = useState(false);
+    const [showCallendarModal, setShowCallendarModal] = useState(false);
     const [showEditProjectThumbModal, setShowEditProjectThumbModal] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
@@ -576,6 +580,12 @@ export default function ProjectManage() {
                         setProjectMember(result.projectMemberInformation);
                     } else {
                         setProjectMember([]);
+                    }
+
+                    if (result.projectLogEntities != null) {
+                        setProjectLog(result.projectLogEntities);
+                    } else {
+                        setProjectLog([]);
                     }
 
                 } else {
@@ -1249,6 +1259,74 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
+                {showInputCallendarLogModal && isLogined && loginSuccess && (
+                    <div className="callendar-input-log-modal">
+                        
+                    </div>
+                )}
+                {showCallendarModal && (
+                    <div className="callendar-modal-overlay">
+                        <div className="callendar-date-container">
+                            <div className="project-log-container">
+                                <div className="project-modal-log-header">
+                                    <h3>
+                                        {projectBasic.title} - {selectedDate}
+                                    </h3>
+                                    {isLogined && loginSuccess ?
+                                        <button
+                                            onClick={() => {
+                                                if (!isLogined || !loginSuccess) {
+                                                    navigatedLoginPage();
+                                                    return;
+                                                }
+                                                setShowInputCallendarLogModal(true);
+                                                setShowCallendarModal(false);
+                                            }}
+                                        >
+                                            +
+                                        </button>
+                                        :
+                                        <button
+                                            disabled
+                                        >
+                                            +
+                                        </button>
+                                    }
+                                </div>
+                                <div className="project-modal-log-bottom-wrapper">
+                                    <div className="project-daily-log-slider">
+                                        {/* 생성일자로 클릭시 상단부에 고정으로 클릭 카드 하나 추가 */}
+                                        {projectBasic.created.split('T')[0] === selectedDate && (
+                                            <span className="project-log-click-card" onClick={() => setClickCreated(true)}>
+                                                + 프로젝트 생성일
+                                            </span>
+                                        )}
+                                        로그 슬라이더 영역 여기에 삼항연산자로 <p/>
+                                        로그가 있으면 로그를 상하단 슬라이더 형식으로 표시 <p/>
+                                        없으면 로그 없음 문구 표시할거임<p/>
+                                    </div>
+                                    <div className="project-log-view-container">
+                                        {/* 시작일 일치로 생성된 카드를 클릭했을때 보여지는 */}
+                                        {clickCreated && (
+                                            <div className="click-log-content">
+                                                <div className="click-log-header">
+                                                    <span className="milestone-tag">Milestone</span>
+                                                    <h3>{projectBasic.title}</h3>
+                                                    <p className="start-date-text">
+                                                        <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
+                                                    </p>
+                                                </div>
+                                                <div className="click-log-body">
+                                                    <p>축하합니다! 새로운 프로젝트의 기록이 이날부터 시작되었습니다.</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div className="project-calendar-section">
                     {projectBasic.created && projectBasic.status === 'C' && (
                         <FullCalendar
@@ -1264,7 +1342,14 @@ export default function ProjectManage() {
                             events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
-                                console.log('날짜 클릭:', info.dateStr);
+                                // info.dateStr;
+                                setSelectedDate(info.dateStr);
+                                setShowCallendarModal(true);
+                            }}
+                            eventClick={(info) => {
+                                // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.
+                                // setSelectedDate(info.event.startStr.split('T')[0]); // 시간 정보 제외 날짜만 추출
+                                // setShowCallendarModal(true);
                             }}
                         />
                     )}
@@ -1281,7 +1366,14 @@ export default function ProjectManage() {
                             events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
-                                console.log('날짜 클릭:', info.dateStr);
+                                // info.dateStr;
+                                setSelectedDate(info.dateStr);
+                                setShowCallendarModal(true);
+                            }}
+                            eventClick={(info) => {
+                                // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.
+                                // setSelectedDate(info.event.startStr.split('T')[0]); // 시간 정보 제외 날짜만 추출
+                                // setShowCallendarModal(true);
                             }}
                         />
                     )}
