@@ -21,13 +21,15 @@ export default function ProjectManage() {
     const [newProjectThumb, setNewProjectThumb] = useState(null);
     const [thumbPreview, setThumbPreview] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [summary, setSummary] = useState('');
     const [skillTool, setSkillTool] = useState('');
     const [selectCategory, setSelectCategory] = useState('');
 
+    const [clickEnd, setClickEnd] = useState(false);
     const [clickCreated, setClickCreated] = useState(false);
-    const [showInputCallendarLogModal,setShowInputCallendarLogModal] = useState(false);
+    const [showInputCallendarLogModal, setShowInputCallendarLogModal] = useState(false);
     const [showCallendarModal, setShowCallendarModal] = useState(false);
     const [showEditProjectThumbModal, setShowEditProjectThumbModal] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
@@ -42,6 +44,11 @@ export default function ProjectManage() {
     const navigate = useNavigate();
 
     const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
+    
+    const exitLogInputModal = () => {
+        setShowCallendarModal(true);
+        setShowInputCallendarLogModal(false);
+    }
 
     // 파일 선택 시 미리보기 처리
     const handleFileSelect = (e) => {
@@ -76,6 +83,14 @@ export default function ProjectManage() {
         };
         reader.readAsDataURL(file);
     };
+
+    function CustomUploadAdapterPlugin(editor) {
+        const addToast = editor.config.get('addToast');
+
+        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+            return CustomUploadAdapter(loader, addToast);
+        };
+    }
 
     const handleUpdateProjectThumb = async () => {
         if (!newProjectThumb) {
@@ -749,7 +764,7 @@ export default function ProjectManage() {
 
     useEffect(() => {
         if (!projectBasic.created) return;
-        if (projectBasic.status === 'C' && projectBasic.status === 'D') {
+        if (projectBasic.status === 'C' || projectBasic.status === 'D') {
             setCalendarEvents([
                 {
                     title: '프로젝트 시작',
@@ -986,9 +1001,19 @@ export default function ProjectManage() {
                         {projectMember.length > 0 && (
                             <div className={permissionGrade === 'L' ? "team-member-information" : "team-member-information-non-leader"}>
                                 {projectMember.map(member => (
-                                    <div key={member.id} className="member-card">
-                                        <div className="member-name">{member.pjMemberName}</div>
+                                    <div key={member.id} className="member-card"
+                                        style={projectBasic.teamValue
+                                            && member.pjMemberName === projectBasic.starter ?
+                                            {
+                                                display: 'none',
+                                                visibility: 'hidden'
+                                            }
+                                            :
+                                            {
 
+                                            }
+                                        }>
+                                        <div className="member-name">{member.pjMemberName}</div>
                                         <div className="member-detail-wrapper">
                                             <div className="member-detail">
                                                 <span className="member-detail-label">권한:</span>
@@ -1259,9 +1284,21 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
-                {showInputCallendarLogModal && isLogined && loginSuccess && (
+                {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && (
                     <div className="callendar-input-log-modal">
-                        
+                        <div className="callendar-log-input-header">
+                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
+                        </div>
+                        <div className="callendar-log-input-main-container">
+                            <div className="log-input-button-wrapper">
+                                <button
+                                    onClick={() => exitLogInputModal()}
+                                >
+                                    취소
+                                </button>
+                                <button onClick={() => inputNewDaliyLog()}> 등록 </button>
+                            </div>
+                        </div>
                     </div>
                 )}
                 {showCallendarModal && (
@@ -1301,23 +1338,34 @@ export default function ProjectManage() {
                                                 + 프로젝트 생성일
                                             </span>
                                         )}
-                                        로그 슬라이더 영역 여기에 삼항연산자로 <p/>
-                                        로그가 있으면 로그를 상하단 슬라이더 형식으로 표시 <p/>
-                                        없으면 로그 없음 문구 표시할거임<p/>
+                                        {(projectBasic.status === 'D' || projectBasic.status === 'C') && projectBasic.endDay.split('T')[0] === selectedDate && (
+                                            <span className="project-log-click-card" onClick={() => setClickEnd(true)}>
+                                                프로젝트 종료일
+                                            </span>
+                                        )}
+                                        로그 슬라이더 영역 여기에 삼항연산자로 <p />
+                                        로그가 있으면 로그를 상하단 슬라이더 형식으로 표시 <p />
+                                        없으면 로그 없음 문구 표시할거임<p />
                                     </div>
                                     <div className="project-log-view-container">
                                         {/* 시작일 일치로 생성된 카드를 클릭했을때 보여지는 */}
                                         {clickCreated && (
                                             <div className="click-log-content">
                                                 <div className="click-log-header">
-                                                    <span className="milestone-tag">Milestone</span>
                                                     <h3>{projectBasic.title}</h3>
                                                     <p className="start-date-text">
                                                         <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
                                                     </p>
                                                 </div>
-                                                <div className="click-log-body">
-                                                    <p>축하합니다! 새로운 프로젝트의 기록이 이날부터 시작되었습니다.</p>
+                                            </div>
+                                        )}
+                                        {clickEnd && (
+                                            <div className="click-log-content">
+                                                <div className="click-log-header">
+                                                    <h3>{projectBasic.title}</h3>
+                                                    <p className="start-date-text">
+                                                        <strong>{selectedDate}</strong>에 프로젝트가 성공적으로 종료되었습니다.
+                                                    </p>
                                                 </div>
                                             </div>
                                         )}
@@ -1345,6 +1393,8 @@ export default function ProjectManage() {
                                 // info.dateStr;
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
+                                setClickCreated(false);
+                                setClickEnd(false);
                             }}
                             eventClick={(info) => {
                                 // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.
@@ -1369,6 +1419,8 @@ export default function ProjectManage() {
                                 // info.dateStr;
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
+                                setClickCreated(false);
+                                setClickEnd(false);
                             }}
                             eventClick={(info) => {
                                 // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.

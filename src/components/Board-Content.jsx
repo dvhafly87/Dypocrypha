@@ -25,17 +25,17 @@ export default function BoardPost({ boardId, boardName }) {
   postsPerPage = isMobile ? 5 : 6;
   const maxLength = Math.floor((window.innerWidth * 0.8) / 8);
   const minSwipeDistance = 50;
- 
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 600);
-      setIsComport(window.innerWidth <= 1300); 
+      setIsComport(window.innerWidth <= 1300);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
   useEffect(() => {
     const boardPostCalling = async () => {
       try {
@@ -95,21 +95,21 @@ export default function BoardPost({ boardId, boardName }) {
     }
     return title;
   };
-  
+
   const formatDate = (dateString) => {
     // Z를 제거하고 한국 시간으로 파싱
     const dateWithoutZ = dateString.replace('Z', '');
     const date = new Date(dateWithoutZ);
     const today = new Date();
-    
+
     const dateYear = date.getFullYear();
     const dateMonth = date.getMonth();
     const dateDay = date.getDate();
-    
+
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
-    
+
     if (dateYear === todayYear && dateMonth === todayMonth && dateDay === todayDay) {
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -126,18 +126,18 @@ export default function BoardPost({ boardId, boardName }) {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
-  
+
   const onTouchMove = (e) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
-  
+
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe && currentPage < totalPages) {
       handlePageChange(currentPage + 1);
     }
@@ -195,18 +195,18 @@ export default function BoardPost({ boardId, boardName }) {
       </div>
 
       {/* 게시글 목록 */}
-      <div 
-      className="board-post-list-container"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}>
+      <div
+        className="board-post-list-container"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}>
         <table className="board-post-table">
           <thead className="board-post-table-header">
             <tr>
               <th>번호</th>
               <th>제목</th>
               <th>작성자</th>
-              <th>작성일</th> 
+              <th>작성일</th>
               <th>조회</th>
             </tr>
           </thead>
@@ -250,9 +250,9 @@ export default function BoardPost({ boardId, boardName }) {
                             {(() => {
                               const date = new Date(post.updatedAt.replace('Z', ''));
                               const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() && 
-                                            date.getMonth() === today.getMonth() && 
-                                            date.getDate() === today.getDate();
+                              const isToday = date.getFullYear() === today.getFullYear() &&
+                                date.getMonth() === today.getMonth() &&
+                                date.getDate() === today.getDate();
                               return isToday ? '수정됨 ' : '수정일 ';
                             })()}
                           </span>
@@ -290,9 +290,9 @@ export default function BoardPost({ boardId, boardName }) {
                             {(() => {
                               const date = new Date(post.updatedAt.replace('Z', ''));
                               const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() && 
-                                            date.getMonth() === today.getMonth() && 
-                                            date.getDate() === today.getDate();
+                              const isToday = date.getFullYear() === today.getFullYear() &&
+                                date.getMonth() === today.getMonth() &&
+                                date.getDate() === today.getDate();
                               return isToday ? '수정됨 ' : '수정일 ';
                             })()}
                           </span>
@@ -304,13 +304,13 @@ export default function BoardPost({ boardId, boardName }) {
                   );
                 })}
 
-                {Array.from({ 
-                  length: Math.max(0, postsPerPage - currentPosts.length) 
+                {Array.from({
+                  length: Math.max(0, postsPerPage - currentPosts.length)
                 }).map((_, index) => (
                   <tr key={`empty-${index}`} className="board-post-row-empty">
-                    <td colSpan="6" style={{ 
+                    <td colSpan="6" style={{
                       height: isMobile ? '60px' : '70px',
-                      borderBottom: '1px solid #f0f0f0' 
+                      borderBottom: '1px solid #f0f0f0'
                     }}></td>
                   </tr>
                 ))}
