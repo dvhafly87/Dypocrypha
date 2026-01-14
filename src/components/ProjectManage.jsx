@@ -7,6 +7,8 @@ import '../css/ProjectManage.css';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Editor } from '@toast-ui/react-editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
 
 export default function ProjectManage() {
     const [projectBasic, setProjectBasic] = useState([]);
@@ -22,7 +24,7 @@ export default function ProjectManage() {
     const [thumbPreview, setThumbPreview] = useState(null);
     const [selectedDate, setSelectedDate] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const editorRef = useRef();
     const [summary, setSummary] = useState('');
     const [skillTool, setSkillTool] = useState('');
     const [selectCategory, setSelectCategory] = useState('');
@@ -43,11 +45,21 @@ export default function ProjectManage() {
     const { isLogined, loginSuccess } = useAuth();
     const navigate = useNavigate();
 
+    const today = new Date();
+    const todayStr =
+        `${today.getFullYear()}-` +
+        `${String(today.getMonth() + 1).padStart(2, '0')}-` +
+        `${String(today.getDate()).padStart(2, '0')}`;
+
     const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
-    
+
     const exitLogInputModal = () => {
         setShowCallendarModal(true);
         setShowInputCallendarLogModal(false);
+    }
+
+    const onUploadImage = async (blob, callback) => {
+        alert("hi");
     }
 
     // 파일 선택 시 미리보기 처리
@@ -83,14 +95,6 @@ export default function ProjectManage() {
         };
         reader.readAsDataURL(file);
     };
-
-    function CustomUploadAdapterPlugin(editor) {
-        const addToast = editor.config.get('addToast');
-
-        editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-            return CustomUploadAdapter(loader, addToast);
-        };
-    }
 
     const handleUpdateProjectThumb = async () => {
         if (!newProjectThumb) {
@@ -1289,7 +1293,18 @@ export default function ProjectManage() {
                         <div className="callendar-log-input-header">
                             <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
                         </div>
+
                         <div className="callendar-log-input-main-container">
+                            <Editor
+                                initialValue=""
+                                initialEditType="markdown"
+                                previewStyle="vertical"
+                                height="500px"
+                                hooks={{
+                                    addImageBlobHook: onUploadImage
+                                }}
+                                useCommandShortcut={true}
+                            />
                             <div className="log-input-button-wrapper">
                                 <button
                                     onClick={() => exitLogInputModal()}
@@ -1309,7 +1324,7 @@ export default function ProjectManage() {
                                     <h3>
                                         {projectBasic.title} - {selectedDate}
                                     </h3>
-                                    {isLogined && loginSuccess ?
+                                    {isLogined && loginSuccess && selectedDate === todayStr ?
                                         <button
                                             onClick={() => {
                                                 if (!isLogined || !loginSuccess) {
