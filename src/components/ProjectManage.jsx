@@ -8,6 +8,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Editor } from '@toast-ui/react-editor';
+import { onUploadImage } from '../util/onUploadImage.js';
 import '@toast-ui/editor/dist/toastui-editor.css';
 
 export default function ProjectManage() {
@@ -58,9 +59,6 @@ export default function ProjectManage() {
         setShowInputCallendarLogModal(false);
     }
 
-    const onUploadImage = async (blob, callback) => {
-        alert("hi");
-    }
 
     // 파일 선택 시 미리보기 처리
     const handleFileSelect = (e) => {
@@ -142,6 +140,21 @@ export default function ProjectManage() {
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             navigate('/');
         }
+    };
+
+    const adapter = async (blob, callback) => {
+        const uploader = onUploadImage({
+            blob,
+            onSuccess: ({ default: url }) => {
+                callback(url, 'image'); // string URL만 넘김
+            },
+            onError: (err) => {
+                console.error(err);
+                addToast(err.message, 'error');
+            }
+        });
+
+        await uploader.upload();
     };
 
 
@@ -1301,7 +1314,7 @@ export default function ProjectManage() {
                                 previewStyle="vertical"
                                 height="500px"
                                 hooks={{
-                                    addImageBlobHook: onUploadImage
+                                    addImageBlobHook: adapter
                                 }}
                                 useCommandShortcut={true}
                             />
