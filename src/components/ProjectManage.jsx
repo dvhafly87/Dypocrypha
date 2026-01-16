@@ -59,6 +59,67 @@ export default function ProjectManage() {
         setShowInputCallendarLogModal(false);
     }
 
+    const inputNewDailyLog = async () => {
+        if (!loginSuccess || !isLogined) {
+            const toastData = {
+                status: 'error',
+                message: "로그인이 필요한 기능입니다"
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/login');
+            return;
+        }
+
+        const editorInstance = editorRef.current?.getInstance();
+        const content = editorInstance?.getMarkdown()?.trim();
+
+        if (!content) {
+            addToast("내용을 입력해 주십시오", "error");
+            return;
+        }
+
+        //str
+        if (!selectedDate) {
+            addToast("날짜를 선택해 주십시오", "error");
+            return;
+        }
+
+        if (!projectBasic?.id) {
+            addToast("프로젝트 정보가 올바르지 않습니다", "error");
+            return;
+        }
+
+        //projectBasic = useState([]) 형태
+
+        try {
+
+            const response = await fetch(`${API.API_BASE_URL}/project/daily/log`, {
+                method: 'POST',
+                credentials: 'include', //쿠키값 전송
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    logProjectId: projectBasic.id,
+                    logProjectDate: selectedDate,
+                    logProjectContent: content
+                })
+            });
+
+            if (!response.ok) throw new Error("SERVER_ERROR");
+
+        } catch (error) {
+            const toastData = {
+                status: 'error',
+                message: "프로젝트 로그 기록중 에러 발생"
+            };
+            console.error(error);
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+            return;
+        }
+    };
+
 
     // 파일 선택 시 미리보기 처리
     const handleFileSelect = (e) => {
@@ -1309,6 +1370,7 @@ export default function ProjectManage() {
 
                         <div className="callendar-log-input-main-container">
                             <Editor
+                                ref={editorRef}
                                 initialValue=""
                                 initialEditType="markdown"
                                 previewStyle="vertical"
@@ -1324,7 +1386,7 @@ export default function ProjectManage() {
                                 >
                                     취소
                                 </button>
-                                <button onClick={() => inputNewDaliyLog()}> 등록 </button>
+                                <button onClick={() => inputNewDailyLog()}> 등록 </button>
                             </div>
                         </div>
                     </div>
