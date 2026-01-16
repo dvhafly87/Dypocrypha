@@ -106,7 +106,37 @@ export default function ProjectManage() {
                 })
             });
 
-            if (!response.ok) throw new Error("SERVER_ERROR");
+            if (response.status === 500) {
+                const toastData = {
+                    status: 'error',
+                    message: "서버 통신 불가"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            }
+
+            const result = await response.json();
+
+            if (response.status === 404 || response.status === 400) {
+                const toastData = {
+                    status: 'error',
+                    message: result?.logSavedMessage || "요청을 처리할 수 없습니다"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 401) {
+                const toastData = {
+                    status: 'error',
+                    message: result.logSavedMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login'); //로그인 페이지로
+            } else if (response.status === 403) {
+                addToast(result.logSavedMessage, "warning");
+                return;
+            }
 
         } catch (error) {
             const toastData = {
