@@ -109,7 +109,7 @@ export default function ProjectManage() {
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
-                    message: "서버 통신 불가"
+                    message: result.logSavedMessage != null ? result.logSavedMessage : "서버 통신 불각"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
@@ -136,6 +136,13 @@ export default function ProjectManage() {
             } else if (response.status === 403) {
                 addToast(result.logSavedMessage, "warning");
                 return;
+            } else if(response.status === 201) {
+                  const toastData = {
+                    status: 'success',
+                    message: result.logSavedMessage != null ? result.logSavedMessage : "저장되었습니다"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                window.location.reload();
             }
 
         } catch (error) {
