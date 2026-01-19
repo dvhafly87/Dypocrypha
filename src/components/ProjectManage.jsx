@@ -9,11 +9,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Editor } from '@toast-ui/react-editor';
 import { onUploadImage } from '../util/onUploadImage.js';
+import { Viewer } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
 
 export default function ProjectManage() {
     const [projectBasic, setProjectBasic] = useState([]);
     const [projectLog, setProjectLog] = useState([]);
+    const [selectedLogId, setSelectedLogId] = useState(null);
     const [newMemberRole, setNewMemberRole] = useState('');
     const [customRole, setCustomRole] = useState('');
     const [projectMember, setProjectMember] = useState([]);
@@ -59,6 +61,22 @@ export default function ProjectManage() {
         setShowInputCallendarLogModal(false);
     }
 
+    const getFilteredLogs = () => {
+        if (!projectLog || projectLog.length === 0) return [];
+
+        return projectLog.filter(log => {
+            // logDailyDate가 "2024-01-15" 형식이라면
+            const logDate = log.logDailyDate.split('T')[0]; // ISO 형식 대비
+            return logDate === selectedDate;
+        });
+    };
+
+    // 3. 선택된 로그 찾기
+    const getSelectedLog = () => {
+        const filtered = getFilteredLogs();
+        return filtered.find(log => log.logId === selectedLogId);
+    };
+
     const inputNewDailyLog = async () => {
         if (!loginSuccess || !isLogined) {
             const toastData = {
@@ -89,8 +107,6 @@ export default function ProjectManage() {
             return;
         }
 
-        //projectBasic = useState([]) 형태
-
         try {
 
             const response = await fetch(`${API.API_BASE_URL}/project/daily/log`, {
@@ -109,7 +125,7 @@ export default function ProjectManage() {
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
-                    message: result.logSavedMessage != null ? result.logSavedMessage : "서버 통신 불각"
+                    message: result.logSavedMessage != null ? result.logSavedMessage : "서버 통신 불가"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
@@ -136,8 +152,8 @@ export default function ProjectManage() {
             } else if (response.status === 403) {
                 addToast(result.logSavedMessage, "warning");
                 return;
-            } else if(response.status === 201) {
-                  const toastData = {
+            } else if (response.status === 201) {
+                const toastData = {
                     status: 'success',
                     message: result.logSavedMessage != null ? result.logSavedMessage : "저장되었습니다"
                 };
@@ -190,6 +206,14 @@ export default function ProjectManage() {
             setThumbPreview(reader.result);
         };
         reader.readAsDataURL(file);
+    };
+
+    const PostView = ({ content }) => {
+        return (
+            <Viewer
+                initialValue={content}   // DB에서 가져온 마크다운 문자열
+            />
+        );
     };
 
     const handleUpdateProjectThumb = async () => {
@@ -712,8 +736,8 @@ export default function ProjectManage() {
                         setProjectMember([]);
                     }
 
-                    if (result.projectLogEntities != null) {
-                        setProjectLog(result.projectLogEntities);
+                    if (result.projectCallendarLog != null) {
+                        setProjectLog(result.projectCallendarLog);
                     } else {
                         setProjectLog([]);
                     }
@@ -1429,14 +1453,19 @@ export default function ProjectManage() {
                     </div>
                 )}
                 {showCallendarModal && (
-                    <div className="callendar-modal-overlay">
-                        <div className="callendar-date-container">
+                    <div className="callendar-modal-overlay" onClick={() => {
+                        setShowCallendarModal(false);
+                        setSelectedLogId(null);
+                    }}>
+                        <div className="callendar-date-container" onClick={(e) => e.stopPropagation()}>
                             <div className="project-log-container">
+                                {/* 헤더 */}
                                 <div className="project-modal-log-header">
                                     <h3>
-                                        {projectBasic.title} - {selectedDate}
+                                        <span>{projectBasic.title} - {selectedDate}</span>
                                     </h3>
-                                    {isLogined && loginSuccess && selectedDate === todayStr ?
+
+                                    {isLogined && loginSuccess && selectedDate === todayStr ? (
                                         <button
                                             onClick={() => {
                                                 if (!isLogined || !loginSuccess) {
@@ -1449,59 +1478,219 @@ export default function ProjectManage() {
                                         >
                                             +
                                         </button>
-                                        :
-                                        <button
-                                            disabled
-                                        >
-                                            +
-                                        </button>
-                                    }
+                                    ) : (
+                                        <button disabled>+</button>
+                                    )}
                                 </div>
-                                <div className="project-modal-log-bottom-wrapper">
-                                    <div className="project-daily-log-slider">
-                                        {/* 생성일자로 클릭시 상단부에 고정으로 클릭 카드 하나 추가 */}
-                                        {projectBasic.created.split('T')[0] === selectedDate && (
-                                            <span className="project-log-click-card" onClick={() => setClickCreated(true)}>
-                                                + 프로젝트 생성일
-                                            </span>
-                                        )}
-                                        {(projectBasic.status === 'D' || projectBasic.status === 'C') && projectBasic.endDay.split('T')[0] === selectedDate && (
-                                            <span className="project-log-click-card" onClick={() => setClickEnd(true)}>
-                                                프로젝트 종료일
-                                            </span>
-                                        )}
-                                        로그 슬라이더 영역 여기에 삼항연산자로 <p />
-                                        로그가 있으면 로그를 상하단 슬라이더 형식으로 표시 <p />
-                                        없으면 로그 없음 문구 표시할거임<p />
-                                    </div>
-                                    <div className="project-log-view-container">
-                                        {/* 시작일 일치로 생성된 카드를 클릭했을때 보여지는 */}
-                                        {clickCreated && (
-                                            <div className="click-log-content">
-                                                <div className="click-log-header">
-                                                    <h3>{projectBasic.title}</h3>
-                                                    <p className="start-date-text">
-                                                        <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
-                                                    </p>
+
+                                {/* 로그 뷰어 */}
+                                {(() => {
+                                    const filteredLogs = getFilteredLogs();
+                                    const selectedLog = getSelectedLog();
+
+                                    // 프로젝트 생성일/종료일 체크
+                                    const isCreatedDate = projectBasic.created?.split('T')[0] === selectedDate;
+                                    const isEndDate = (projectBasic.status === 'D' || projectBasic.status === 'C') &&
+                                        projectBasic.endDay?.split('T')[0] === selectedDate;
+
+                                    return filteredLogs.length > 0 || isCreatedDate || isEndDate ? (
+                                        <div className="project-log-viewer-container">
+                                            {/* 좌측: 로그 목록 */}
+                                            <div className="project-log-list-section">
+                                                <div className="project-log-list-header">
+                                                    <h4>로그 목록</h4>
+                                                    <span className="log-count">
+                                                        {filteredLogs.length + (isCreatedDate ? 1 : 0) + (isEndDate ? 1 : 0)}개
+                                                    </span>
+                                                </div>
+                                                <div className="project-log-list-items">
+                                                    {/* 프로젝트 생성일 카드 */}
+                                                    {isCreatedDate && (
+                                                        <div
+                                                            className={`project-log-list-item special-log ${selectedLogId === 'created' ? 'active' : ''}`}
+                                                            onClick={() => setSelectedLogId('created')}
+                                                        >
+                                                            <div className="log-list-title">
+                                                                🎉 프로젝트 생성일
+                                                            </div>
+                                                            <div className="log-list-meta">
+                                                                <span className="log-creator">시스템</span>
+                                                                <span className="log-time">
+                                                                    {new Date(projectBasic.created).toLocaleTimeString('ko-KR', {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* 프로젝트 종료일 카드 */}
+                                                    {isEndDate && (
+                                                        <div
+                                                            className={`project-log-list-item special-log ${selectedLogId === 'ended' ? 'active' : ''}`}
+                                                            onClick={() => setSelectedLogId('ended')}
+                                                        >
+                                                            <div className="log-list-title">
+                                                                {projectBasic.status === 'C' ? '✅ 프로젝트 완료일' : '⏸️ 프로젝트 중단일'}
+                                                            </div>
+                                                            <div className="log-list-meta">
+                                                                <span className="log-creator">시스템</span>
+                                                                <span className="log-time">
+                                                                    {new Date(projectBasic.endDay).toLocaleTimeString('ko-KR', {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* 일반 로그 목록 */}
+                                                    {filteredLogs.map((log) => (
+                                                        <div
+                                                            key={log.logId}
+                                                            className={`project-log-list-item ${selectedLogId === log.logId ? 'active' : ''}`}
+                                                            onClick={() => setSelectedLogId(log.logId)}
+                                                        >
+                                                            <div className="log-list-title">
+                                                                {log.logContent.length > 50
+                                                                    ? log.logContent.substring(0, 50) + "..."
+                                                                    : log.logContent}
+                                                            </div>
+                                                            <div className="log-list-meta">
+                                                                <span className="log-creator">{log.logCreator}</span>
+                                                                <span className="log-time">
+                                                                    {log.createdDate && new Date(log.createdDate).toLocaleTimeString('ko-KR', {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
-                                        )}
-                                        {clickEnd && (
-                                            <div className="click-log-content">
-                                                <div className="click-log-header">
-                                                    <h3>{projectBasic.title}</h3>
-                                                    <p className="start-date-text">
-                                                        <strong>{selectedDate}</strong>에 프로젝트가 성공적으로 종료되었습니다.
-                                                    </p>
-                                                </div>
+
+                                            {/* 우측: 로그 상세 내용 */}
+                                            <div className="project-log-content-section">
+                                                {selectedLog ? (
+                                                    <div className="project-log-detail">
+                                                        <div className="log-detail-header">
+                                                            <h4>로그 상세</h4>
+                                                            <div className="log-detail-meta">
+                                                                <span className="log-detail-creator">작성자: {selectedLog.logCreator}</span>
+                                                                <span className="log-detail-datetime">
+                                                                    {new Date(selectedLog.createdDate).toLocaleString('ko-KR', {
+                                                                        year: 'numeric',
+                                                                        month: '2-digit',
+                                                                        day: '2-digit',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="log-detail-content">
+                                                            <div className="log-content-text">
+                                                                <Viewer initialValue={selectedLog.logContent || ''} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : selectedLogId === 'created' ? (
+                                                    <div className="project-log-detail">
+                                                        <div className="log-detail-header">
+                                                            <h4>프로젝트 생성일</h4>
+                                                            <div className="log-detail-meta">
+                                                                <span className="log-detail-datetime">
+                                                                    {new Date(projectBasic.created).toLocaleString('ko-KR', {
+                                                                        year: 'numeric',
+                                                                        month: '2-digit',
+                                                                        day: '2-digit',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="log-detail-content">
+                                                            <div className="special-log-content">
+                                                                <div className="special-log-icon">🎉</div>
+                                                                <h3>{projectBasic.title}</h3>
+                                                                <p>
+                                                                    <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : selectedLogId === 'ended' ? (
+                                                    <div className="project-log-detail">
+                                                        <div className="log-detail-header">
+                                                            <h4>{projectBasic.status === 'C' ? '프로젝트 완료일' : '프로젝트 중단일'}</h4>
+                                                            <div className="log-detail-meta">
+                                                                <span className="log-detail-datetime">
+                                                                    {new Date(projectBasic.endDay).toLocaleString('ko-KR', {
+                                                                        year: 'numeric',
+                                                                        month: '2-digit',
+                                                                        day: '2-digit',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="log-detail-content">
+                                                            <div className="special-log-content">
+                                                                <div className="special-log-icon">
+                                                                    {projectBasic.status === 'C' ? '✅' : '⏸️'}
+                                                                </div>
+                                                                <h3>{projectBasic.title}</h3>
+                                                                <p>
+                                                                    <strong>{selectedDate}</strong>에 프로젝트가
+                                                                    {projectBasic.status === 'C' ? ' 성공적으로 완료' : ' 중단'}되었습니다.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="project-log-empty-state">
+                                                        <svg
+                                                            width="64"
+                                                            height="64"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="1.5"
+                                                        >
+                                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        <p>로그를 선택해주세요</p>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
+                                        </div>
+                                    ) : (
+                                        <div className="project-log-empty-container">
+                                            <svg
+                                                width="80"
+                                                height="80"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="1.5"
+                                            >
+                                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <h4>프로젝트 로그 없음</h4>
+                                            <p>현재 선택된 날짜에 등록된 로그가 없습니다.</p>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
                 )}
+
                 <div className="project-calendar-section">
                     {projectBasic.created && projectBasic.status === 'C' && (
                         <FullCalendar

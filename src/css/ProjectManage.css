@@ -1324,7 +1324,7 @@
     }
 }
 
-.project-modal-log-header {
+/* .project-modal-log-header {
     display:flex;
     flex-direction: row;
 }
@@ -1343,4 +1343,704 @@
 .project-daily-log-slider{
     display:flex;
     flex-direction: column;
+}
+옹앙 */
+/* ============================================
+   캘린더 모달 오버레이
+   ============================================ */
+.callendar-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    padding: 20px;
+}
+
+/* ============================================
+   캘린더 날짜 컨테이너
+   ============================================ */
+.callendar-date-container {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   프로젝트 로그 컨테이너
+   ============================================ */
+.project-log-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ============================================
+   모달 헤더
+   ============================================ */
+.project-modal-log-header {
+    padding: 24px 28px;
+    border-bottom: 2px solid #e5e7eb;
+    background: linear-gradient(to bottom, #ffffff, #f9fafb);
+    flex-shrink: 0;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.project-modal-log-header h3 {
+    margin: 0 0 20px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-modal-log-header button {
+    padding: 10px 18px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+    min-width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-modal-log-header button:hover:not(:disabled) {
+    background-color: #2563eb;
+    transform: scale(1.05);
+}
+
+.project-modal-log-header button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.project-modal-log-header button:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ============================================
+   로그 뷰어 컨테이너 (좌측 리스트 + 우측 콘텐츠)
+   ============================================ */
+.project-log-viewer-container {
+    display: flex;
+    gap: 0;
+    height: 450px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   좌측: 로그 리스트 섹션
+   ============================================ */
+.project-log-list-section {
+    width: 38%;
+    border-right: 2px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+}
+
+.project-log-list-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+}
+
+.project-log-list-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.log-count {
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #e5e7eb;
+    padding: 5px 12px;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.project-log-list-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.project-log-list-item {
+    padding: 16px;
+    margin-bottom: 10px;
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.project-log-list-item:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    transform: translateX(4px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.project-log-list-item.active {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    transform: translateX(4px);
+}
+
+.log-list-title {
+    font-size: 15px;
+    color: #111827;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.log-list-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.log-creator {
+    font-weight: 600;
+    color: #374151;
+}
+
+.log-time {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* ============================================
+   우측: 로그 상세 콘텐츠 섹션
+   ============================================ */
+.project-log-content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.project-log-detail {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.log-detail-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #fafafa;
+}
+
+.log-detail-header h4 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.log-detail-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #6b7280;
+    flex-wrap: wrap;
+}
+
+.log-detail-creator {
+    font-weight: 600;
+    color: #374151;
+}
+
+.log-detail-creator::before {
+    content: "👤 ";
+}
+
+.log-detail-datetime {
+    color: #9ca3af;
+}
+
+.log-detail-datetime::before {
+    content: "🕐 ";
+}
+
+.log-detail-content {
+    flex: 1;
+    padding: 28px;
+    overflow-y: auto;
+}
+
+.log-content-text {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #374151;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ============================================
+   로그 빈 상태
+   ============================================ */
+.project-log-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+    padding: 40px;
+}
+
+.project-log-empty-state svg {
+    margin-bottom: 20px;
+    opacity: 0.4;
+}
+
+.project-log-empty-state p {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ============================================
+   로그가 없는 경우
+   ============================================ */
+.project-log-open-modal {
+    padding: 60px 40px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.project-log-open-modal > div:first-child {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.project-log-content-viewer {
+    font-size: 14px;
+    color: #9ca3af;
+    line-height: 1.6;
+}
+
+/* ============================================
+   모달 하단 영역
+   ============================================ */
+.project-modal-log-bottom-wrapper {
+    padding: 24px 28px;
+    border-top: 2px solid #e5e7eb;
+    background: linear-gradient(to top, #ffffff, #f9fafb);
+    flex-shrink: 0;
+}
+
+.project-daily-log-slider {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.project-log-click-card {
+    padding: 10px 18px;
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.project-log-click-card:hover {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.project-log-click-card:active {
+    transform: translateY(0);
+}
+
+.project-log-view-container {
+    min-height: 100px;
+}
+
+.click-log-content {
+    padding: 24px;
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.click-log-header h3 {
+    margin: 0 0 14px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.start-date-text {
+    margin: 0;
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.7;
+}
+
+.start-date-text strong {
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+/* ============================================
+   스크롤바 스타일
+   ============================================ */
+.project-log-list-items::-webkit-scrollbar,
+.log-detail-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.project-log-list-items::-webkit-scrollbar-track,
+.log-detail-content::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+}
+
+.project-log-list-items::-webkit-scrollbar-thumb,
+.log-detail-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.project-log-list-items::-webkit-scrollbar-thumb:hover,
+.log-detail-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ============================================
+   반응형 디자인 - 900px 이하
+   ============================================ */
+@media (max-width: 900px) {
+    .callendar-date-container {
+        max-width: 95%;
+    }
+
+    .project-modal-log-header {
+        padding: 20px 24px;
+    }
+
+    .project-modal-log-header h3 {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+
+    .project-log-viewer-container {
+        height: 500px;
+    }
+
+    .project-log-list-section {
+        width: 40%;
+    }
+
+    .project-modal-log-bottom-wrapper {
+        padding: 20px 24px;
+    }
+
+    .log-detail-content {
+        padding: 20px;
+    }
+}
+
+/* ============================================
+   반응형 디자인 - 600px 이하 (모바일)
+   ============================================ */
+@media (max-width: 600px) {
+    .callendar-modal-overlay {
+        padding: 10px;
+    }
+
+    .callendar-date-container {
+        max-width: 100%;
+        max-height: 95vh;
+        border-radius: 12px;
+    }
+
+    .project-modal-log-header {
+        padding: 16px 20px;
+    }
+
+    .project-modal-log-header h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .project-modal-log-header button {
+        align-self: flex-end;
+        font-size: 20px;
+        padding: 8px 16px;
+        min-width: 40px;
+        height: 40px;
+    }
+
+    /* 모바일에서는 상하 레이아웃 */
+    .project-log-viewer-container {
+        flex-direction: column;
+        height: auto;
+        max-height: 550px;
+    }
+
+    .project-log-list-section {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #e5e7eb;
+        max-height: 220px;
+    }
+
+    .project-log-list-header {
+        padding: 14px 16px;
+    }
+
+    .project-log-list-header h4 {
+        font-size: 15px;
+    }
+
+    .log-count {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+
+    .project-log-list-items {
+        padding: 10px;
+    }
+
+    .project-log-list-item {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .project-log-list-item:hover,
+    .project-log-list-item.active {
+        transform: none;
+    }
+
+    .log-list-title {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .log-list-meta {
+        font-size: 12px;
+    }
+
+    .project-log-content-section {
+        min-height: 280px;
+    }
+
+    .log-detail-header {
+        padding: 14px 16px;
+    }
+
+    .log-detail-header h4 {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .log-detail-meta {
+        font-size: 12px;
+        gap: 12px;
+    }
+
+    .log-detail-content {
+        padding: 16px;
+    }
+
+    .log-content-text {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .project-log-empty-state {
+        padding: 30px 20px;
+    }
+
+    .project-log-empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+    }
+
+    .project-log-empty-state p {
+        font-size: 14px;
+    }
+
+    .project-log-open-modal {
+        padding: 40px 20px;
+    }
+
+    .project-log-open-modal > div:first-child {
+        font-size: 16px;
+    }
+
+    .project-modal-log-bottom-wrapper {
+        padding: 16px 20px;
+    }
+
+    .project-daily-log-slider {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .project-log-click-card {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .project-log-click-card:hover {
+        transform: none;
+    }
+
+    .project-log-view-container {
+        min-height: 80px;
+    }
+
+    .click-log-content {
+        padding: 16px;
+    }
+
+    .click-log-header h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .start-date-text {
+        font-size: 14px;
+    }
+}
+
+
+/* ============================================
+   추가 CSS (기존 CSS에 추가)
+   ============================================ */
+
+/* 특별 로그 카드 (생성일/종료일) */
+.project-log-list-item.special-log {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #0ea5e9;
+}
+
+.project-log-list-item.special-log:hover {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    border-color: #0284c7;
+}
+
+.project-log-list-item.special-log.active {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #3b82f6;
+}
+
+/* 특별 로그 상세 콘텐츠 */
+.special-log-content {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.special-log-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.special-log-content h3 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.special-log-content p {
+    margin: 0;
+    font-size: 16px;
+    color: #6b7280;
+    line-height: 1.8;
+}
+
+.special-log-content strong {
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+/* 전체 비어있을 때 */
+.project-log-empty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 60px 40px;
+    color: #9ca3af;
+}
+
+.project-log-empty-container svg {
+    margin-bottom: 24px;
+    opacity: 0.4;
+}
+
+.project-log-empty-container h4 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.project-log-empty-container p {
+    margin: 0;
+    font-size: 15px;
+    color: #9ca3af;
 }
