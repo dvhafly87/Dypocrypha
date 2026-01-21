@@ -22,6 +22,7 @@ export default function ProjectManage() {
     const [teamNameInput, setTeamNameInput] = useState('');
     const [permissionGrade, setPermissionGrade] = useState('');
     const [newMemberName, setNewMemberName] = useState('');
+    const [logTitle, setLogTitle] = useState('');
     const [newMemberGrade, setNewMemberGrade] = useState('M');
     const [newProjectThumb, setNewProjectThumb] = useState(null);
     const [thumbPreview, setThumbPreview] = useState(null);
@@ -61,12 +62,100 @@ export default function ProjectManage() {
         setShowInputCallendarLogModal(false);
     }
 
+    const deleteThisProjectLog = async () => {
+        const selectedLog = getSelectedLog();
+        if (!isLogined) {
+            addToast("로그인이 필요합니다.", "warning");
+            return;
+        }
+        if (!selectedLog) {
+            addToast("선택된 로그가 없습니다", "warning");
+            return;
+        }
+
+        if (selectedLogId === 'created' || selectedLogId === 'ended') {
+            addToast("시스템 로그는 삭제할 수 없습니다", "warning");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/daily/log/delete`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    logId: selectedLog.logId,
+                    logDate: selectedDate,
+                    projectId: projectBasic.id
+                })
+            });
+
+            if (response.status === 500) {
+                const toastData = {
+                    status: 'error',
+                    message: '서버 통신 불가'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+            }
+
+            const result = await response.json();
+
+            if (response.status === 500 && result.logDeleteMessage != null) {
+                const toastData = {
+                    status: 'error',
+                    message: '로그 삭제 중' + '서버 통신 불가'
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 404 || response.status === 400) {
+                if (response.status === 404 && result.logDeleteNPE != null) {
+                    addToast(result.logDeleteNPE, "warning");
+                    return;
+                }
+                const toastData = {
+                    status: 'error',
+                    message: result.logDeleteMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 403) {
+                const toastData = {
+                    status: 'error',
+                    message: result.logDeleteMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login');
+                return;
+            } else if (response.status === 201) {
+                setProjectLog(prevLogs =>
+                    prevLogs.filter(log => log.logId !== selectedLog.logId)
+                );
+
+                setSelectedLogId(null);
+
+                addToast(result.logDeleteMessage || '로그가 삭제되었습니다', 'success');
+                return;
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'error',
+                message: '로그 삭제 중 오류가 발생했습니다.'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+        }
+    }
+
     const getFilteredLogs = () => {
         if (!projectLog || projectLog.length === 0) return [];
 
         return projectLog.filter(log => {
-            // logDailyDate가 "2024-01-15" 형식이라면
-            const logDate = log.logDailyDate.split('T')[0]; // ISO 형식 대비
+            const logDate = log.logDailyDate.split('T')[0];
             return logDate === selectedDate;
         });
     };
@@ -78,6 +167,10 @@ export default function ProjectManage() {
     };
 
     const inputNewDailyLog = async () => {
+        if (logTitle.length > 20 || logTitle == null) {
+            addToast("로그 제목을 입력해 주십시오", "warning");
+            return;
+        }
         if (!loginSuccess || !isLogined) {
             const toastData = {
                 status: 'error',
@@ -108,7 +201,6 @@ export default function ProjectManage() {
         }
 
         try {
-
             const response = await fetch(`${API.API_BASE_URL}/project/daily/log`, {
                 method: 'POST',
                 credentials: 'include', //쿠키값 전송
@@ -118,7 +210,8 @@ export default function ProjectManage() {
                 body: JSON.stringify({
                     logProjectId: projectBasic.id,
                     logProjectDate: selectedDate,
-                    logProjectContent: content
+                    logProjectContent: content,
+                    logProjectTitle: logTitle
                 })
             });
 
@@ -207,14 +300,7 @@ export default function ProjectManage() {
         };
         reader.readAsDataURL(file);
     };
-
-    const PostView = ({ content }) => {
-        return (
-            <Viewer
-                initialValue={content}   // DB에서 가져온 마크다운 문자열
-            />
-        );
-    };
+    const MAX_LOG_TITLE = 20;
 
     const handleUpdateProjectThumb = async () => {
         if (!newProjectThumb) {
@@ -307,7 +393,14 @@ export default function ProjectManage() {
             const result = await response.json();
 
             if (result.updateProjectInformationStatus) {
-                window.location.reload();
+                setProjectBasic(prev => ({
+                    ...prev,
+                    summary: summary,
+                    skillStack: skillTool,
+                    pjCategory: selectCategory
+                }));
+                addToast("수정되었습니다.", "success");
+                return true;
             } else {
                 addToast(result.updateProjectInformationMessage, "error");
             }
@@ -325,19 +418,16 @@ export default function ProjectManage() {
     const handleUpdateSummary = async () => {
         const success = await updateSubmitProjectInformation();
         if (success) {
-            addToast('프로젝트 개요가 수정되었습니다.', 'success');
+            // addToast 제거 (updateSubmitProjectInformation에서 이미 띄움)
             setShowEditSummary(false);
-            window.location.reload();
         }
     };
 
-    // 스킬/툴 수정 핸들러
     const handleUpdateSkillTool = async () => {
         const success = await updateSubmitProjectInformation();
         if (success) {
-            addToast('스킬/툴이 수정되었습니다.', 'success');
+            // addToast 제거
             setShowEditSkillTool(false);
-            window.location.reload();
         }
     };
 
@@ -376,7 +466,11 @@ export default function ProjectManage() {
             const result = await response.json();
 
             if (result.updateProjectInformationStatus) {
-                window.location.reload();
+                setProjectBasic(prev => ({
+                    ...prev,
+                    pjCategory: category
+                }));
+                addToast("카테고리가 수정되었습니다.", "success");
             } else {
                 addToast(result.updateProjectInformationMessage, "error");
             }
@@ -903,29 +997,56 @@ export default function ProjectManage() {
 
     useEffect(() => {
         if (!projectBasic.created) return;
-        if (projectBasic.status === 'C' || projectBasic.status === 'D') {
-            setCalendarEvents([
-                {
-                    title: '프로젝트 시작',
-                    date: projectBasic.created,
-                    color: '#10b981'
-                },
-                ...(projectBasic.endDay ? [{
-                    title: '프로젝트 종료',
-                    date: projectBasic.endDay,
-                    color: '#3b82f6'
-                }] : [])
-            ]);
-        } else {
-            setCalendarEvents([
-                {
-                    title: '프로젝트 시작',
-                    date: projectBasic.created,
-                    color: '#10b981'
-                }
-            ])
+
+        const events = [];
+
+        // 프로젝트 시작 이벤트
+        events.push({
+            title: '🎉 프로젝트 시작',
+            date: projectBasic.created,
+            backgroundColor: '#10b981',
+            borderColor: '#10b981',
+            type: 'project-start'
+        });
+
+        // 프로젝트 종료 이벤트
+        if ((projectBasic.status === 'C' || projectBasic.status === 'D') && projectBasic.endDay) {
+            events.push({
+                title: projectBasic.status === 'C' ? '✅ 프로젝트 완료' : '⏸️ 프로젝트 중단',
+                date: projectBasic.endDay,
+                backgroundColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
+                borderColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
+                type: 'project-end'
+            });
         }
-    }, [projectBasic]);
+
+        if (projectLog && projectLog.length > 0) {
+            projectLog.forEach(log => {
+                const dateStr = log.logDailyDate.split('T')[0];
+
+                const shortContent = log.logTitle.length > 10
+                    ? log.logTitle.substring(0, 10) + '...'
+                    : log.logTitle;
+
+                events.push({
+                    id: `log-${log.logId}`,
+                    title: projectBasic.teamValue ? `[${log.logCreator}] ${shortContent}` : `${shortContent}`,
+                    date: dateStr,
+                    backgroundColor: '#f59e0b',
+                    borderColor: '#f59e0b',
+                    textColor: '#fff',
+                    type: 'project-log',
+                    extendedProps: {
+                        logId: log.logId,
+                        creator: log.logCreator,
+                        fullContent: log.logContent
+                    }
+                });
+            });
+        }
+
+        setCalendarEvents(events);
+    }, [projectBasic, projectLog]);
 
     return (
         <>
@@ -1424,33 +1545,48 @@ export default function ProjectManage() {
                     </div>
                 )}
                 {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && (
-                    <div className="callendar-input-log-modal">
-                        <div className="callendar-log-input-header">
-                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
-                        </div>
-
-                        <div className="callendar-log-input-main-container">
-                            <Editor
-                                ref={editorRef}
-                                initialValue=""
-                                initialEditType="markdown"
-                                previewStyle="vertical"
-                                height="500px"
-                                hooks={{
-                                    addImageBlobHook: adapter
-                                }}
-                                useCommandShortcut={true}
-                            />
-                            <div className="log-input-button-wrapper">
-                                <button
-                                    onClick={() => exitLogInputModal()}
-                                >
-                                    취소
-                                </button>
-                                <button onClick={() => inputNewDailyLog()}> 등록 </button>
+                    <>
+                        <div className="project-modal-overlay" onClick={() => setShowInputCallendarLogModal(false)}>
+                            <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
+                                <div className="callendar-log-input-header">
+                                    <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
+                                </div>
+                                <div>
+                                    <input
+                                        placeholder="제목을 입력해주세요 ..."
+                                        autoComplete='off'
+                                        maxLength={20}
+                                        value={logTitle}
+                                        onChange={(e) => setLogTitle(e.target.value)}
+                                    />
+                                    <div style={{ fontSize: '12px', color: '#888' }}>
+                                        {logTitle.length} / {MAX_LOG_TITLE}
+                                    </div>
+                                </div>
+                                <div className="callendar-log-input-main-container">
+                                    <Editor
+                                        ref={editorRef}
+                                        initialValue=""
+                                        initialEditType="markdown"
+                                        previewStyle="vertical"
+                                        height="500px"
+                                        hooks={{
+                                            addImageBlobHook: adapter
+                                        }}
+                                        useCommandShortcut={true}
+                                    />
+                                    <div className="log-input-button-wrapper">
+                                        <button
+                                            onClick={() => exitLogInputModal()}
+                                        >
+                                            취소
+                                        </button>
+                                        <button onClick={() => inputNewDailyLog()}> 등록 </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 )}
                 {showCallendarModal && (
                     <div className="callendar-modal-overlay" onClick={() => {
@@ -1554,10 +1690,11 @@ export default function ProjectManage() {
                                                             onClick={() => setSelectedLogId(log.logId)}
                                                         >
                                                             <div className="log-list-title">
-                                                                {log.logContent.length > 50
-                                                                    ? log.logContent.substring(0, 50) + "..."
-                                                                    : log.logContent}
+                                                                {log.logTitle.length > 15
+                                                                    ? log.logTitle.substring(0, 15) + "..."
+                                                                    : log.logTitle}
                                                             </div>
+
                                                             <div className="log-list-meta">
                                                                 <span className="log-creator">{log.logCreator}</span>
                                                                 <span className="log-time">
@@ -1577,7 +1714,78 @@ export default function ProjectManage() {
                                                 {selectedLog ? (
                                                     <div className="project-log-detail">
                                                         <div className="log-detail-header">
-                                                            <h4>로그 상세</h4>
+                                                            <div className="log-header-wrapper">
+                                                                <h4>{selectedLog.logTitle}</h4>
+                                                                <div className="log-active-button-wrapper">
+                                                                    <button>
+                                                                        <svg
+                                                                            className="edit-log-btn"
+                                                                            width="16"
+                                                                            height="16"
+                                                                            viewBox="0 0 24 24"
+                                                                            fill="none"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            <path
+                                                                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                                stroke-linejoin="round"
+                                                                            />
+                                                                            <path
+                                                                                d="M14.06 4.94l3.75 3.75"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                                stroke-linecap="round"
+                                                                            />
+                                                                        </svg>
+                                                                        <p className="btn-edit-com">
+                                                                            수정
+                                                                        </p>
+                                                                    </button>
+                                                                    <button onClick={() => deleteThisProjectLog()}>
+                                                                        <svg
+                                                                            className="delete-log-btn"
+                                                                            width="16"
+                                                                            height="16"
+                                                                            viewBox="0 0 24 24"
+                                                                            fill="none"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            <path
+                                                                                d="M4 7h16"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                                stroke-linecap="round"
+                                                                            />
+                                                                            <path
+                                                                                d="M9 7V4h6v3"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                                stroke-linejoin="round"
+                                                                            />
+                                                                            <rect
+                                                                                x="6"
+                                                                                y="7"
+                                                                                width="12"
+                                                                                height="13"
+                                                                                rx="2"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                            />
+                                                                            <path
+                                                                                d="M10 11v6M14 11v6"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="1.8"
+                                                                                stroke-linecap="round"
+                                                                            />
+                                                                        </svg>
+                                                                        <p className="btn-delete-com">
+                                                                            삭제
+                                                                        </p>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                             <div className="log-detail-meta">
                                                                 <span className="log-detail-creator">작성자: {selectedLog.logCreator}</span>
                                                                 <span className="log-detail-datetime">
@@ -1593,7 +1801,10 @@ export default function ProjectManage() {
                                                         </div>
                                                         <div className="log-detail-content">
                                                             <div className="log-content-text">
-                                                                <Viewer initialValue={selectedLog.logContent || ''} />
+                                                                <Viewer
+                                                                    key={selectedLog.logId}
+                                                                    initialValue={selectedLog.logContent || ''}
+                                                                />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1706,16 +1917,28 @@ export default function ProjectManage() {
                             events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
-                                // info.dateStr;
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
-                                setClickCreated(false);
-                                setClickEnd(false);
+                                setSelectedLogId(null); // 초기화
                             }}
                             eventClick={(info) => {
-                                // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.
-                                // setSelectedDate(info.event.startStr.split('T')[0]); // 시간 정보 제외 날짜만 추출
-                                // setShowCallendarModal(true);
+                                // 이벤트 클릭 시 해당 로그 선택
+                                const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
+
+                                if (eventType === 'project-log') {
+                                    const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId(logId);
+                                    setShowCallendarModal(true);
+                                } else if (eventType === 'project-start') {
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId('created');
+                                    setShowCallendarModal(true);
+                                } else if (eventType === 'project-end') {
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId('ended');
+                                    setShowCallendarModal(true);
+                                }
                             }}
                         />
                     )}
@@ -1732,16 +1955,27 @@ export default function ProjectManage() {
                             events={calendarEvents}
                             height="auto"
                             dateClick={(info) => {
-                                // info.dateStr;
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
-                                setClickCreated(false);
-                                setClickEnd(false);
+                                setSelectedLogId(null); // 초기화
                             }}
                             eventClick={(info) => {
-                                // // info.event.startStr에 해당 이벤트의 날짜 정보가 들어있습니다.
-                                // setSelectedDate(info.event.startStr.split('T')[0]); // 시간 정보 제외 날짜만 추출
-                                // setShowCallendarModal(true);
+
+                                const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
+                                if (eventType === 'project-log') {
+                                    const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId(logId);
+                                    setShowCallendarModal(true);
+                                } else if (eventType === 'project-start') {
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId('created');
+                                    setShowCallendarModal(true);
+                                } else if (eventType === 'project-end') {
+                                    setSelectedDate(info.event.startStr.split('T')[0]);
+                                    setSelectedLogId('ended');
+                                    setShowCallendarModal(true);
+                                }
                             }}
                         />
                     )}

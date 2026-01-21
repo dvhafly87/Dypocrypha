@@ -1396,7 +1396,7 @@
     border-bottom: 2px solid #e5e7eb;
     background: linear-gradient(to bottom, #ffffff, #f9fafb);
     flex-shrink: 0;
-    display:flex;
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
@@ -1413,7 +1413,7 @@
 
 .project-modal-log-header button {
     padding: 10px 18px;
-    background-color: #3b82f6;
+    background-color: #10b981;
     color: white;
     border: none;
     border-radius: 8px;
@@ -1573,12 +1573,96 @@
     background-color: #fafafa;
 }
 
+.log-header-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .log-detail-header h4 {
     margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 700;
     color: #111827;
 }
+
+.log-active-button-wrapper {
+    display: flex;
+    gap: 6px;
+}
+
+/* 공통 버튼 */
+.log-active-button-wrapper > button {
+    width: 56px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.05s ease;
+}
+
+/* ✏ 수정 버튼 */
+.log-active-button-wrapper > button:first-child {
+    background-color: #2FA4A9;
+    color: #fff;
+}
+
+.log-active-button-wrapper > button:first-child:hover {
+    background-color: #278F94;
+    box-shadow: 0 4px 10px rgba(47, 164, 169, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-edit-com {
+    display:none;
+}
+
+.log-active-button-wrapper > button:first-child:hover .edit-log-btn{
+    display:none;
+}
+
+.log-active-button-wrapper > button:first-child:hover .btn-edit-com{
+    display:block;
+}
+
+/* 🗑 삭제 버튼 (outline) */
+.log-active-button-wrapper > button:nth-child(2) {
+    background-color: transparent;
+    border: 1px solid #E57373;
+    color: #E57373;
+}
+
+.log-active-button-wrapper > button:nth-child(2):hover {
+    background-color: #E57373;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(229, 115, 115, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-delete-com {
+    display:none;
+}
+
+.log-active-button-wrapper > button:nth-child(2):hover .delete-log-btn{
+  display:none;
+}
+
+.log-active-button-wrapper > button:nth-child(2):hover .btn-delete-com{
+  display:block;
+}
+
+/* 눌림 */
+.log-active-button-wrapper > button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
 
 .log-detail-meta {
     display: flex;
@@ -1652,7 +1736,7 @@
     color: #6b7280;
 }
 
-.project-log-open-modal > div:first-child {
+.project-log-open-modal>div:first-child {
     font-size: 18px;
     font-weight: 600;
     color: #374151;
@@ -1925,7 +2009,7 @@
         padding: 40px 20px;
     }
 
-    .project-log-open-modal > div:first-child {
+    .project-log-open-modal>div:first-child {
         font-size: 16px;
     }
 
@@ -2043,4 +2127,310 @@
     margin: 0;
     font-size: 15px;
     color: #9ca3af;
+}
+
+/* 이벤트 크기 축소 */
+.fc-daygrid-event {
+    white-space: nowrap !important;
+    font-size: 0.7em !important;
+    /* 폰트 크기 축소 */
+    padding: 1px 2px !important;
+    /* 패딩 축소 */
+    margin: 1px 0 !important;
+    line-height: 1.2 !important;
+}
+
+.fc-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.7em;
+}
+
+.fc-daygrid-event-dot {
+    display: none;
+    /* 점 제거 */
+}
+
+/* 이벤트 컨테이너 */
+.fc-daygrid-day-events {
+    margin-top: 1px !important;
+}
+
+/* +more 링크 스타일 */
+.fc-daygrid-more-link {
+    font-size: 0.7em !important;
+    padding: 1px 3px !important;
+}
+
+/* 날짜 셀 높이 조정 */
+.fc-daygrid-day-frame {
+    min-height: 80px;
+    /* 필요에 따라 조정 */
+}
+
+/* 이벤트 높이 축소 */
+.fc-h-event {
+    border: 1px solid !important;
+    border-radius: 2px !important;
+    height: 18px !important;
+    /* 높이 고정 */
+}
+
+.fc-daygrid-event {
+    font-size: 0.6em !important;
+    padding: 0px 2px !important;
+    margin: 0.5px 0 !important;
+    line-height: 1.1 !important;
+}
+
+.fc-h-event {
+    height: 15px !important;
+}
+
+.fc-event-title {
+    font-size: 0.6em;
+}
+
+/* ============================================
+   캘린더 로그 입력 모달
+   ============================================ */
+.callendar-input-log-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff !important;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    z-index: 1001;
+    padding: 2.5rem;
+    animation: slideUp 0.3s ease;
+}
+
+/* 모달 헤더 */
+.callendar-log-input-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.callendar-log-input-header h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.3px;
+}
+
+/* 제목 입력 영역 */
+.callendar-input-log-modal>div:nth-child(2) {
+    margin-bottom: 1.5rem;
+}
+
+.callendar-input-log-modal>div:nth-child(2) input {
+    width: 100%;
+    padding: 0.9rem 1.1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    margin-bottom: 0.5rem;
+}
+
+.callendar-input-log-modal>div:nth-child(2) input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.callendar-input-log-modal>div:nth-child(2) input::placeholder {
+    color: #9ca3af;
+}
+
+/* 글자 수 카운터 */
+.callendar-input-log-modal>div:nth-child(2)>div {
+    text-align: right;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* 메인 컨테이너 */
+.callendar-log-input-main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* 에디터 래퍼 */
+.callendar-log-input-main-container .toastui-editor-defaultUI {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.callendar-log-input-main-container .toastui-editor-defaultUI:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* 버튼 래퍼 */
+.log-input-button-wrapper {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+}
+
+.log-input-button-wrapper button {
+    padding: 0.9rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    min-width: 100px;
+}
+
+.log-input-button-wrapper button:first-child {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.log-input-button-wrapper button:first-child:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.log-input-button-wrapper button:last-child {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.log-input-button-wrapper button:last-child:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* 스크롤바 스타일 */
+.callendar-input-log-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.callendar-input-log-modal::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+}
+
+.callendar-input-log-modal::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.callendar-input-log-modal::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ============================================
+   반응형 - 900px 이하
+   ============================================ */
+@media (max-width: 900px) {
+    .callendar-input-log-modal {
+        padding: 2rem;
+        max-width: 95%;
+    }
+
+    .callendar-log-input-header h4 {
+        font-size: 1.3rem;
+    }
+
+    .callendar-log-input-main-container .toastui-editor-defaultUI {
+        height: 400px !important;
+    }
+}
+
+/* ============================================
+   반응형 - 600px 이하 (모바일)
+   ============================================ */
+@media (max-width: 600px) {
+    .callendar-input-log-modal {
+        padding: 1.75rem;
+        max-width: 95%;
+        max-height: 95vh;
+    }
+
+    .callendar-log-input-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .callendar-log-input-header h4 {
+        font-size: 1.15rem;
+    }
+
+    .callendar-input-log-modal>div:nth-child(2) {
+        margin-bottom: 1.25rem;
+    }
+
+    .callendar-input-log-modal>div:nth-child(2) input {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .callendar-log-input-main-container {
+        gap: 1rem;
+    }
+
+    .callendar-log-input-main-container .toastui-editor-defaultUI {
+        height: 350px !important;
+    }
+
+    .log-input-button-wrapper {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .log-input-button-wrapper button {
+        width: 100%;
+        padding: 0.85rem;
+        font-size: 0.9rem;
+        min-width: auto;
+    }
+}
+
+/* ============================================
+   반응형 - 400px 이하
+   ============================================ */
+@media (max-width: 400px) {
+    .callendar-input-log-modal {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .callendar-log-input-header h4 {
+        font-size: 1.05rem;
+    }
+
+    .callendar-input-log-modal>div:nth-child(2) input {
+        padding: 0.75rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .callendar-log-input-main-container .toastui-editor-defaultUI {
+        height: 300px !important;
+    }
+
+    .log-input-button-wrapper button {
+        padding: 0.8rem;
+        font-size: 0.85rem;
+    }
 }
