@@ -24,7 +24,7 @@ function Base64UploadAdapter(editor) {
             })
         );
       },
-      abort: () => {},
+      abort: () => { },
     };
   };
 }
@@ -58,7 +58,7 @@ export default function BoardWrite() {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const postData = {
         boardInputtitle: title.trim(),
@@ -67,7 +67,7 @@ export default function BoardWrite() {
       };
 
       console.log("등록할 데이터:", postData);
-      
+
       const response = await fetch(`${API.API_BASE_URL}/board/postwrite`, {
         method: 'POST',
         credentials: 'include',
@@ -76,7 +76,7 @@ export default function BoardWrite() {
         },
         body: JSON.stringify(postData)
       });
-      
+
       alert("게시글이 등록되었습니다!");
       navigate(-1);
     } catch (error) {
@@ -102,11 +102,11 @@ export default function BoardWrite() {
       <div className="board-write-header">
         <h2>게시글 작성</h2>
       </div>
-      
+
       <div className="board-writemain-container">
         <div className="input-group">
           <label htmlFor="post-title" className="input-label">제목</label>
-          <input 
+          <input
             id="post-title"
             type="text"
             placeholder="제목을 입력하세요"
@@ -133,7 +133,7 @@ export default function BoardWrite() {
               placeholder: "내용을 입력하세요...",
               toolbar: [
                 'heading', '|',
-                'bold', 'italic', 'link', '|',
+                'bold', 'italic', 'strikethrough', 'link', '|',
                 'bulletedList', 'numberedList', '|',
                 'blockQuote', 'insertTable', '|',
                 'imageUpload', '|',

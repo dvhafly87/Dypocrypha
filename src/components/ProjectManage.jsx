@@ -43,6 +43,7 @@ export default function ProjectManage() {
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
     const [showEditSummary, setShowEditSummary] = useState(false);
     const [showEditSkillTool, setShowEditSkillTool] = useState(false);
+    const [showEditLogModal, setShowEditLogModal] = useState(false);
 
     const { projectId } = useParams();
     const { addToast } = useToast();
@@ -56,6 +57,112 @@ export default function ProjectManage() {
         `${String(today.getDate()).padStart(2, '0')}`;
 
     const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
+
+    const updateProjectLog = async () => {
+        const selectedLog = getSelectedLog();
+
+        // 1. 로그 선택 확인 ✅
+        if (!selectedLog) {
+            addToast("수정할 로그를 선택해주세요", "warning");
+            return;
+        }
+
+        // 2. ⭐ 시스템 로그 수정 방지 추가
+        if (selectedLogId === 'created' || selectedLogId === 'ended') {
+            addToast("시스템 로그는 수정할 수 없습니다", "warning");
+            return;
+        }
+
+        // 3. ⭐ 제목 검증 개선 (순서 변경)
+        if (!logTitle || logTitle.trim().length === 0) {
+            addToast("로그 제목을 입력해 주십시오", "warning");
+            return;
+        }
+
+        if (logTitle.length > 20) {
+            addToast("로그 제목은 20자를 초과할 수 없습니다", "warning");
+            return;
+        }
+
+        // 4. 로그인 확인 ✅
+        if (!loginSuccess || !isLogined) {
+            const toastData = {
+                status: 'error',
+                message: "로그인이 필요한 기능입니다"
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/login');
+            return;
+        }
+
+        // 5. 내용 검증 ✅
+        const editorInstance = editorRef.current?.getInstance();
+        const content = editorInstance?.getMarkdown()?.trim();
+
+        if (!content) {
+            addToast("내용을 입력해 주십시오", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/daily/log/update`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    logId: selectedLog.logId,
+                    logProjectDate: selectedDate,
+                    logProjectContent: content,
+                    logProjectId: projectBasic.id,
+                    logProjectTitle: logTitle
+                })
+            });
+
+            if (response.status === 500) {
+                const toastData = {
+                    status: 'error',
+                    message: "서버 통신 불가"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            }
+
+            const result = await response.json();
+
+
+        } catch (error) {
+            const toastData = {
+                status: 'error',
+                message: "프로젝트 로그 수정 중 에러 발생"
+            };
+            console.error(error);
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+        }
+    };
+    const viewerProjectlogEditModal = () => {
+
+        const selectedLog = getSelectedLog();
+
+        if (!selectedLog) {
+            addToast("수정할 로그를 선택해주세요", "warning");
+            return;
+        }
+
+        // 선택된 로그의 정보를 state에 설정
+        setLogTitle(selectedLog.logTitle);
+
+        // 에디터에 기존 내용 설정 (다음 렌더링에서)
+        if (editorRef.current) {
+            editorRef.current.getInstance()?.setMarkdown(selectedLog.logContent || '');
+        }
+
+        setShowEditLogModal(true);
+        setShowCallendarModal(false);
+    }
 
     const exitLogInputModal = () => {
         setShowCallendarModal(true);
@@ -1716,75 +1823,77 @@ export default function ProjectManage() {
                                                         <div className="log-detail-header">
                                                             <div className="log-header-wrapper">
                                                                 <h4>{selectedLog.logTitle}</h4>
-                                                                <div className="log-active-button-wrapper">
-                                                                    <button>
-                                                                        <svg
-                                                                            className="edit-log-btn"
-                                                                            width="16"
-                                                                            height="16"
-                                                                            viewBox="0 0 24 24"
-                                                                            fill="none"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                        >
-                                                                            <path
-                                                                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                                stroke-linejoin="round"
-                                                                            />
-                                                                            <path
-                                                                                d="M14.06 4.94l3.75 3.75"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                                stroke-linecap="round"
-                                                                            />
-                                                                        </svg>
-                                                                        <p className="btn-edit-com">
-                                                                            수정
-                                                                        </p>
-                                                                    </button>
-                                                                    <button onClick={() => deleteThisProjectLog()}>
-                                                                        <svg
-                                                                            className="delete-log-btn"
-                                                                            width="16"
-                                                                            height="16"
-                                                                            viewBox="0 0 24 24"
-                                                                            fill="none"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                        >
-                                                                            <path
-                                                                                d="M4 7h16"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                                stroke-linecap="round"
-                                                                            />
-                                                                            <path
-                                                                                d="M9 7V4h6v3"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                                stroke-linejoin="round"
-                                                                            />
-                                                                            <rect
-                                                                                x="6"
-                                                                                y="7"
-                                                                                width="12"
-                                                                                height="13"
-                                                                                rx="2"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                            />
-                                                                            <path
-                                                                                d="M10 11v6M14 11v6"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="1.8"
-                                                                                stroke-linecap="round"
-                                                                            />
-                                                                        </svg>
-                                                                        <p className="btn-delete-com">
-                                                                            삭제
-                                                                        </p>
-                                                                    </button>
-                                                                </div>
+                                                                {isLogined && loginSuccess && (
+                                                                    <div className="log-active-button-wrapper">
+                                                                        <button onClick={() => viewerProjectlogEditModal()}>
+                                                                            <svg
+                                                                                className="edit-log-btn"
+                                                                                width="16"
+                                                                                height="16"
+                                                                                viewBox="0 0 24 24"
+                                                                                fill="none"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                            >
+                                                                                <path
+                                                                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                    stroke-linejoin="round"
+                                                                                />
+                                                                                <path
+                                                                                    d="M14.06 4.94l3.75 3.75"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                    stroke-linecap="round"
+                                                                                />
+                                                                            </svg>
+                                                                            <p className="btn-edit-com">
+                                                                                수정
+                                                                            </p>
+                                                                        </button>
+                                                                        <button onClick={() => deleteThisProjectLog()}>
+                                                                            <svg
+                                                                                className="delete-log-btn"
+                                                                                width="16"
+                                                                                height="16"
+                                                                                viewBox="0 0 24 24"
+                                                                                fill="none"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                            >
+                                                                                <path
+                                                                                    d="M4 7h16"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                    stroke-linecap="round"
+                                                                                />
+                                                                                <path
+                                                                                    d="M9 7V4h6v3"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                    stroke-linejoin="round"
+                                                                                />
+                                                                                <rect
+                                                                                    x="6"
+                                                                                    y="7"
+                                                                                    width="12"
+                                                                                    height="13"
+                                                                                    rx="2"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                />
+                                                                                <path
+                                                                                    d="M10 11v6M14 11v6"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="1.8"
+                                                                                    stroke-linecap="round"
+                                                                                />
+                                                                            </svg>
+                                                                            <p className="btn-delete-com">
+                                                                                삭제
+                                                                            </p>
+                                                                        </button>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                             <div className="log-detail-meta">
                                                                 <span className="log-detail-creator">작성자: {selectedLog.logCreator}</span>
@@ -1901,7 +2010,60 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
-
+                {/* 프로젝트 로그 수정 모달 */}
+                {showEditLogModal && !showCallendarModal && !showInputCallendarLogModal && isLogined && loginSuccess && (
+                    <>
+                        <div className="project-modal-overlay" onClick={() => {
+                            setShowEditLogModal(false);
+                            setShowCallendarModal(true);
+                            // 초기화
+                            setLogTitle('');
+                        }}>
+                            <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
+                                <div className="callendar-log-input-header">
+                                    <h4>프로젝트 {projectBasic.title} - {selectedDate} 로그 수정</h4>
+                                </div>
+                                <div>
+                                    <input
+                                        placeholder={"수정할 제목을 입력해주세요 {" + getSelectedLog()?.logTitle + "}"}
+                                        autoComplete='off'
+                                        maxLength={20}
+                                        value={logTitle}
+                                        onChange={(e) => setLogTitle(e.target.value)}
+                                    />
+                                    <div style={{ fontSize: '12px', color: '#888' }}>
+                                        {logTitle.length} / {MAX_LOG_TITLE}
+                                    </div>
+                                </div>
+                                <div className="callendar-log-input-main-container">
+                                    <Editor
+                                        ref={editorRef}
+                                        initialValue={getSelectedLog()?.logContent || ''}
+                                        initialEditType="markdown"
+                                        previewStyle="vertical"
+                                        height="500px"
+                                        hooks={{
+                                            addImageBlobHook: adapter
+                                        }}
+                                        useCommandShortcut={true}
+                                    />
+                                    <div className="log-input-button-wrapper">
+                                        <button
+                                            onClick={() => {
+                                                setShowEditLogModal(false);
+                                                setShowCallendarModal(true);
+                                                setLogTitle('');
+                                            }}
+                                        >
+                                            취소
+                                        </button>
+                                        <button onClick={() => updateProjectLog()}>수정</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
                 <div className="project-calendar-section">
                     {projectBasic.created && projectBasic.status === 'C' && (
                         <FullCalendar
@@ -1919,6 +2081,7 @@ export default function ProjectManage() {
                             dateClick={(info) => {
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
+                                setShowEditLogModal(false);
                                 setSelectedLogId(null); // 초기화
                             }}
                             eventClick={(info) => {
@@ -1957,6 +2120,7 @@ export default function ProjectManage() {
                             dateClick={(info) => {
                                 setSelectedDate(info.dateStr);
                                 setShowCallendarModal(true);
+                                setShowEditLogModal(false);
                                 setSelectedLogId(null); // 초기화
                             }}
                             eventClick={(info) => {

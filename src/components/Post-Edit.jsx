@@ -49,7 +49,7 @@ function CustomUploadAdapter(loader, addToast) {
         return {
           default: `${API.API_BASE_URL}${data.url}`
         };
-        
+
       } catch (error) {
         if (error instanceof TypeError) {
           addToast("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.", "error");
@@ -69,10 +69,10 @@ function CustomUploadAdapterPlugin(editor) {
 }
 
 export default function PostEdit() {
-  const { addToast } = useToast();   
+  const { addToast } = useToast();
   const { boardId, postId } = useParams();
   const navigate = useNavigate();
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [postData, setPostData] = useState(null);
   const [title, setTitle] = useState("");
@@ -80,7 +80,7 @@ export default function PostEdit() {
   const [isPinned, setIsPinned] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [initialContent, setInitialContent] = useState("");
-  
+
   const editorRef = useRef(null);
 
   // 게시글 데이터 불러오기
@@ -153,7 +153,7 @@ export default function PostEdit() {
       addToast("내용을 입력해주세요.", "warning");
       return;
     }
-    
+
     const MAX_IMAGES = 20;
     const imageTagRegex = /<img\b[^>]*>/gi;
     const imageTags = editorContent.match(imageTagRegex);
@@ -175,7 +175,7 @@ export default function PostEdit() {
         updateisPinned: isPinned,
         updateisAnonymous: isAnonymous
       };
-      
+
       const response = await fetch(`${API.API_BASE_URL}/board/post/update`, {
         method: 'POST',
         credentials: 'include',
@@ -184,7 +184,7 @@ export default function PostEdit() {
         },
         body: JSON.stringify(updateData)
       });
-      
+
       if (!response.ok) {
         addToast("서버 통신 오류", "error");
         return;
@@ -207,8 +207,8 @@ export default function PostEdit() {
 
   const handleCancel = async () => {
     const editorContent = editorRef.current ? editorRef.current.getData() : '';
-    
-    const hasChanges = 
+
+    const hasChanges =
       title !== (postData?.postTitle || "") ||
       editorContent !== initialContent ||
       isPinned !== (postData?.postIsPinned || false) ||
@@ -265,11 +265,11 @@ export default function PostEdit() {
       <div className="board-write-header">
         <h2>게시글 수정</h2>
       </div>
-      
+
       <div className="board-writemain-container">
         <div className="input-group">
           <label htmlFor="post-title" className="input-label">제목</label>
-          <input 
+          <input
             id="post-title"
             type="text"
             placeholder="제목을 입력하세요"
@@ -294,7 +294,7 @@ export default function PostEdit() {
             />
             <label htmlFor="pinned-option" className="option-label">
               <svg className="option-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z" fill="currentColor"/>
+                <path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z" fill="currentColor" />
               </svg>
               <span className="option-text">게시글 고정</span>
               <span className="option-description">게시판 상단에 고정됩니다</span>
@@ -311,8 +311,8 @@ export default function PostEdit() {
             />
             <label htmlFor="anonymous-option" className="option-label">
               <svg className="option-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z" fill="currentColor"/>
-                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor" opacity="0.3"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z" fill="currentColor" />
+                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" fill="currentColor" opacity="0.3" />
               </svg>
               <span className="option-text">익명으로 작성</span>
               <span className="option-description">작성자가 익명으로 표시됩니다</span>
@@ -322,55 +322,55 @@ export default function PostEdit() {
 
         {/* 1. 데이터 로딩이 끝났을 때만 에디터를 렌더링합니다 */}
         {!isLoading && postData && (
-            <div className="editor-group">
+          <div className="editor-group">
             <label className="input-label">내용</label>
             <CKEditor
-                editor={ClassicEditor}
-                
-                // 2. data={initialContent} 속성은 제거! (사용자님이 하신 방식)
-                
-                onReady={(editor) => {
+              editor={ClassicEditor}
+
+              // 2. data={initialContent} 속성은 제거! (사용자님이 하신 방식)
+
+              onReady={(editor) => {
                 editorRef.current = editor;
-                
+
                 // 3. 로딩이 끝난 후 렌더링되므로 initialContent는 무조건 존재합니다.
                 // 여기서 딱 한 번만 데이터를 넣어줍니다.
                 if (initialContent) {
-                    editor.setData(initialContent);
+                  editor.setData(initialContent);
                 }
-                }}
+              }}
 
-                disabled={isSubmitting}
-                config={{
+              disabled={isSubmitting}
+              config={{
                 addToast: addToast,
                 extraPlugins: [CustomUploadAdapterPlugin],
                 placeholder: "내용을 입력하세요...",
                 toolbar: [
-                    'heading', '|',
-                    'bold', 'italic', 'link', '|',
-                    'bulletedList', 'numberedList', '|',
-                    'blockQuote', 'insertTable', '|',
-                    'imageUpload', '|',
-                    'undo', 'redo'
+                  'heading', '|',
+                  'bold', 'italic', 'strikethrough', 'link', '|',
+                  'bulletedList', 'numberedList', '|',
+                  'blockQuote', 'insertTable', '|',
+                  'imageUpload', '|',
+                  'undo', 'redo'
                 ],
                 image: {
-                    toolbar: [
+                  toolbar: [
                     'imageTextAlternative', '|',
                     'imageStyle:inline',
                     'imageStyle:block',
                     'imageStyle:side'
-                    ],
-                    styles: [
+                  ],
+                  styles: [
                     'inline', 'block', 'side'
-                    ]
+                  ]
                 },
                 table: {
-                    contentToolbar: [
+                  contentToolbar: [
                     'tableColumn', 'tableRow', 'mergeTableCells'
-                    ]
+                  ]
                 }
-                }}
+              }}
             />
-            </div>
+          </div>
         )}
 
         <div className="button-group">
