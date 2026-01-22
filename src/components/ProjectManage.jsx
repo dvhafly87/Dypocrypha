@@ -123,7 +123,7 @@ export default function ProjectManage() {
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
-                    message: "서버 통신 불가"
+                    message: result.logUpdateMessage || "서버 통신 불가"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
@@ -132,7 +132,38 @@ export default function ProjectManage() {
 
             const result = await response.json();
 
+            if (response.status === 404 || response.status === 400) {
+                const toastData = {
+                    status: 'error',
+                    message: result.logUpdateMessage || "유효하지 않은 요청입니다"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 403) {
+                const toastData = {
+                    status: 'success',
+                    message: result.logUpdateMessage || "로그인이 필요한 서비스 입니다"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login');
+                return;
+            } else if (response.status === 200) {
+                setProjectLog((prevLogs) =>
+                    prevLogs.map((log) =>
+                        log.logId === selectedLog.logId
+                            ? { ...log, logContent: content, logTitle: logTitle } // 수정된 데이터로 교체
+                            : log // 나머지 로그는 유지
+                    )
+                );
+                // --------------------------------
 
+                setShowCallendarModal(true);
+                setShowEditLogModal(false);
+                setSelectedLogId(null);
+                addToast(result.logUpdateMessage || '로그가 수정되었습니다', 'success'); // result 변수명 통일 (Delete -> Update)
+                return;
+            }
         } catch (error) {
             const toastData = {
                 status: 'error',
