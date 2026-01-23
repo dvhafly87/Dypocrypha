@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useApiError } from '../util/ResultHandler.js';
+
 import { useToast } from '../components/ToastContext';
 import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
@@ -13,6 +15,7 @@ import { Viewer } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
 
 export default function ProjectManage() {
+    const { handleNetworkError } = useApiError();
     const [projectBasic, setProjectBasic] = useState([]);
     const [projectLog, setProjectLog] = useState([]);
     const [selectedLogId, setSelectedLogId] = useState(null);
@@ -120,6 +123,8 @@ export default function ProjectManage() {
                 })
             });
 
+            const result = await response.json();
+
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
@@ -128,11 +133,7 @@ export default function ProjectManage() {
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
-            }
-
-            const result = await response.json();
-
-            if (response.status === 404 || response.status === 400) {
+            } else if (response.status === 404 || response.status === 400) {
                 const toastData = {
                     status: 'error',
                     message: result.logUpdateMessage || "유효하지 않은 요청입니다"
@@ -140,7 +141,7 @@ export default function ProjectManage() {
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
-            } else if (response.status === 403) {
+            } else if (response.status === 401) {
                 const toastData = {
                     status: 'success',
                     message: result.logUpdateMessage || "로그인이 필요한 서비스 입니다"
@@ -148,30 +149,29 @@ export default function ProjectManage() {
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/login');
                 return;
-            } else if (response.status === 200) {
-                setProjectLog((prevLogs) =>
-                    prevLogs.map((log) =>
-                        log.logId === selectedLog.logId
-                            ? { ...log, logContent: content, logTitle: logTitle } // 수정된 데이터로 교체
-                            : log // 나머지 로그는 유지
-                    )
-                );
-                // --------------------------------
-
-                setShowCallendarModal(true);
-                setShowEditLogModal(false);
-                setSelectedLogId(null);
-                addToast(result.logUpdateMessage || '로그가 수정되었습니다', 'success'); // result 변수명 통일 (Delete -> Update)
+            } else if (response.status === 403) {
+                addToast(result.logUpdateMessage, "warning");
                 return;
+            } else if (response.status === 200) {
+                if (result.logUpdateStatus) {
+                    setProjectLog((prevLogs) =>
+                        prevLogs.map((log) =>
+                            log.logId === selectedLog.logId
+                                ? { ...log, logContent: content, logTitle: logTitle } // 수정된 데이터로 교체
+                                : log // 나머지 로그는 유지
+                        )
+                    );
+                    // --------------------------------
+
+                    setShowCallendarModal(true);
+                    setShowEditLogModal(false);
+                    setSelectedLogId(null);
+                    addToast(result.logUpdateMessage || '로그가 수정되었습니다', 'success'); // result 변수명 통일 (Delete -> Update)
+                    return;
+                }
             }
         } catch (error) {
-            const toastData = {
-                status: 'error',
-                message: "프로젝트 로그 수정 중 에러 발생"
-            };
-            console.error(error);
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/');
+            handleNetworkError(error, "프로젝트 로그 수정중 에러가 발생했습니다");
         }
     };
     const viewerProjectlogEditModal = () => {
@@ -230,38 +230,25 @@ export default function ProjectManage() {
                 })
             });
 
+            const result = await response.json();
+
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
-                    message: '서버 통신 불가'
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/');
-            }
-
-            const result = await response.json();
-
-            if (response.status === 500 && result.logDeleteMessage != null) {
-                const toastData = {
-                    status: 'error',
-                    message: '로그 삭제 중' + '서버 통신 불가'
+                    message: result.logDeleteMesage || "서버 통신 불가"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
             } else if (response.status === 404 || response.status === 400) {
-                if (response.status === 404 && result.logDeleteNPE != null) {
-                    addToast(result.logDeleteNPE, "warning");
-                    return;
-                }
                 const toastData = {
                     status: 'error',
-                    message: result.logDeleteMessage
+                    message: result.logDeleteMessage || "유효하지 않은 요청입니다"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
-            } else if (response.status === 403) {
+            } else if (response.status === 401) {
                 const toastData = {
                     status: 'error',
                     message: result.logDeleteMessage
@@ -269,23 +256,23 @@ export default function ProjectManage() {
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/login');
                 return;
-            } else if (response.status === 201) {
-                setProjectLog(prevLogs =>
-                    prevLogs.filter(log => log.logId !== selectedLog.logId)
-                );
-
-                setSelectedLogId(null);
-
-                addToast(result.logDeleteMessage || '로그가 삭제되었습니다', 'success');
+            } else if (response.status === 403) {
+                addToast(result.logDeleteMessage, "warning");
                 return;
+            } else if (response.status === 201) {
+                if (result.logDeleteStatus) {
+                    setProjectLog(prevLogs =>
+                        prevLogs.filter(log => log.logId !== selectedLog.logId)
+                    );
+
+                    setSelectedLogId(null);
+
+                    addToast(result.logDeleteMessage || '로그가 삭제되었습니다', 'success');
+                    return;
+                }
             }
         } catch (error) {
-            const toastData = {
-                status: 'error',
-                message: '로그 삭제 중 오류가 발생했습니다.'
-            };
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/');
+            handleNetworkError(error, "프로젝트 로그 삭제중 에러가 발생했습니다");
         }
     }
 
@@ -353,6 +340,8 @@ export default function ProjectManage() {
                 })
             });
 
+            const result = await response.json();
+
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
@@ -361,11 +350,7 @@ export default function ProjectManage() {
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
-            }
-
-            const result = await response.json();
-
-            if (response.status === 404 || response.status === 400) {
+            } else if (response.status === 404 || response.status === 400) {
                 const toastData = {
                     status: 'error',
                     message: result?.logSavedMessage || "요청을 처리할 수 없습니다"
@@ -379,28 +364,24 @@ export default function ProjectManage() {
                     message: result.logSavedMessage
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/login'); //로그인 페이지로
+                navigate('/login');
+                return;
             } else if (response.status === 403) {
                 addToast(result.logSavedMessage, "warning");
                 return;
             } else if (response.status === 201) {
-                const toastData = {
-                    status: 'success',
-                    message: result.logSavedMessage != null ? result.logSavedMessage : "저장되었습니다"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                window.location.reload();
+                if (result.logSavedStatus) {
+                    const toastData = {
+                        status: 'success',
+                        message: result.logSavedMessage != null ? result.logSavedMessage : "저장되었습니다"
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    window.location.reload();
+                }
             }
 
         } catch (error) {
-            const toastData = {
-                status: 'error',
-                message: "프로젝트 로그 기록중 에러 발생"
-            };
-            console.error(error);
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/');
-            return;
+            handleNetworkError(error, "프로젝트 로그 작성중 에러가 발생했습니다");
         }
     };
 
@@ -859,6 +840,25 @@ export default function ProjectManage() {
             }
         }
     };
+
+    useEffect(() => {
+        const isAnyModalOpen =
+            showInputCallendarLogModal ||
+            showCallendarModal ||
+            showEditProjectThumbModal ||
+            showAddMemberModal ||
+            showEditLogModal;
+
+        if (isAnyModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showInputCallendarLogModal, showCallendarModal, showEditProjectThumbModal, showAddMemberModal, showEditLogModal]);
 
     const statusMenuRef = useRef(null);
 
@@ -1682,7 +1682,7 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
-                {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && (
+                {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && !showEditLogModal && (
                     <>
                         <div className="project-modal-overlay" onClick={() => setShowInputCallendarLogModal(false)}>
                             <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
@@ -1747,6 +1747,7 @@ export default function ProjectManage() {
                                                     return;
                                                 }
                                                 setShowInputCallendarLogModal(true);
+                                                setLogTitle("");
                                                 setShowCallendarModal(false);
                                             }}
                                         >
