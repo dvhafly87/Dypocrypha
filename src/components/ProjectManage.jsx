@@ -52,7 +52,17 @@ export default function ProjectManage() {
     const { addToast } = useToast();
     const { isLogined, loginSuccess } = useAuth();
     const navigate = useNavigate();
+    // 1. useState 추가 (기존 state들 아래에)
+    const [pageIndex, setPageIndex] = useState(0);
 
+    // 2. 페이지 전환 함수 추가
+    const goToNextPage = () => {
+        setPageIndex(1);
+    };
+
+    const goToPrevPage = () => {
+        setPageIndex(0);
+    };
     const today = new Date();
     const todayStr =
         `${today.getFullYear()}-` +
@@ -229,8 +239,8 @@ export default function ProjectManage() {
                     projectId: projectBasic.id
                 })
             });
-
             const result = await response.json();
+            handleApiReturnResult(response);
 
             if (response.status === 500) {
                 const toastData = {
@@ -1188,994 +1198,1020 @@ export default function ProjectManage() {
 
     return (
         <>
-            <div className="project-manage-container">
-                <div className="project-manage-header">
-                    <div className="project-manage-thumb-wrapper">
-                        {projectBasic.projectThumb ?
-                            <img
-                                className="project-manage-thumbnail"
-                                src={`${API.API_BASE_URL}/projectThumb/${projectBasic.projectThumb}`}
-                                alt="프로젝트 썸네일"
-                            />
-                            :
-                            <svg
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="gray"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                <polyline points="21 15 16 10 5 21" />
-                            </svg>
-                        }
-
-                        <div className="project-manage-overlay">
-                            <div className="project-manage-info">
-                                <h1 className="project-title">{projectBasic.title}</h1>
-                                <div className="project-status-wrapper" ref={statusMenuRef}>
-                                    <button
-                                        className="project-status-badge"
-                                        style={{ backgroundColor: getStatusColor(projectBasic.status) }}
-                                        onClick={() => setShowStatusMenu(!showStatusMenu)}
-                                    >
-                                        {getStatusLabel(projectBasic.status)}
-                                        <span className="status-arrow">▼</span>
-                                    </button>
-
-                                    {showStatusMenu && (
-                                        <div className="status-dropdown">
-                                            <button onClick={() => handleStatusChange('I')}>진행중</button>
-                                            <button onClick={() => handleStatusChange('C')}>완료</button>
-                                            <button onClick={() => handleStatusChange('D')}>중단</button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            {permissionGrade === 'L' && (
-                                <div className="button-wrapper">
-                                    <button className="project-thumb-edit-btn" onClick={() => setShowEditProjectThumbModal(true)}>
-                                        프로젝트 썸네일 변경
-                                    </button>
-                                    <button className="project-delete-btn"
-                                        onClick={handleDeleteProject}
-                                    >
-                                        삭제
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className="project-manage-content-area">
-                    <div className="project-manage-summary-area">
-                        <section className="summary-section">
-                            <h3>프로젝트 개요</h3>
-                            {showEditSummary ? (
-                                <p className="summary-text">
-                                    <textarea
-                                        value={summary}
-                                        onChange={(e) => setSummary(e.target.value)}
-                                        autoComplete="off"
-                                        placeholder={projectBasic.summary || '프로젝트 설명을 입력해주세요'}
+            <div className="page-container" data-index={pageIndex}>
+                {pageIndex === 0 && (
+                    <div className="project-manage-container">
+                        <div className="project-manage-header">
+                            <div className="project-manage-thumb-wrapper">
+                                {projectBasic.projectThumb ?
+                                    <img
+                                        className="project-manage-thumbnail"
+                                        src={`${API.API_BASE_URL}/projectThumb/${projectBasic.projectThumb}`}
+                                        alt="프로젝트 썸네일"
                                     />
-                                    <button onClick={handleUpdateSummary}>수정</button>
-                                    <button onClick={() => {
-                                        setSummary(projectBasic.summary || '');
-                                        setShowEditSummary(false);
-                                    }}>취소</button>
-                                </p>
-                            ) : (
-                                <p className="summary-text">
-                                    {projectBasic.summary || '프로젝트 설명이 없습니다.'}
-                                    {permissionGrade === 'L' && (
-                                        <button onClick={() => setShowEditSummary(true)}>수정하기</button>
-                                    )}
-                                </p>
-                            )}
-                        </section>
+                                    :
+                                    <svg
+                                        width="48"
+                                        height="48"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="gray"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21 15 16 10 5 21" />
+                                    </svg>
+                                }
 
-                        <div className="summary-divider" />
+                                <div className="project-manage-overlay">
+                                    <div className="project-manage-info">
+                                        <h1 className="project-title">{projectBasic.title}</h1>
+                                        <div className="project-status-wrapper" ref={statusMenuRef}>
+                                            <button
+                                                className="project-status-badge"
+                                                style={{ backgroundColor: getStatusColor(projectBasic.status) }}
+                                                onClick={() => setShowStatusMenu(!showStatusMenu)}
+                                            >
+                                                {getStatusLabel(projectBasic.status)}
+                                                <span className="status-arrow">▼</span>
+                                            </button>
 
-                        <section className="summary-section inline">
-                            <div className="category-select-wrapper">
-                                <span className="summary-label">카테고리</span>
-
-                                <div className="category-select">
-                                    <span className="summary-value">
-                                        {projectBasic.pjCategory}
-                                    </span>
-
-                                    {permissionGrade === 'L' && (
-                                        <button
-                                            className="category-update-select-button"
-                                            onClick={() => setShowCategorySelect(!showCategorySelect)}
-                                        >
-                                            ▼
-                                        </button>
-                                    )}
-
-                                    {showCategorySelect && (
-                                        <ul className="category-dropdown">
-                                            {categories
-                                                .filter(category => category !== projectBasic.pjCategory)
-                                                .map(category => (
-                                                    <li
-                                                        key={category}
-                                                        onClick={() => handleUpdateCategory(category)}
-                                                    >
-                                                        {category}
-                                                    </li>
-                                                ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div>
-                                <span className="summary-label">상태</span>
-                                <span
-                                    className="summary-status"
-                                    style={{ color: getStatusColor(projectBasic.status) }}
-                                >
-                                    {getStatusLabel(projectBasic.status)}
-                                    <span className="status-duration">
-                                        {projectBasic.status === 'I' && ` · ${getProjectDays(projectBasic)}일째`}
-                                        {projectBasic.status === 'C' && ` · 총 ${getProjectDays(projectBasic)}일`}
-                                        {projectBasic.status === 'D' && ` · ${getProjectDays(projectBasic)}일 만에 중단`}
-                                    </span>
-                                </span>
-                            </div>
-                        </section>
-
-                        <div className="summary-divider" />
-
-                        <section className="summary-section">
-                            <h3>사용 스킬 / 툴</h3>
-                            {showEditSkillTool ? (
-                                <div className="skill-inline">
-                                    <input
-                                        value={skillTool}
-                                        onChange={(e) => setSkillTool(e.target.value)}
-                                        autoComplete="off"
-                                        placeholder={projectBasic.skillStack}
-                                    />
-                                    <button onClick={handleUpdateSkillTool}>수정</button>
-                                    <button onClick={() => {
-                                        setSkillTool(projectBasic.skillStack || '');
-                                        setShowEditSkillTool(false);
-                                    }}>취소</button>
-                                </div>
-                            ) : (
-                                <div className="skill-inline">
-                                    {projectBasic.skillStack?.split(',').map((skill, idx) => (
-                                        <span key={idx} className="skill-badge">
-                                            {skill.trim()}
-                                        </span>
-                                    ))}
-                                    {permissionGrade === 'L' && (
-                                        <button onClick={() => setShowEditSkillTool(true)}>수정하기</button>
-                                    )}
-                                </div>
-                            )}
-                        </section>
-
-                        <div className="summary-divider" />
-
-                        <section className="summary-section">
-                            <h3>진행 기간</h3>
-
-                            {projectBasic.status === "I" && (
-                                <div className="project-duration-container">
-                                    {formatDate(projectBasic.created)} ~
-                                </div>
-                            )}
-
-                            {(projectBasic.status === "D" || projectBasic.status === "C") && (
-                                <div className="project-duration-container">
-                                    {formatDate(projectBasic.created)} ~ {formatDate(projectBasic.endDay)}
-                                </div>
-                            )}
-                        </section>
-                    </div>
-                    <div className="project-manage-teamValue-area">
-                        <div className="project-manage-teamValue">
-                            {projectBasic.teamValue ? "팀 프로젝트" : "개인 프로젝트"}
-                        </div>
-
-                        <div className="team-info-section">
-                            <span className="team-info-label">
-                                {projectBasic.teamValue ? "팀명" : "진행자"}
-                            </span>
-                            <div className="project-manage-teamName">
-                                {projectBasic.teamValue ? projectBasic.teamName : projectBasic.starter}
-                            </div>
-                        </div>
-
-                        {projectMember.length > 0 && (
-                            <div className={permissionGrade === 'L' ? "team-member-information" : "team-member-information-non-leader"}>
-                                {projectMember.map(member => (
-                                    <div key={member.id} className="member-card"
-                                        style={projectBasic.teamValue
-                                            && member.pjMemberName === projectBasic.starter ?
-                                            {
-                                                display: 'none',
-                                                visibility: 'hidden'
-                                            }
-                                            :
-                                            {
-
-                                            }
-                                        }>
-                                        <div className="member-name">{member.pjMemberName}</div>
-                                        <div className="member-detail-wrapper">
-                                            <div className="member-detail">
-                                                <span className="member-detail-label">권한:</span>
-                                                <span className="member-grade-badge">
-                                                    {getMemberGradeLabel(member.pjMemberGrade)}
-                                                </span>
-                                            </div>
-                                            {member.pjMemberRole && (
-                                                <div className="member-detail">
-                                                    <span className="member-detail-label">담당:</span>
-                                                    <span className="member-role-badge">
-                                                        {member.pjMemberRole}
-                                                    </span>
+                                            {showStatusMenu && (
+                                                <div className="status-dropdown">
+                                                    <button onClick={() => handleStatusChange('I')}>진행중</button>
+                                                    <button onClick={() => handleStatusChange('C')}>완료</button>
+                                                    <button onClick={() => handleStatusChange('D')}>중단</button>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="member-actions">
-                                            {permissionGrade === 'L' && member.pjStatus === 'T' && (
+                                    </div>
+                                    {permissionGrade === 'L' && (
+                                        <div className="button-wrapper">
+                                            <button className="project-thumb-edit-btn" onClick={() => setShowEditProjectThumbModal(true)}>
+                                                프로젝트 썸네일 변경
+                                            </button>
+                                            <button className="project-delete-btn"
+                                                onClick={handleDeleteProject}
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="project-manage-content-area">
+                            <div className="project-manage-summary-area">
+                                <section className="summary-section">
+                                    <h3>프로젝트 개요</h3>
+                                    {showEditSummary ? (
+                                        <p className="summary-text">
+                                            <textarea
+                                                value={summary}
+                                                onChange={(e) => setSummary(e.target.value)}
+                                                autoComplete="off"
+                                                placeholder={projectBasic.summary || '프로젝트 설명을 입력해주세요'}
+                                            />
+                                            <button onClick={handleUpdateSummary}>수정</button>
+                                            <button onClick={() => {
+                                                setSummary(projectBasic.summary || '');
+                                                setShowEditSummary(false);
+                                            }}>취소</button>
+                                        </p>
+                                    ) : (
+                                        <p className="summary-text">
+                                            {projectBasic.summary || '프로젝트 설명이 없습니다.'}
+                                            {permissionGrade === 'L' && (
+                                                <button onClick={() => setShowEditSummary(true)}>수정하기</button>
+                                            )}
+                                        </p>
+                                    )}
+                                </section>
+
+                                <div className="summary-divider" />
+
+                                <section className="summary-section inline">
+                                    <div className="category-select-wrapper">
+                                        <span className="summary-label">카테고리</span>
+
+                                        <div className="category-select">
+                                            <span className="summary-value">
+                                                {projectBasic.pjCategory}
+                                            </span>
+
+                                            {permissionGrade === 'L' && (
                                                 <button
-                                                    className="member-action-btn change-grade"
-                                                    onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
+                                                    className="category-update-select-button"
+                                                    onClick={() => setShowCategorySelect(!showCategorySelect)}
                                                 >
-                                                    {member.pjMemberGrade !== 'L' ? "관리자로 변경" : "팀원으로 변경"}
+                                                    ▼
                                                 </button>
                                             )}
 
-                                            {permissionGrade === 'L' && member.pjStatus === 'T' && (
-                                                <button
-                                                    className="member-action-btn remove"
-                                                    onClick={() => handleRemoveMember(member.id)}
-                                                >
-                                                    제거
-                                                </button>
+                                            {showCategorySelect && (
+                                                <ul className="category-dropdown">
+                                                    {categories
+                                                        .filter(category => category !== projectBasic.pjCategory)
+                                                        .map(category => (
+                                                            <li
+                                                                key={category}
+                                                                onClick={() => handleUpdateCategory(category)}
+                                                            >
+                                                                {category}
+                                                            </li>
+                                                        ))}
+                                                </ul>
                                             )}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
 
-                        {isLogined && loginSuccess ?
-                            <button
-                                className="add-member-btn"
-                                onClick={() => {
-                                    if (!isLogined || !loginSuccess) {
-                                        navigatedLoginPage();
-                                        return;
-                                    }
-                                    setShowAddMemberModal(true);
-                                }}
-                            >
-                                {projectBasic.teamValue ? "+ 팀원 추가" : "팀 프로젝트 전환"}
-                            </button>
-                            :
-                            <button
-                                className="non-log-add-member-btn"
-                                disabled
-                            >
-                                로그인 후 이용가능합니다
-                            </button>
-                        }
-                    </div>
+                                    <div>
+                                        <span className="summary-label">상태</span>
+                                        <span
+                                            className="summary-status"
+                                            style={{ color: getStatusColor(projectBasic.status) }}
+                                        >
+                                            {getStatusLabel(projectBasic.status)}
+                                            <span className="status-duration">
+                                                {projectBasic.status === 'I' && ` · ${getProjectDays(projectBasic)}일째`}
+                                                {projectBasic.status === 'C' && ` · 총 ${getProjectDays(projectBasic)}일`}
+                                                {projectBasic.status === 'D' && ` · ${getProjectDays(projectBasic)}일 만에 중단`}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </section>
 
-                    {showAddMemberModal && (
-                        <div className="project-modal-overlay" onClick={() => setShowAddMemberModal(false)}>
-                            <div className="project-modal-content" onClick={(e) => e.stopPropagation()}>
-                                <h3 className="project-modal-title">팀원 추가</h3>
+                                <div className="summary-divider" />
 
-                                {!projectBasic.teamValue && (
-                                    <>
-                                        <div className="project-modal-notice">
-                                            개인 프로젝트에서 팀원을 추가하면 팀 프로젝트로 전환됩니다.
+                                <section className="summary-section">
+                                    <h3>사용 스킬 / 툴</h3>
+                                    {showEditSkillTool ? (
+                                        <div className="skill-inline">
+                                            <input
+                                                value={skillTool}
+                                                onChange={(e) => setSkillTool(e.target.value)}
+                                                autoComplete="off"
+                                                placeholder={projectBasic.skillStack}
+                                            />
+                                            <button onClick={handleUpdateSkillTool}>수정</button>
+                                            <button onClick={() => {
+                                                setSkillTool(projectBasic.skillStack || '');
+                                                setShowEditSkillTool(false);
+                                            }}>취소</button>
                                         </div>
+                                    ) : (
+                                        <div className="skill-inline">
+                                            {projectBasic.skillStack?.split(',').map((skill, idx) => (
+                                                <span key={idx} className="skill-badge">
+                                                    {skill.trim()}
+                                                </span>
+                                            ))}
+                                            {permissionGrade === 'L' && (
+                                                <button onClick={() => setShowEditSkillTool(true)}>수정하기</button>
+                                            )}
+                                        </div>
+                                    )}
+                                </section>
+
+                                <div className="summary-divider" />
+
+                                <section className="summary-section">
+                                    <h3>진행 기간</h3>
+
+                                    {projectBasic.status === "I" && (
+                                        <div className="project-duration-container">
+                                            {formatDate(projectBasic.created)} ~
+                                        </div>
+                                    )}
+
+                                    {(projectBasic.status === "D" || projectBasic.status === "C") && (
+                                        <div className="project-duration-container">
+                                            {formatDate(projectBasic.created)} ~ {formatDate(projectBasic.endDay)}
+                                        </div>
+                                    )}
+                                </section>
+                            </div>
+                            <div className="project-manage-teamValue-area">
+                                <div className="project-manage-teamValue">
+                                    {projectBasic.teamValue ? "팀 프로젝트" : "개인 프로젝트"}
+                                </div>
+
+                                <div className="team-info-section">
+                                    <span className="team-info-label">
+                                        {projectBasic.teamValue ? "팀명" : "진행자"}
+                                    </span>
+                                    <div className="project-manage-teamName">
+                                        {projectBasic.teamValue ? projectBasic.teamName : projectBasic.starter}
+                                    </div>
+                                </div>
+
+                                {projectMember.length > 0 && (
+                                    <div className={permissionGrade === 'L' ? "team-member-information" : "team-member-information-non-leader"}>
+                                        {projectMember.map(member => (
+                                            <div key={member.id} className="member-card"
+                                                style={projectBasic.teamValue
+                                                    && member.pjMemberName === projectBasic.starter ?
+                                                    {
+                                                        display: 'none',
+                                                        visibility: 'hidden'
+                                                    }
+                                                    :
+                                                    {
+
+                                                    }
+                                                }>
+                                                <div className="member-name">{member.pjMemberName}</div>
+                                                <div className="member-detail-wrapper">
+                                                    <div className="member-detail">
+                                                        <span className="member-detail-label">권한:</span>
+                                                        <span className="member-grade-badge">
+                                                            {getMemberGradeLabel(member.pjMemberGrade)}
+                                                        </span>
+                                                    </div>
+                                                    {member.pjMemberRole && (
+                                                        <div className="member-detail">
+                                                            <span className="member-detail-label">담당:</span>
+                                                            <span className="member-role-badge">
+                                                                {member.pjMemberRole}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="member-actions">
+                                                    {permissionGrade === 'L' && member.pjStatus === 'T' && (
+                                                        <button
+                                                            className="member-action-btn change-grade"
+                                                            onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
+                                                        >
+                                                            {member.pjMemberGrade !== 'L' ? "관리자로 변경" : "팀원으로 변경"}
+                                                        </button>
+                                                    )}
+
+                                                    {permissionGrade === 'L' && member.pjStatus === 'T' && (
+                                                        <button
+                                                            className="member-action-btn remove"
+                                                            onClick={() => handleRemoveMember(member.id)}
+                                                        >
+                                                            제거
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {isLogined && loginSuccess ?
+                                    <button
+                                        className="add-member-btn"
+                                        onClick={() => {
+                                            if (!isLogined || !loginSuccess) {
+                                                navigatedLoginPage();
+                                                return;
+                                            }
+                                            setShowAddMemberModal(true);
+                                        }}
+                                    >
+                                        {projectBasic.teamValue ? "+ 팀원 추가" : "팀 프로젝트 전환"}
+                                    </button>
+                                    :
+                                    <button
+                                        className="non-log-add-member-btn"
+                                        disabled
+                                    >
+                                        로그인 후 이용가능합니다
+                                    </button>
+                                }
+                            </div>
+
+                            {showAddMemberModal && (
+                                <div className="project-modal-overlay" onClick={() => setShowAddMemberModal(false)}>
+                                    <div className="project-modal-content" onClick={(e) => e.stopPropagation()}>
+                                        <h3 className="project-modal-title">팀원 추가</h3>
+
+                                        {!projectBasic.teamValue && (
+                                            <>
+                                                <div className="project-modal-notice">
+                                                    개인 프로젝트에서 팀원을 추가하면 팀 프로젝트로 전환됩니다.
+                                                </div>
+
+                                                <div className="project-modal-input-group">
+                                                    <label className="project-modal-label">팀 이름</label>
+                                                    <input
+                                                        type="text"
+                                                        className="project-modal-input"
+                                                        placeholder="팀 이름을 입력하세요"
+                                                        value={teamNameInput}
+                                                        onChange={(e) => setTeamNameInput(e.target.value)}
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
 
                                         <div className="project-modal-input-group">
-                                            <label className="project-modal-label">팀 이름</label>
+                                            <label className="project-modal-label">팀원 이름</label>
                                             <input
                                                 type="text"
                                                 className="project-modal-input"
-                                                placeholder="팀 이름을 입력하세요"
-                                                value={teamNameInput}
-                                                onChange={(e) => setTeamNameInput(e.target.value)}
+                                                placeholder="팀원 이름을 입력하세요"
+                                                value={newMemberName}
+                                                onChange={(e) => setNewMemberName(e.target.value)}
                                             />
                                         </div>
-                                    </>
-                                )}
 
-                                <div className="project-modal-input-group">
-                                    <label className="project-modal-label">팀원 이름</label>
-                                    <input
-                                        type="text"
-                                        className="project-modal-input"
-                                        placeholder="팀원 이름을 입력하세요"
-                                        value={newMemberName}
-                                        onChange={(e) => setNewMemberName(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="project-modal-input-group">
-                                    <label className="project-modal-label">권한</label>
-                                    <select
-                                        className="project-modal-input"
-                                        value={newMemberGrade}
-                                        onChange={(e) => setNewMemberGrade(e.target.value)}
-                                    >
-                                        <option value="M">팀원</option>
-                                        <option value="L">관리자</option>
-                                    </select>
-                                </div>
-
-                                <div className="project-modal-input-group">
-                                    <label className="project-modal-label">담당 역할</label>
-                                    <select
-                                        className="project-modal-input"
-                                        value={newMemberRole}
-                                        onChange={(e) => {
-                                            setNewMemberRole(e.target.value);
-                                            if (e.target.value !== '직접입력') {
-                                                setCustomRole('');
-                                            }
-                                        }}
-                                    >
-                                        <option value="">역할 선택</option>
-                                        <option value="프론트엔드">프론트엔드</option>
-                                        <option value="백엔드">백엔드</option>
-                                        <option value="디자인">디자인</option>
-                                        <option value="기획">기획</option>
-                                        <option value="직접입력">직접 입력</option>
-                                    </select>
-
-                                    {newMemberRole === '직접입력' && (
-                                        <input
-                                            type="text"
-                                            className="project-modal-input"
-                                            style={{ marginTop: '8px' }}
-                                            placeholder="역할을 입력하세요"
-                                            value={customRole}
-                                            onChange={(e) => setCustomRole(e.target.value)}
-                                        />
-                                    )}
-                                </div>
-
-                                <div className="project-modal-actions">
-                                    <button
-                                        className="project-modal-btn cancel"
-                                        onClick={() => {
-                                            setShowAddMemberModal(false);
-                                            setNewMemberName('');
-                                            setNewMemberGrade('M');
-                                            setNewMemberRole('');
-                                            setCustomRole('');
-                                            setTeamNameInput('');
-                                        }}
-                                    >
-                                        취소
-                                    </button>
-                                    <button
-                                        className="project-modal-btn confirm"
-                                        onClick={handleAddMember}
-                                    >
-                                        추가
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {showEditProjectThumbModal && (
-                    <div className="project-thumb-edit-modal-overlay" onClick={() => {
-                        setShowEditProjectThumbModal(false);
-                        setNewProjectThumb(null);
-                        setThumbPreview(null);
-                    }}>
-                        <div className="project-thumb-edit-modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h3 className="project-thumb-edit-modal-title">프로젝트 썸네일 변경</h3>
-
-                            <div className="project-thumb-preview-section">
-                                <label className="project-thumb-preview-label">
-                                    {thumbPreview ? '새 썸네일 미리보기' : '현재 썸네일'}
-                                </label>
-                                <div className="project-thumb-preview">
-                                    {thumbPreview ? (
-                                        <img
-                                            className="project-thumb-image"
-                                            src={thumbPreview}
-                                            alt="새 썸네일 미리보기"
-                                        />
-                                    ) : projectBasic.projectThumb ? (
-                                        <img
-                                            className="project-thumb-image"
-                                            src={`${API.API_BASE_URL}/projectThumb/${projectBasic.projectThumb}`}
-                                            alt="현재 썸네일"
-                                        />
-                                    ) : (
-                                        <div className="project-thumb-placeholder">
-                                            <svg
-                                                width="48"
-                                                height="48"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="gray"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
+                                        <div className="project-modal-input-group">
+                                            <label className="project-modal-label">권한</label>
+                                            <select
+                                                className="project-modal-input"
+                                                value={newMemberGrade}
+                                                onChange={(e) => setNewMemberGrade(e.target.value)}
                                             >
-                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                                <polyline points="21 15 16 10 5 21" />
-                                            </svg>
-                                            <span>썸네일 없음</span>
+                                                <option value="M">팀원</option>
+                                                <option value="L">관리자</option>
+                                            </select>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
 
-                            <div className="project-thumb-upload-section">
-                                <label className="project-thumb-upload-label">
-                                    새 썸네일 업로드
-                                    <span className="file-format-info">(PNG, JPEG, JPG / 최대 10MB)</span>
-                                </label>
-                                <div className="file-input-wrapper">
-                                    <input
-                                        type="file"
-                                        id="projectThumbFile"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        onChange={handleFileSelect}
-                                        className="file-input-hidden"
-                                    />
-                                    <label htmlFor="projectThumbFile" className="file-input-label">
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                            <polyline points="17 8 12 3 7 8" />
-                                            <line x1="12" y1="3" x2="12" y2="15" />
-                                        </svg>
-                                        {newProjectThumb ? newProjectThumb.name : '파일 선택'}
-                                    </label>
-                                </div>
-                            </div>
+                                        <div className="project-modal-input-group">
+                                            <label className="project-modal-label">담당 역할</label>
+                                            <select
+                                                className="project-modal-input"
+                                                value={newMemberRole}
+                                                onChange={(e) => {
+                                                    setNewMemberRole(e.target.value);
+                                                    if (e.target.value !== '직접입력') {
+                                                        setCustomRole('');
+                                                    }
+                                                }}
+                                            >
+                                                <option value="">역할 선택</option>
+                                                <option value="프론트엔드">프론트엔드</option>
+                                                <option value="백엔드">백엔드</option>
+                                                <option value="디자인">디자인</option>
+                                                <option value="기획">기획</option>
+                                                <option value="직접입력">직접 입력</option>
+                                            </select>
 
-                            <div className="project-thumb-edit-modal-actions">
-                                <button
-                                    className="project-thumb-edit-modal-btn cancel"
-                                    onClick={() => {
-                                        setShowEditProjectThumbModal(false);
-                                        setNewProjectThumb(null);
-                                        setThumbPreview(null);
-                                    }}
-                                >
-                                    취소
-                                </button>
-                                <button
-                                    className="project-thumb-edit-modal-btn confirm"
-                                    onClick={handleUpdateProjectThumb}
-                                >
-                                    변경
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && !showEditLogModal && (
-                    <>
-                        <div className="project-modal-overlay" onClick={() => setShowInputCallendarLogModal(false)}>
-                            <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
-                                <div className="callendar-log-input-header">
-                                    <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
-                                </div>
-                                <div>
-                                    <input
-                                        placeholder="제목을 입력해주세요 ..."
-                                        autoComplete='off'
-                                        maxLength={20}
-                                        value={logTitle}
-                                        onChange={(e) => setLogTitle(e.target.value)}
-                                    />
-                                    <div style={{ fontSize: '12px', color: '#888' }}>
-                                        {logTitle.length} / {MAX_LOG_TITLE}
+                                            {newMemberRole === '직접입력' && (
+                                                <input
+                                                    type="text"
+                                                    className="project-modal-input"
+                                                    style={{ marginTop: '8px' }}
+                                                    placeholder="역할을 입력하세요"
+                                                    value={customRole}
+                                                    onChange={(e) => setCustomRole(e.target.value)}
+                                                />
+                                            )}
+                                        </div>
+
+                                        <div className="project-modal-actions">
+                                            <button
+                                                className="project-modal-btn cancel"
+                                                onClick={() => {
+                                                    setShowAddMemberModal(false);
+                                                    setNewMemberName('');
+                                                    setNewMemberGrade('M');
+                                                    setNewMemberRole('');
+                                                    setCustomRole('');
+                                                    setTeamNameInput('');
+                                                }}
+                                            >
+                                                취소
+                                            </button>
+                                            <button
+                                                className="project-modal-btn confirm"
+                                                onClick={handleAddMember}
+                                            >
+                                                추가
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="callendar-log-input-main-container">
-                                    <Editor
-                                        ref={editorRef}
-                                        initialValue=""
-                                        initialEditType="markdown"
-                                        previewStyle="vertical"
-                                        height="500px"
-                                        hooks={{
-                                            addImageBlobHook: adapter
-                                        }}
-                                        useCommandShortcut={true}
-                                    />
-                                    <div className="log-input-button-wrapper">
+                            )}
+                        </div>
+
+                        {showEditProjectThumbModal && (
+                            <div className="project-thumb-edit-modal-overlay" onClick={() => {
+                                setShowEditProjectThumbModal(false);
+                                setNewProjectThumb(null);
+                                setThumbPreview(null);
+                            }}>
+                                <div className="project-thumb-edit-modal-content" onClick={(e) => e.stopPropagation()}>
+                                    <h3 className="project-thumb-edit-modal-title">프로젝트 썸네일 변경</h3>
+
+                                    <div className="project-thumb-preview-section">
+                                        <label className="project-thumb-preview-label">
+                                            {thumbPreview ? '새 썸네일 미리보기' : '현재 썸네일'}
+                                        </label>
+                                        <div className="project-thumb-preview">
+                                            {thumbPreview ? (
+                                                <img
+                                                    className="project-thumb-image"
+                                                    src={thumbPreview}
+                                                    alt="새 썸네일 미리보기"
+                                                />
+                                            ) : projectBasic.projectThumb ? (
+                                                <img
+                                                    className="project-thumb-image"
+                                                    src={`${API.API_BASE_URL}/projectThumb/${projectBasic.projectThumb}`}
+                                                    alt="현재 썸네일"
+                                                />
+                                            ) : (
+                                                <div className="project-thumb-placeholder">
+                                                    <svg
+                                                        width="48"
+                                                        height="48"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="gray"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    >
+                                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                                        <polyline points="21 15 16 10 5 21" />
+                                                    </svg>
+                                                    <span>썸네일 없음</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="project-thumb-upload-section">
+                                        <label className="project-thumb-upload-label">
+                                            새 썸네일 업로드
+                                            <span className="file-format-info">(PNG, JPEG, JPG / 최대 10MB)</span>
+                                        </label>
+                                        <div className="file-input-wrapper">
+                                            <input
+                                                type="file"
+                                                id="projectThumbFile"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                onChange={handleFileSelect}
+                                                className="file-input-hidden"
+                                            />
+                                            <label htmlFor="projectThumbFile" className="file-input-label">
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                >
+                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                    <polyline points="17 8 12 3 7 8" />
+                                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                                </svg>
+                                                {newProjectThumb ? newProjectThumb.name : '파일 선택'}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className="project-thumb-edit-modal-actions">
                                         <button
-                                            onClick={() => exitLogInputModal()}
+                                            className="project-thumb-edit-modal-btn cancel"
+                                            onClick={() => {
+                                                setShowEditProjectThumbModal(false);
+                                                setNewProjectThumb(null);
+                                                setThumbPreview(null);
+                                            }}
                                         >
                                             취소
                                         </button>
-                                        <button onClick={() => inputNewDailyLog()}> 등록 </button>
+                                        <button
+                                            className="project-thumb-edit-modal-btn confirm"
+                                            onClick={handleUpdateProjectThumb}
+                                        >
+                                            변경
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </>
-                )}
-                {showCallendarModal && (
-                    <div className="callendar-modal-overlay" onClick={() => {
-                        setShowCallendarModal(false);
-                        setSelectedLogId(null);
-                    }}>
-                        <div className="callendar-date-container" onClick={(e) => e.stopPropagation()}>
-                            <div className="project-log-container">
-                                {/* 헤더 */}
-                                <div className="project-modal-log-header">
-                                    <h3>
-                                        <span>{projectBasic.title} - {selectedDate}</span>
-                                    </h3>
-
-                                    {isLogined && loginSuccess && selectedDate === todayStr ? (
-                                        <button
-                                            onClick={() => {
-                                                if (!isLogined || !loginSuccess) {
-                                                    navigatedLoginPage();
-                                                    return;
-                                                }
-                                                setShowInputCallendarLogModal(true);
-                                                setLogTitle("");
-                                                setShowCallendarModal(false);
-                                            }}
-                                        >
-                                            +
-                                        </button>
-                                    ) : (
-                                        <button disabled>+</button>
-                                    )}
-                                </div>
-
-                                {/* 로그 뷰어 */}
-                                {(() => {
-                                    const filteredLogs = getFilteredLogs();
-                                    const selectedLog = getSelectedLog();
-
-                                    // 프로젝트 생성일/종료일 체크
-                                    const isCreatedDate = projectBasic.created?.split('T')[0] === selectedDate;
-                                    const isEndDate = (projectBasic.status === 'D' || projectBasic.status === 'C') &&
-                                        projectBasic.endDay?.split('T')[0] === selectedDate;
-
-                                    return filteredLogs.length > 0 || isCreatedDate || isEndDate ? (
-                                        <div className="project-log-viewer-container">
-                                            {/* 좌측: 로그 목록 */}
-                                            <div className="project-log-list-section">
-                                                <div className="project-log-list-header">
-                                                    <h4>로그 목록</h4>
-                                                    <span className="log-count">
-                                                        {filteredLogs.length + (isCreatedDate ? 1 : 0) + (isEndDate ? 1 : 0)}개
-                                                    </span>
-                                                </div>
-                                                <div className="project-log-list-items">
-                                                    {/* 프로젝트 생성일 카드 */}
-                                                    {isCreatedDate && (
-                                                        <div
-                                                            className={`project-log-list-item special-log ${selectedLogId === 'created' ? 'active' : ''}`}
-                                                            onClick={() => setSelectedLogId('created')}
-                                                        >
-                                                            <div className="log-list-title">
-                                                                🎉 프로젝트 생성일
-                                                            </div>
-                                                            <div className="log-list-meta">
-                                                                <span className="log-creator">시스템</span>
-                                                                <span className="log-time">
-                                                                    {new Date(projectBasic.created).toLocaleTimeString('ko-KR', {
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* 프로젝트 종료일 카드 */}
-                                                    {isEndDate && (
-                                                        <div
-                                                            className={`project-log-list-item special-log ${selectedLogId === 'ended' ? 'active' : ''}`}
-                                                            onClick={() => setSelectedLogId('ended')}
-                                                        >
-                                                            <div className="log-list-title">
-                                                                {projectBasic.status === 'C' ? '✅ 프로젝트 완료일' : '⏸️ 프로젝트 중단일'}
-                                                            </div>
-                                                            <div className="log-list-meta">
-                                                                <span className="log-creator">시스템</span>
-                                                                <span className="log-time">
-                                                                    {new Date(projectBasic.endDay).toLocaleTimeString('ko-KR', {
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* 일반 로그 목록 */}
-                                                    {filteredLogs.map((log) => (
-                                                        <div
-                                                            key={log.logId}
-                                                            className={`project-log-list-item ${selectedLogId === log.logId ? 'active' : ''}`}
-                                                            onClick={() => setSelectedLogId(log.logId)}
-                                                        >
-                                                            <div className="log-list-title">
-                                                                {log.logTitle.length > 15
-                                                                    ? log.logTitle.substring(0, 15) + "..."
-                                                                    : log.logTitle}
-                                                            </div>
-
-                                                            <div className="log-list-meta">
-                                                                <span className="log-creator">{log.logCreator}</span>
-                                                                <span className="log-time">
-                                                                    {log.createdDate && new Date(log.createdDate).toLocaleTimeString('ko-KR', {
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                        )}
+                        {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && !showEditLogModal && (
+                            <>
+                                <div className="project-modal-overlay" onClick={() => setShowInputCallendarLogModal(false)}>
+                                    <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
+                                        <div className="callendar-log-input-header">
+                                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
+                                        </div>
+                                        <div>
+                                            <input
+                                                placeholder="제목을 입력해주세요 ..."
+                                                autoComplete='off'
+                                                maxLength={20}
+                                                value={logTitle}
+                                                onChange={(e) => setLogTitle(e.target.value)}
+                                            />
+                                            <div style={{ fontSize: '12px', color: '#888' }}>
+                                                {logTitle.length} / {MAX_LOG_TITLE}
                                             </div>
+                                        </div>
+                                        <div className="callendar-log-input-main-container">
+                                            <Editor
+                                                ref={editorRef}
+                                                initialValue=""
+                                                initialEditType="markdown"
+                                                previewStyle="vertical"
+                                                height="500px"
+                                                hooks={{
+                                                    addImageBlobHook: adapter
+                                                }}
+                                                useCommandShortcut={true}
+                                            />
+                                            <div className="log-input-button-wrapper">
+                                                <button
+                                                    onClick={() => exitLogInputModal()}
+                                                >
+                                                    취소
+                                                </button>
+                                                <button onClick={() => inputNewDailyLog()}> 등록 </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        {showCallendarModal && (
+                            <div className="callendar-modal-overlay" onClick={() => {
+                                setShowCallendarModal(false);
+                                setSelectedLogId(null);
+                            }}>
+                                <div className="callendar-date-container" onClick={(e) => e.stopPropagation()}>
+                                    <div className="project-log-container">
+                                        {/* 헤더 */}
+                                        <div className="project-modal-log-header">
+                                            <h3>
+                                                <span>{projectBasic.title} - {selectedDate}</span>
+                                            </h3>
 
-                                            {/* 우측: 로그 상세 내용 */}
-                                            <div className="project-log-content-section">
-                                                {selectedLog ? (
-                                                    <div className="project-log-detail">
-                                                        <div className="log-detail-header">
-                                                            <div className="log-header-wrapper">
-                                                                <h4>{selectedLog.logTitle}</h4>
-                                                                {isLogined && loginSuccess && (
-                                                                    <div className="log-active-button-wrapper">
-                                                                        <button onClick={() => viewerProjectlogEditModal()}>
-                                                                            <svg
-                                                                                className="edit-log-btn"
-                                                                                width="16"
-                                                                                height="16"
-                                                                                viewBox="0 0 24 24"
-                                                                                fill="none"
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                            >
-                                                                                <path
-                                                                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                    stroke-linejoin="round"
-                                                                                />
-                                                                                <path
-                                                                                    d="M14.06 4.94l3.75 3.75"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                    stroke-linecap="round"
-                                                                                />
-                                                                            </svg>
-                                                                            <p className="btn-edit-com">
-                                                                                수정
-                                                                            </p>
-                                                                        </button>
-                                                                        <button onClick={() => deleteThisProjectLog()}>
-                                                                            <svg
-                                                                                className="delete-log-btn"
-                                                                                width="16"
-                                                                                height="16"
-                                                                                viewBox="0 0 24 24"
-                                                                                fill="none"
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                            >
-                                                                                <path
-                                                                                    d="M4 7h16"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                    stroke-linecap="round"
-                                                                                />
-                                                                                <path
-                                                                                    d="M9 7V4h6v3"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                    stroke-linejoin="round"
-                                                                                />
-                                                                                <rect
-                                                                                    x="6"
-                                                                                    y="7"
-                                                                                    width="12"
-                                                                                    height="13"
-                                                                                    rx="2"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                />
-                                                                                <path
-                                                                                    d="M10 11v6M14 11v6"
-                                                                                    stroke="currentColor"
-                                                                                    stroke-width="1.8"
-                                                                                    stroke-linecap="round"
-                                                                                />
-                                                                            </svg>
-                                                                            <p className="btn-delete-com">
-                                                                                삭제
-                                                                            </p>
-                                                                        </button>
+                                            {isLogined && loginSuccess && selectedDate === todayStr ? (
+                                                <button
+                                                    onClick={() => {
+                                                        if (!isLogined || !loginSuccess) {
+                                                            navigatedLoginPage();
+                                                            return;
+                                                        }
+                                                        setShowInputCallendarLogModal(true);
+                                                        setLogTitle("");
+                                                        setShowCallendarModal(false);
+                                                    }}
+                                                >
+                                                    +
+                                                </button>
+                                            ) : (
+                                                <button disabled>+</button>
+                                            )}
+                                        </div>
+
+                                        {/* 로그 뷰어 */}
+                                        {(() => {
+                                            const filteredLogs = getFilteredLogs();
+                                            const selectedLog = getSelectedLog();
+
+                                            // 프로젝트 생성일/종료일 체크
+                                            const isCreatedDate = projectBasic.created?.split('T')[0] === selectedDate;
+                                            const isEndDate = (projectBasic.status === 'D' || projectBasic.status === 'C') &&
+                                                projectBasic.endDay?.split('T')[0] === selectedDate;
+
+                                            return filteredLogs.length > 0 || isCreatedDate || isEndDate ? (
+                                                <div className="project-log-viewer-container">
+                                                    {/* 좌측: 로그 목록 */}
+                                                    <div className="project-log-list-section">
+                                                        <div className="project-log-list-header">
+                                                            <h4>로그 목록</h4>
+                                                            <span className="log-count">
+                                                                {filteredLogs.length + (isCreatedDate ? 1 : 0) + (isEndDate ? 1 : 0)}개
+                                                            </span>
+                                                        </div>
+                                                        <div className="project-log-list-items">
+                                                            {/* 프로젝트 생성일 카드 */}
+                                                            {isCreatedDate && (
+                                                                <div
+                                                                    className={`project-log-list-item special-log ${selectedLogId === 'created' ? 'active' : ''}`}
+                                                                    onClick={() => setSelectedLogId('created')}
+                                                                >
+                                                                    <div className="log-list-title">
+                                                                        🎉 프로젝트 생성일
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                            <div className="log-detail-meta">
-                                                                <span className="log-detail-creator">작성자: {selectedLog.logCreator}</span>
-                                                                <span className="log-detail-datetime">
-                                                                    {new Date(selectedLog.createdDate).toLocaleString('ko-KR', {
-                                                                        year: 'numeric',
-                                                                        month: '2-digit',
-                                                                        day: '2-digit',
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="log-detail-content">
-                                                            <div className="log-content-text">
-                                                                <Viewer
-                                                                    key={selectedLog.logId}
-                                                                    initialValue={selectedLog.logContent || ''}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : selectedLogId === 'created' ? (
-                                                    <div className="project-log-detail">
-                                                        <div className="log-detail-header">
-                                                            <h4>프로젝트 생성일</h4>
-                                                            <div className="log-detail-meta">
-                                                                <span className="log-detail-datetime">
-                                                                    {new Date(projectBasic.created).toLocaleString('ko-KR', {
-                                                                        year: 'numeric',
-                                                                        month: '2-digit',
-                                                                        day: '2-digit',
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="log-detail-content">
-                                                            <div className="special-log-content">
-                                                                <div className="special-log-icon">🎉</div>
-                                                                <h3>{projectBasic.title}</h3>
-                                                                <p>
-                                                                    <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ) : selectedLogId === 'ended' ? (
-                                                    <div className="project-log-detail">
-                                                        <div className="log-detail-header">
-                                                            <h4>{projectBasic.status === 'C' ? '프로젝트 완료일' : '프로젝트 중단일'}</h4>
-                                                            <div className="log-detail-meta">
-                                                                <span className="log-detail-datetime">
-                                                                    {new Date(projectBasic.endDay).toLocaleString('ko-KR', {
-                                                                        year: 'numeric',
-                                                                        month: '2-digit',
-                                                                        day: '2-digit',
-                                                                        hour: '2-digit',
-                                                                        minute: '2-digit'
-                                                                    })}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="log-detail-content">
-                                                            <div className="special-log-content">
-                                                                <div className="special-log-icon">
-                                                                    {projectBasic.status === 'C' ? '✅' : '⏸️'}
+                                                                    <div className="log-list-meta">
+                                                                        <span className="log-creator">시스템</span>
+                                                                        <span className="log-time">
+                                                                            {new Date(projectBasic.created).toLocaleTimeString('ko-KR', {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
-                                                                <h3>{projectBasic.title}</h3>
-                                                                <p>
-                                                                    <strong>{selectedDate}</strong>에 프로젝트가
-                                                                    {projectBasic.status === 'C' ? ' 성공적으로 완료' : ' 중단'}되었습니다.
-                                                                </p>
-                                                            </div>
+                                                            )}
+
+                                                            {/* 프로젝트 종료일 카드 */}
+                                                            {isEndDate && (
+                                                                <div
+                                                                    className={`project-log-list-item special-log ${selectedLogId === 'ended' ? 'active' : ''}`}
+                                                                    onClick={() => setSelectedLogId('ended')}
+                                                                >
+                                                                    <div className="log-list-title">
+                                                                        {projectBasic.status === 'C' ? '✅ 프로젝트 완료일' : '⏸️ 프로젝트 중단일'}
+                                                                    </div>
+                                                                    <div className="log-list-meta">
+                                                                        <span className="log-creator">시스템</span>
+                                                                        <span className="log-time">
+                                                                            {new Date(projectBasic.endDay).toLocaleTimeString('ko-KR', {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* 일반 로그 목록 */}
+                                                            {filteredLogs.map((log) => (
+                                                                <div
+                                                                    key={log.logId}
+                                                                    className={`project-log-list-item ${selectedLogId === log.logId ? 'active' : ''}`}
+                                                                    onClick={() => setSelectedLogId(log.logId)}
+                                                                >
+                                                                    <div className="log-list-title">
+                                                                        {log.logTitle.length > 15
+                                                                            ? log.logTitle.substring(0, 15) + "..."
+                                                                            : log.logTitle}
+                                                                    </div>
+
+                                                                    <div className="log-list-meta">
+                                                                        <span className="log-creator">{log.logCreator}</span>
+                                                                        <span className="log-time">
+                                                                            {log.createdDate && new Date(log.createdDate).toLocaleTimeString('ko-KR', {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
-                                                ) : (
-                                                    <div className="project-log-empty-state">
-                                                        <svg
-                                                            width="64"
-                                                            height="64"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            strokeWidth="1.5"
-                                                        >
-                                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                        </svg>
-                                                        <p>로그를 선택해주세요</p>
+
+                                                    {/* 우측: 로그 상세 내용 */}
+                                                    <div className="project-log-content-section">
+                                                        {selectedLog ? (
+                                                            <div className="project-log-detail">
+                                                                <div className="log-detail-header">
+                                                                    <div className="log-header-wrapper">
+                                                                        <h4>{selectedLog.logTitle}</h4>
+                                                                        {isLogined && loginSuccess && (
+                                                                            <div className="log-active-button-wrapper">
+                                                                                <button onClick={() => viewerProjectlogEditModal()}>
+                                                                                    <svg
+                                                                                        className="edit-log-btn"
+                                                                                        width="16"
+                                                                                        height="16"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        fill="none"
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                    >
+                                                                                        <path
+                                                                                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                            stroke-linejoin="round"
+                                                                                        />
+                                                                                        <path
+                                                                                            d="M14.06 4.94l3.75 3.75"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                            stroke-linecap="round"
+                                                                                        />
+                                                                                    </svg>
+                                                                                    <p className="btn-edit-com">
+                                                                                        수정
+                                                                                    </p>
+                                                                                </button>
+                                                                                <button onClick={() => deleteThisProjectLog()}>
+                                                                                    <svg
+                                                                                        className="delete-log-btn"
+                                                                                        width="16"
+                                                                                        height="16"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        fill="none"
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                    >
+                                                                                        <path
+                                                                                            d="M4 7h16"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                            stroke-linecap="round"
+                                                                                        />
+                                                                                        <path
+                                                                                            d="M9 7V4h6v3"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                            stroke-linejoin="round"
+                                                                                        />
+                                                                                        <rect
+                                                                                            x="6"
+                                                                                            y="7"
+                                                                                            width="12"
+                                                                                            height="13"
+                                                                                            rx="2"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                        />
+                                                                                        <path
+                                                                                            d="M10 11v6M14 11v6"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="1.8"
+                                                                                            stroke-linecap="round"
+                                                                                        />
+                                                                                    </svg>
+                                                                                    <p className="btn-delete-com">
+                                                                                        삭제
+                                                                                    </p>
+                                                                                </button>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="log-detail-meta">
+                                                                        <span className="log-detail-creator">작성자: {selectedLog.logCreator}</span>
+                                                                        <span className="log-detail-datetime">
+                                                                            {new Date(selectedLog.createdDate).toLocaleString('ko-KR', {
+                                                                                year: 'numeric',
+                                                                                month: '2-digit',
+                                                                                day: '2-digit',
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="log-detail-content">
+                                                                    <div className="log-content-text">
+                                                                        <Viewer
+                                                                            key={selectedLog.logId}
+                                                                            initialValue={selectedLog.logContent || ''}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : selectedLogId === 'created' ? (
+                                                            <div className="project-log-detail">
+                                                                <div className="log-detail-header">
+                                                                    <h4>프로젝트 생성일</h4>
+                                                                    <div className="log-detail-meta">
+                                                                        <span className="log-detail-datetime">
+                                                                            {new Date(projectBasic.created).toLocaleString('ko-KR', {
+                                                                                year: 'numeric',
+                                                                                month: '2-digit',
+                                                                                day: '2-digit',
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="log-detail-content">
+                                                                    <div className="special-log-content">
+                                                                        <div className="special-log-icon">🎉</div>
+                                                                        <h3>{projectBasic.title}</h3>
+                                                                        <p>
+                                                                            <strong>{selectedDate}</strong>에 프로젝트가 시작되었습니다.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : selectedLogId === 'ended' ? (
+                                                            <div className="project-log-detail">
+                                                                <div className="log-detail-header">
+                                                                    <h4>{projectBasic.status === 'C' ? '프로젝트 완료일' : '프로젝트 중단일'}</h4>
+                                                                    <div className="log-detail-meta">
+                                                                        <span className="log-detail-datetime">
+                                                                            {new Date(projectBasic.endDay).toLocaleString('ko-KR', {
+                                                                                year: 'numeric',
+                                                                                month: '2-digit',
+                                                                                day: '2-digit',
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="log-detail-content">
+                                                                    <div className="special-log-content">
+                                                                        <div className="special-log-icon">
+                                                                            {projectBasic.status === 'C' ? '✅' : '⏸️'}
+                                                                        </div>
+                                                                        <h3>{projectBasic.title}</h3>
+                                                                        <p>
+                                                                            <strong>{selectedDate}</strong>에 프로젝트가
+                                                                            {projectBasic.status === 'C' ? ' 성공적으로 완료' : ' 중단'}되었습니다.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="project-log-empty-state">
+                                                                <svg
+                                                                    width="64"
+                                                                    height="64"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="1.5"
+                                                                >
+                                                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                                <p>로그를 선택해주세요</p>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
+                                                </div>
+                                            ) : (
+                                                <div className="project-log-empty-container">
+                                                    <svg
+                                                        width="80"
+                                                        height="80"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                    >
+                                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <h4>프로젝트 로그 없음</h4>
+                                                    <p>현재 선택된 날짜에 등록된 로그가 없습니다.</p>
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {/* 프로젝트 로그 수정 모달 */}
+                        {showEditLogModal && !showCallendarModal && !showInputCallendarLogModal && isLogined && loginSuccess && (
+                            <>
+                                <div className="project-modal-overlay" onClick={() => {
+                                    setShowEditLogModal(false);
+                                    setShowCallendarModal(true);
+                                    // 초기화
+                                    setLogTitle('');
+                                }}>
+                                    <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
+                                        <div className="callendar-log-input-header">
+                                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 로그 수정</h4>
+                                        </div>
+                                        <div>
+                                            <input
+                                                placeholder={"수정할 제목을 입력해주세요 {" + getSelectedLog()?.logTitle + "}"}
+                                                autoComplete='off'
+                                                maxLength={20}
+                                                value={logTitle}
+                                                onChange={(e) => setLogTitle(e.target.value)}
+                                            />
+                                            <div style={{ fontSize: '12px', color: '#888' }}>
+                                                {logTitle.length} / {MAX_LOG_TITLE}
                                             </div>
                                         </div>
-                                    ) : (
-                                        <div className="project-log-empty-container">
-                                            <svg
-                                                width="80"
-                                                height="80"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                            >
-                                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            <h4>프로젝트 로그 없음</h4>
-                                            <p>현재 선택된 날짜에 등록된 로그가 없습니다.</p>
+                                        <div className="callendar-log-input-main-container">
+                                            <Editor
+                                                ref={editorRef}
+                                                initialValue={getSelectedLog()?.logContent || ''}
+                                                initialEditType="markdown"
+                                                previewStyle="vertical"
+                                                height="500px"
+                                                hooks={{
+                                                    addImageBlobHook: adapter
+                                                }}
+                                                useCommandShortcut={true}
+                                            />
+                                            <div className="log-input-button-wrapper">
+                                                <button
+                                                    onClick={() => {
+                                                        setShowEditLogModal(false);
+                                                        setShowCallendarModal(true);
+                                                        setLogTitle('');
+                                                    }}
+                                                >
+                                                    취소
+                                                </button>
+                                                <button onClick={() => updateProjectLog()}>수정</button>
+                                            </div>
                                         </div>
-                                    );
-                                })()}
-                            </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        <div className="project-calendar-section">
+                            {projectBasic.created && projectBasic.status === 'C' && (
+                                <FullCalendar
+                                    plugins={[dayGridPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth"
+                                    initialDate={projectBasic.created}
+                                    locale="ko"
+                                    headerToolbar={{
+                                        left: 'prev',
+                                        center: 'title',
+                                        right: 'next'
+                                    }}
+                                    events={calendarEvents}
+                                    height="auto"
+                                    dateClick={(info) => {
+                                        setSelectedDate(info.dateStr);
+                                        setShowCallendarModal(true);
+                                        setShowEditLogModal(false);
+                                        setSelectedLogId(null); // 초기화
+                                    }}
+                                    eventClick={(info) => {
+                                        // 이벤트 클릭 시 해당 로그 선택
+                                        const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
+
+                                        if (eventType === 'project-log') {
+                                            const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId(logId);
+                                            setShowCallendarModal(true);
+                                        } else if (eventType === 'project-start') {
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId('created');
+                                            setShowCallendarModal(true);
+                                        } else if (eventType === 'project-end') {
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId('ended');
+                                            setShowCallendarModal(true);
+                                        }
+                                    }}
+                                />
+                            )}
+                            {projectBasic.status !== 'C' && projectBasic.status !== 'D' && (
+                                <FullCalendar
+                                    plugins={[dayGridPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth"
+                                    locale="ko"
+                                    headerToolbar={{
+                                        left: 'prev',
+                                        center: 'title',
+                                        right: 'next'
+                                    }}
+                                    events={calendarEvents}
+                                    height="auto"
+                                    dateClick={(info) => {
+                                        setSelectedDate(info.dateStr);
+                                        setShowCallendarModal(true);
+                                        setShowEditLogModal(false);
+                                        setSelectedLogId(null); // 초기화
+                                    }}
+                                    eventClick={(info) => {
+
+                                        const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
+                                        if (eventType === 'project-log') {
+                                            const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId(logId);
+                                            setShowCallendarModal(true);
+                                        } else if (eventType === 'project-start') {
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId('created');
+                                            setShowCallendarModal(true);
+                                        } else if (eventType === 'project-end') {
+                                            setSelectedDate(info.event.startStr.split('T')[0]);
+                                            setSelectedLogId('ended');
+                                            setShowCallendarModal(true);
+                                        }
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 )}
-                {/* 프로젝트 로그 수정 모달 */}
-                {showEditLogModal && !showCallendarModal && !showInputCallendarLogModal && isLogined && loginSuccess && (
-                    <>
-                        <div className="project-modal-overlay" onClick={() => {
-                            setShowEditLogModal(false);
-                            setShowCallendarModal(true);
-                            // 초기화
-                            setLogTitle('');
-                        }}>
-                            <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
-                                <div className="callendar-log-input-header">
-                                    <h4>프로젝트 {projectBasic.title} - {selectedDate} 로그 수정</h4>
-                                </div>
-                                <div>
-                                    <input
-                                        placeholder={"수정할 제목을 입력해주세요 {" + getSelectedLog()?.logTitle + "}"}
-                                        autoComplete='off'
-                                        maxLength={20}
-                                        value={logTitle}
-                                        onChange={(e) => setLogTitle(e.target.value)}
-                                    />
-                                    <div style={{ fontSize: '12px', color: '#888' }}>
-                                        {logTitle.length} / {MAX_LOG_TITLE}
-                                    </div>
-                                </div>
-                                <div className="callendar-log-input-main-container">
-                                    <Editor
-                                        ref={editorRef}
-                                        initialValue={getSelectedLog()?.logContent || ''}
-                                        initialEditType="markdown"
-                                        previewStyle="vertical"
-                                        height="500px"
-                                        hooks={{
-                                            addImageBlobHook: adapter
-                                        }}
-                                        useCommandShortcut={true}
-                                    />
-                                    <div className="log-input-button-wrapper">
-                                        <button
-                                            onClick={() => {
-                                                setShowEditLogModal(false);
-                                                setShowCallendarModal(true);
-                                                setLogTitle('');
-                                            }}
-                                        >
-                                            취소
-                                        </button>
-                                        <button onClick={() => updateProjectLog()}>수정</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </>
+                {pageIndex === 1 && (
+                    <div className="project-complete-report-container">
+                        프로젝트 완료 레포트 페이지
+                        <button
+                            className="back-to-manage-btn"
+                            onClick={goToPrevPage}
+                        >
+                            ← 프로젝트 관리로 돌아가기
+                        </button>
+                    </div>
                 )}
-                <div className="project-calendar-section">
-                    {projectBasic.created && projectBasic.status === 'C' && (
-                        <FullCalendar
-                            plugins={[dayGridPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            initialDate={projectBasic.created}
-                            locale="ko"
-                            headerToolbar={{
-                                left: 'prev',
-                                center: 'title',
-                                right: 'next'
-                            }}
-                            events={calendarEvents}
-                            height="auto"
-                            dateClick={(info) => {
-                                setSelectedDate(info.dateStr);
-                                setShowCallendarModal(true);
-                                setShowEditLogModal(false);
-                                setSelectedLogId(null); // 초기화
-                            }}
-                            eventClick={(info) => {
-                                // 이벤트 클릭 시 해당 로그 선택
-                                const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
-
-                                if (eventType === 'project-log') {
-                                    const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId(logId);
-                                    setShowCallendarModal(true);
-                                } else if (eventType === 'project-start') {
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId('created');
-                                    setShowCallendarModal(true);
-                                } else if (eventType === 'project-end') {
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId('ended');
-                                    setShowCallendarModal(true);
-                                }
-                            }}
-                        />
-                    )}
-                    {projectBasic.status !== 'C' && projectBasic.status !== 'D' && (
-                        <FullCalendar
-                            plugins={[dayGridPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            locale="ko"
-                            headerToolbar={{
-                                left: 'prev',
-                                center: 'title',
-                                right: 'next'
-                            }}
-                            events={calendarEvents}
-                            height="auto"
-                            dateClick={(info) => {
-                                setSelectedDate(info.dateStr);
-                                setShowCallendarModal(true);
-                                setShowEditLogModal(false);
-                                setSelectedLogId(null); // 초기화
-                            }}
-                            eventClick={(info) => {
-
-                                const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
-                                if (eventType === 'project-log') {
-                                    const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId(logId);
-                                    setShowCallendarModal(true);
-                                } else if (eventType === 'project-start') {
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId('created');
-                                    setShowCallendarModal(true);
-                                } else if (eventType === 'project-end') {
-                                    setSelectedDate(info.event.startStr.split('T')[0]);
-                                    setSelectedLogId('ended');
-                                    setShowCallendarModal(true);
-                                }
-                            }}
-                        />
-                    )}
-                </div>
+                {isLogined && loginSuccess && projectBasic.status === 'C' && (
+                    <div className="page-arrow-overlay">
+                        <button
+                            className="page-arrow-hitbox"
+                            aria-label="다음 페이지"
+                            onClick={goToNextPage}
+                        >
+                            <span className="page-arrow-icon">›</span>
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     );

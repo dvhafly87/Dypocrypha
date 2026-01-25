@@ -2434,3 +2434,43 @@
         font-size: 0.85rem;
     }
 }
+
+.page-arrow-overlay {
+    position: fixed;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* 👆 보이지 않는 큰 클릭 영역 */
+.page-arrow-hitbox {
+    pointer-events: auto;
+    width: 56px;      /* 접근성 핵심 */
+    height: 96px;
+
+    background: none;
+    border: none;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+/* 👇 실제 보이는 아이콘 */
+.page-arrow-icon {
+    font-size: 64px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.45);
+    transition: all 0.15s ease;
+}
+
+.page-arrow-hitbox:hover .page-arrow-icon,
+.page-arrow-hitbox:focus-visible .page-arrow-icon {
+    color: rgba(0, 0, 0, 0.85);
+    transform: translateX(2px);
+}
