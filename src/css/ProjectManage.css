@@ -2527,7 +2527,7 @@
 }
 
 .project-complete-report-main-information button:hover {
-  background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .project-complete-report-sub-information {
@@ -2535,6 +2535,12 @@
     flex-direction: row;
     gap: 20px;
     color: white;
+}
+
+.sub-info-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
 }
 
 .project-complete-report-sub-header {
@@ -2545,7 +2551,57 @@
     /* 위·좌우·아래 */
     padding: 1.2rem 4rem;
 
-    background-color: #e5e7eb;
+    border-top: 2px solid #e2e8f0;
 
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    /* 상단 경계선 (매우 중요) */
+    border-bottom: 2px solid #e2e8f0;
+
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+
+    /* color: #10b981; */
+    color: #64748b;
+
+    background-color: #ffffff;
+    position: relative;
+    z-index: 10;
+    /* 위로 올라와 보이게 함 */
+
+    /* 그림자를 여러 겹 쌓아 부드럽고 묵직하게 */
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.5),
+        0 4px 6px -2px rgba(0, 0, 0, 0.5);
+}
+
+/* 기본 상태 */
+.selected-sub-menu {
+    color: #64748b; /* 비활성 색상 */
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.selected-sub-menu.active,
+.selected-sub-menu:hover {
+    color: #2e7d32; /* 활성 색상 */
+}
+
+/* 하단 바 (Underline) */
+.selected-sub-menu::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #2e7d32;
+    
+    /* 기본은 숨김 */
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+
+.selected-sub-menu.active::after,
+.selected-sub-menu:hover::after {
+    transform: scaleX(1);
 }

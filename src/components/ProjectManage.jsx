@@ -51,11 +51,8 @@ export default function ProjectManage() {
     const { projectId } = useParams();
     const { addToast } = useToast();
     const { isLogined, loginSuccess } = useAuth();
-    const navigate = useNavigate();
-    // 1. useState 추가 (기존 state들 아래에)
-    const [pageIndex, setPageIndex] = useState(0);
 
-    // 2. 페이지 전환 함수 추가
+    const [pageIndex, setPageIndex] = useState(0);
     const goToNextPage = () => {
         setPageIndex(1);
     };
@@ -63,6 +60,8 @@ export default function ProjectManage() {
     const goToPrevPage = () => {
         setPageIndex(0);
     };
+
+    const navigate = useNavigate();
     const today = new Date();
     const todayStr =
         `${today.getFullYear()}-` +
@@ -2199,13 +2198,15 @@ export default function ProjectManage() {
                             </div>
                             <br />
                             <div className="project-complete-report-sub-information">
-                                <span class="flex items-center gap-2">
+                                <span class="sub-info-wrapper">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock">
                                         <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
                                     </svg>
-                                    45일 진행
+                                    <span className="sub-info-cm">
+                                        총 {getProjectDays(projectBasic)} 일
+                                    </span>
                                 </span>
-                                <span class="flex items-center gap-2">
+                                <span class="sub-info-wrapper">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text">
                                         <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
                                         <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
@@ -2213,22 +2214,26 @@ export default function ProjectManage() {
                                         <path d="M16 13H8"></path>
                                         <path d="M16 17H8"></path>
                                     </svg>
-                                    38개 로그
+                                    <span className="sub-info-cm">
+                                        {projectLog.length}개의 로그
+                                    </span>
                                 </span>
-                                <span class="flex items-center gap-2">
+                                <span class="sub-info-wrapper">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
                                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>
                                         <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                     </svg>
-                                    3명 참여
+                                    <span className="sub-info-cm">
+                                        {projectMember.length - 1}명 참여
+                                    </span>
                                 </span>
                             </div>
                             <div className="project-complete-report-sub-header">
-                                <span>개요</span>
-                                <span>타임라인</span>
-                                <span>인사이트</span>
+                                <span className="selected-sub-menu">개요</span>
+                                <span className="selected-sub-menu">타임라인</span>
+                                <span className="selected-sub-menu">인사이트</span>
                             </div>
                         </div>
                         <div className="page-arrow-overlay-left">
