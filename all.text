@@ -57,11 +57,29 @@ export default function ProjectManage() {
 
     // 2. 페이지 전환 함수 추가
     const goToNextPage = () => {
+        // 전환 시작 표시
+        const container = document.querySelector('.page-container');
+        container?.classList.add('transitioning');
+
         setPageIndex(1);
+
+        // 애니메이션 완료 후 클래스 제거
+        setTimeout(() => {
+            container?.classList.remove('transitioning');
+            window.scrollTo(0, 0); // 페이지 상단으로
+        }, 600);
     };
 
     const goToPrevPage = () => {
+        const container = document.querySelector('.page-container');
+        container?.classList.add('transitioning');
+
         setPageIndex(0);
+
+        setTimeout(() => {
+            container?.classList.remove('transitioning');
+            window.scrollTo(0, 0);
+        }, 600);
     };
     const today = new Date();
     const todayStr =
@@ -2190,47 +2208,9 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
-                {pageIndex === 1 && (
+                {pageIndex === 1 && projectBasic.status === 'C' && (
                     <div className="project-complete-report-container">
-                        <div className="project-complete-report-header">
-                            <div className="project-complete-report-main-information">
-                                <h1>{projectBasic.title} 프로젝트</h1>
-                                <button> PDF </button>
-                            </div>
-                            <br />
-                            <div className="project-complete-report-sub-information">
-                                <span class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock">
-                                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                                    </svg>
-                                    45일 진행
-                                </span>
-                                <span class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text">
-                                        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
-                                        <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
-                                        <path d="M10 9H8"></path>
-                                        <path d="M16 13H8"></path>
-                                        <path d="M16 17H8"></path>
-                                    </svg>
-                                    38개 로그
-                                </span>
-                                <span class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg>
-                                    3명 참여
-                                </span>
-                            </div>
-                            <div className="project-complete-report-sub-header">
-                                <span>개요</span>
-                                <span>타임라인</span>
-                                <span>인사이트</span>
-                            </div>
-                        </div>
+                        프로젝트 완료 레포트 페이지
                         <div className="page-arrow-overlay-left">
                             <button
                                 className="page-arrow-hitbox"

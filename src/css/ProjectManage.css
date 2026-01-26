@@ -1592,7 +1592,7 @@
 }
 
 /* 공통 버튼 */
-.log-active-button-wrapper > button {
+.log-active-button-wrapper>button {
     width: 56px;
     height: 32px;
     border-radius: 8px;
@@ -1608,37 +1608,37 @@
 }
 
 /* ✏ 수정 버튼 */
-.log-active-button-wrapper > button:first-child {
+.log-active-button-wrapper>button:first-child {
     background-color: #2FA4A9;
     color: #fff;
 }
 
-.log-active-button-wrapper > button:first-child:hover {
+.log-active-button-wrapper>button:first-child:hover {
     background-color: #278F94;
     box-shadow: 0 4px 10px rgba(47, 164, 169, 0.35);
     transform: translateY(-1px);
 }
 
 .btn-edit-com {
-    display:none;
+    display: none;
 }
 
-.log-active-button-wrapper > button:first-child:hover .edit-log-btn{
-    display:none;
+.log-active-button-wrapper>button:first-child:hover .edit-log-btn {
+    display: none;
 }
 
-.log-active-button-wrapper > button:first-child:hover .btn-edit-com{
-    display:block;
+.log-active-button-wrapper>button:first-child:hover .btn-edit-com {
+    display: block;
 }
 
 /* 🗑 삭제 버튼 (outline) */
-.log-active-button-wrapper > button:nth-child(2) {
+.log-active-button-wrapper>button:nth-child(2) {
     background-color: transparent;
     border: 1px solid #E57373;
     color: #E57373;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover {
+.log-active-button-wrapper>button:nth-child(2):hover {
     background-color: #E57373;
     color: #fff;
     box-shadow: 0 4px 10px rgba(229, 115, 115, 0.35);
@@ -1646,19 +1646,19 @@
 }
 
 .btn-delete-com {
-    display:none;
+    display: none;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover .delete-log-btn{
-  display:none;
+.log-active-button-wrapper>button:nth-child(2):hover .delete-log-btn {
+    display: none;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover .btn-delete-com{
-  display:block;
+.log-active-button-wrapper>button:nth-child(2):hover .btn-delete-com {
+    display: block;
 }
 
 /* 눌림 */
-.log-active-button-wrapper > button:active {
+.log-active-button-wrapper>button:active {
     transform: translateY(0);
     box-shadow: none;
 }
@@ -2447,7 +2447,8 @@
 /* 👆 보이지 않는 큰 클릭 영역 */
 .page-arrow-hitbox {
     pointer-events: auto;
-    width: 56px;      /* 접근성 핵심 */
+    width: 56px;
+    /* 접근성 핵심 */
     height: 96px;
 
     background: none;
@@ -2473,4 +2474,78 @@
 .page-arrow-hitbox:focus-visible .page-arrow-icon {
     color: rgba(0, 0, 0, 0.85);
     transform: translateX(2px);
+}
+
+.project-complete-report-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 2rem;
+    gap: 2.5rem;
+}
+
+.page-arrow-overlay-left {
+    position: fixed;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.project-complete-report-header {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    border-radius: 15px;
+    padding: 3rem 4rem;
+    overflow: hidden;
+    /* ⭐ 핵심 */
+}
+
+.project-complete-report-main-information {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.project-complete-report-main-information h1 {
+    color: white;
+}
+
+.project-complete-report-main-information button {
+    border: #e5e7eb 0.5px solid;
+    border-radius: 15px;
+    font-size: 10px;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+}
+
+.project-complete-report-main-information button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.project-complete-report-sub-information {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    color: white;
+}
+
+.project-complete-report-sub-header {
+    display: flex;
+    gap: 2rem;
+
+    margin: 2rem -4rem -3rem;
+    /* 위·좌우·아래 */
+    padding: 1.2rem 4rem;
+
+    background-color: #e5e7eb;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
 }
