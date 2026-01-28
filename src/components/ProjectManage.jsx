@@ -53,6 +53,20 @@ export default function ProjectManage() {
     const { isLogined, loginSuccess } = useAuth();
 
     const [pageIndex, setPageIndex] = useState(0);
+    const [dashboardIndex, setDashBoardIndex] = useState('overview');
+
+    const handleChangeDashBoardPage = (e) => {
+        const clickpage = e.currentTarget.dataset.page;
+        setDashBoardIndex(clickpage);
+        if (clickpage === 'overview') {
+
+        } else if (clickpage === 'timeline') {
+
+        } else if (clickpage === 'insight') {
+
+        }
+    }
+
     const goToNextPage = () => {
         setPageIndex(1);
     };
@@ -1265,7 +1279,7 @@ export default function ProjectManage() {
                         <div className="project-manage-content-area">
                             <div className="project-manage-summary-area">
                                 <section className="summary-section">
-                                    <h3>프로젝트 개요</h3>
+                                    <h3>프로젝트 설명</h3>
                                     {showEditSummary ? (
                                         <p className="summary-text">
                                             <textarea
@@ -2231,21 +2245,27 @@ export default function ProjectManage() {
                                 </span>
                             </div>
                             <div className="project-complete-report-sub-header">
-                                <span className="selected-sub-menu">개요</span>
-                                <span className="selected-sub-menu">타임라인</span>
-                                <span className="selected-sub-menu">인사이트</span>
+                                <span className={dashboardIndex === 'overview' ? "selected-sub-menu active" : "selected-sub-menu"}
+                                    data-page="overview"
+                                    onClick={handleChangeDashBoardPage}>개요</span>
+                                <span className={dashboardIndex === 'timeline' ? "selected-sub-menu active" : "selected-sub-menu"}
+                                    data-page="timeline"
+                                    onClick={handleChangeDashBoardPage}>타임라인</span>
+                                <span className={dashboardIndex === 'insight' ? "selected-sub-menu active" : "selected-sub-menu"}
+                                    data-page="insight"
+                                    onClick={handleChangeDashBoardPage}>인사이트</span>
                             </div>
                         </div>
-                        <div className="page-arrow-overlay-left">
-                            <button
-                                className="page-arrow-hitbox"
-                                onClick={goToPrevPage}
-                            >
-                                <span className="page-arrow-icon">
-                                    ‹
-                                </span>
-                            </button>
-                        </div>
+                        {dashboardIndex === 'overview' && projectBasic.status === 'C' && (
+                            <div className="overview-section-container">
+                                <div className="overview-card-wrapper">
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>3</span>
+                                    <span>4</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
                 {isLogined && loginSuccess && projectBasic.status === 'C' && pageIndex !== 1 && (
