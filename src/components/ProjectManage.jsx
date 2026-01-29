@@ -54,7 +54,274 @@ export default function ProjectManage() {
 
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
+    // 히트맵 데이터 생성 (주 단위 구조)
+    const getActivityHeatmapData = () => {
+        if (!projectBasic.created || !projectBasic.endDay) {
+            return { weeks: [], months: [] };
+        }
 
+        const startDate = new Date(projectBasic.created);
+        const endDate = new Date(projectBasic.endDay);
+
+        // 날짜별 로그 개수 미리 계산
+        const logCountByDate = {};
+        projectLog.forEach(log => {
+            const date = log.logDailyDate.split('T')[0];
+            logCountByDate[date] = (logCountByDate[date] || 0) + 1;
+        });
+
+        // 시작일을 일요일로 맞추기
+        const adjustedStart = new Date(startDate);
+        adjustedStart.setDate(adjustedStart.getDate() - adjustedStart.getDay());
+
+        // 주 단위로 데이터 구성
+        const weeks = [];
+        let currentWeek = [];
+        let currentDate = new Date(adjustedStart);
+        const months = [];
+        let lastMonth = -1;
+
+        while (currentDate <= endDate || currentWeek.length > 0) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const isInRange = currentDate >= startDate && currentDate <= endDate;
+
+            // 월 정보 수집 (각 주의 시작(일요일)에만)
+            const monthIndex = currentDate.getMonth();
+            if (monthIndex !== lastMonth && currentDate.getDay() === 0 && weeks.length > 0) {
+                months.push({
+                    name: currentDate.toLocaleDateString('ko-KR', { month: 'short' }),
+                    weekIndex: weeks.length
+                });
+                lastMonth = monthIndex;
+            }
+
+            currentWeek.push({
+                date: dateStr,
+                count: isInRange ? (logCountByDate[dateStr] || 0) : null,
+                dayOfWeek: currentDate.getDay(),
+                isInRange
+            });
+
+            // 토요일이면 주 완성
+            if (currentDate.getDay() === 6) {
+                weeks.push([...currentWeek]);
+                currentWeek = [];
+            }
+
+            currentDate.setDate(currentDate.getDate() + 1);
+
+            // 종료 조건
+            if (currentDate > endDate && currentWeek.length === 0) break;
+        }
+
+        // 마지막 주가 미완성이면 나머지를 null로 채우기
+        if (currentWeek.length > 0) {
+            while (currentWeek.length < 7) {
+                currentWeek.push({
+                    date: null,
+                    count: null,
+                    dayOfWeek: currentWeek.length,
+                    isInRange: false
+                });
+            }
+            weeks.push(currentWeek);
+        }
+
+        return { weeks, months };
+    };
+
+    // 활동 레벨에 따른 색상 (녹색 테마 유지)
+    const getActivityColor = (count) => {
+        if (count === null) return 'transparent';
+        if (count === 0) return '#ebedf0';
+        if (count === 1) return '#9be9a8';
+        if (count >= 2 && count < 5) return '#40c463';
+        if (count >= 5 && count < 10) return '#30a14e';
+        return '#216e39';
+    };
+    
+    // 실제 작업 일수를 계산하는 함수
+    const getActualWorkingDays = () => {
+        if (!projectLog || projectLog.length === 0) return 0;
+
+        const uniqueDates = new Set(
+            projectLog.map(log => log.logDailyDate.split('T')[0])
+        );
+
+        return uniqueDates.size;
+    };
+
+    const getWeeklyLogData = () => {
+        if (!projectBasic.created || !projectBasic.endDay || !projectLog || projectLog.length === 0) {
+            return [];
+        }
+
+        const startDate = new Date(projectBasic.created);
+        const endDate = new Date(projectBasic.endDay);
+
+        console.log('=== 주차별 로그 분석 ===');
+        console.log('프로젝트 시작:', startDate);
+        console.log('프로젝트 종료:', endDate);
+        console.log('전체 로그 수:', projectLog.length);
+
+        const weeks = [];
+        let currentWeekStart = new Date(startDate);
+        let weekNumber = 1;
+
+        while (currentWeekStart <= endDate) {
+            const currentWeekEnd = new Date(currentWeekStart);
+            currentWeekEnd.setDate(currentWeekEnd.getDate() + 6);
+
+            const weekEnd = currentWeekEnd > endDate ? endDate : currentWeekEnd;
+
+            weeks.push({
+                weekNumber,
+                startDate: new Date(currentWeekStart),
+                endDate: new Date(weekEnd),
+                count: 0
+            });
+
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            weekNumber++;
+        }
+
+        // 각 주차에 로그 수 카운트
+        projectLog.forEach(log => {
+            const logDate = new Date(log.logDailyDate);
+            console.log('로그 날짜:', logDate, '|', log.logDailyDate);
+
+            weeks.forEach(week => {
+                // 날짜 비교를 위해 시간 제거
+                const logDateOnly = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
+                const weekStartOnly = new Date(week.startDate.getFullYear(), week.startDate.getMonth(), week.startDate.getDate());
+                const weekEndOnly = new Date(week.endDate.getFullYear(), week.endDate.getMonth(), week.endDate.getDate());
+
+                if (logDateOnly >= weekStartOnly && logDateOnly <= weekEndOnly) {
+                    week.count++;
+                    console.log(`  -> ${week.weekNumber}주차에 카운트`);
+                }
+            });
+        });
+
+        console.log('주차별 결과:', weeks);
+        return weeks;
+    };
+
+    // 멤버별 로그 분포 계산 함수
+    const getMemberLogDistribution = () => {
+        if (!projectLog || projectLog.length === 0) {
+            return [];
+        }
+
+        const memberCount = {};
+
+        projectLog.forEach(log => {
+            const creator = log.logCreator;
+            memberCount[creator] = (memberCount[creator] || 0) + 1;
+        });
+
+        const totalLogs = projectLog.length;
+
+        return Object.entries(memberCount).map(([name, count]) => ({
+            name,
+            count,
+            percentage: ((count / totalLogs) * 100).toFixed(1)
+        })).sort((a, b) => b.count - a.count);
+    };
+
+    // 색상 팔레트 (멤버별로 다른 색상)
+    const getChartColor = (index) => {
+        const colors = [
+            '#10b981', // green
+            '#3b82f6', // blue
+            '#f59e0b', // amber
+            '#ec4899', // pink
+            '#8b5cf6', // purple
+            '#ef4444', // red
+            '#06b6d4', // cyan
+            '#84cc16'  // lime
+        ];
+        return colors[index % colors.length];
+    };
+
+    // 최다 로그 일수 (가장 많은 로그를 작성한 날)
+    const getMostLoggedDay = () => {
+        if (!projectLog || projectLog.length === 0) return { date: '-', count: 0 };
+
+        const dateCount = {};
+
+        projectLog.forEach(log => {
+            const date = log.logDailyDate.split('T')[0];
+            dateCount[date] = (dateCount[date] || 0) + 1;
+        });
+
+        let maxDate = '';
+        let maxCount = 0;
+
+        Object.entries(dateCount).forEach(([date, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                maxDate = date;
+            }
+        });
+
+        return { date: maxDate, count: maxCount };
+    };
+
+    // 최다 로그 기록자
+    const getMostActiveUser = () => {
+        if (!projectLog || projectLog.length === 0) return { name: '-', count: 0 };
+
+        const userCount = {};
+
+        projectLog.forEach(log => {
+            const creator = log.logCreator;
+            userCount[creator] = (userCount[creator] || 0) + 1;
+        });
+
+        let maxUser = '';
+        let maxCount = 0;
+
+        Object.entries(userCount).forEach(([user, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                maxUser = user;
+            }
+        });
+
+        return { name: maxUser, count: maxCount };
+    };
+
+    // 최다 연속 작업 일수
+    const getMaxConsecutiveDays = () => {
+        if (!projectLog || projectLog.length === 0) return 0;
+
+        // 로그가 있는 날짜들을 정렬
+        const uniqueDates = [...new Set(
+            projectLog.map(log => log.logDailyDate.split('T')[0])
+        )].sort();
+
+        let maxStreak = 1;
+        let currentStreak = 1;
+
+        for (let i = 1; i < uniqueDates.length; i++) {
+            const prevDate = new Date(uniqueDates[i - 1]);
+            const currDate = new Date(uniqueDates[i]);
+
+            // 날짜 차이가 1일인지 확인
+            const diffTime = currDate - prevDate;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+            if (diffDays === 1) {
+                currentStreak++;
+                maxStreak = Math.max(maxStreak, currentStreak);
+            } else {
+                currentStreak = 1;
+            }
+        }
+
+        return maxStreak;
+    };
     const handleChangeDashBoardPage = (e) => {
         const clickpage = e.currentTarget.dataset.page;
         setDashBoardIndex(clickpage);
@@ -2255,20 +2522,331 @@ export default function ProjectManage() {
                                     data-page="insight"
                                     onClick={handleChangeDashBoardPage}>인사이트</span>
                             </div>
+                            <div className="page-arrow-overlay-left">
+                                <button
+                                    className="page-arrow-hitbox"
+                                    onClick={goToPrevPage}
+                                >
+                                    <span className="page-arrow-icon">
+                                        ‹
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                         {dashboardIndex === 'overview' && projectBasic.status === 'C' && (
                             <div className="overview-section-container">
                                 <div className="overview-card-wrapper">
-                                    <span>1</span>
-                                    <span>2</span>
-                                    <span>3</span>
-                                    <span>4</span>
+                                    <div className="overview-card">
+                                        <h3>실제 작업 일수</h3>
+                                        <p className="card-value">{getActualWorkingDays()}일</p>
+                                        <p className="card-description">
+                                            전체 {getProjectDays(projectBasic)}일 중 기록
+                                        </p>
+                                    </div>
+
+                                    <div className="overview-card">
+                                        <h3>최다 로그 일수</h3>
+                                        <p className="card-value">{getMostLoggedDay().count}개</p>
+                                        <p className="card-description">
+                                            {getMostLoggedDay().date}
+                                        </p>
+                                    </div>
+
+                                    <div className="overview-card">
+                                        <h3>최다 로그 기록자</h3>
+                                        <p className="card-value">{getMostActiveUser().name}</p>
+                                        <p className="card-description">
+                                            총 {getMostActiveUser().count}개 작성
+                                        </p>
+                                    </div>
+
+                                    <div className="overview-card">
+                                        <h3>최다 연속 작업 일수</h3>
+                                        <p className="card-value">{getMaxConsecutiveDays()}일</p>
+                                        <p className="card-description">
+                                            연속 기록 달성
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* 중단: 차트 영역 */}
+                                <div className="overview-charts-section">
+                                    {/* 멤버별 로그 분포 원형 차트 */}
+                                    <div className="chart-container pie-chart-container">
+                                        <div className="chart-header">
+                                            <h3>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="9" cy="7" r="4"></circle>
+                                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                                </svg>
+                                                멤버별 로그 분포
+                                            </h3>
+                                        </div>
+
+                                        <div className="pie-chart-wrapper">
+                                            {/* 원형 차트 - conic-gradient 방식 */}
+                                            <div className="pie-chart-circle">
+                                                {(() => {
+                                                    const distribution = getMemberLogDistribution();
+                                                    let accumulatedPercent = 0;
+
+                                                    const gradientStops = distribution.map((member, index) => {
+                                                        const color = getChartColor(index);
+                                                        const startPercent = accumulatedPercent;
+                                                        const endPercent = accumulatedPercent + parseFloat(member.percentage);
+                                                        accumulatedPercent = endPercent;
+
+                                                        return `${color} ${startPercent}% ${endPercent}%`;
+                                                    }).join(', ');
+
+                                                    return (
+                                                        <div
+                                                            className="pie-chart-visual"
+                                                            style={{
+                                                                background: `conic-gradient(${gradientStops})`
+                                                            }}
+                                                        >
+                                                            <div className="pie-chart-center"></div>
+                                                        </div>
+                                                    );
+                                                })()}
+                                            </div>
+
+                                            {/* 범례 */}
+                                            <div className="pie-chart-legend">
+                                                {getMemberLogDistribution().map((member, index) => (
+                                                    <div key={member.name} className="legend-item">
+                                                        <span
+                                                            className="legend-color"
+                                                            style={{ backgroundColor: getChartColor(index) }}
+                                                        ></span>
+                                                        <span className="legend-name">{member.name}</span>
+                                                        <span className="legend-value">
+                                                            {member.count}개 ({member.percentage}%)
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* 주차별 로그 막대 그래프 */}
+                                    <div className="chart-container bar-chart-container">
+                                        <div className="chart-header">
+                                            <h3>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                                                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                                                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                                                </svg>
+                                                주차별 로그 기록
+                                            </h3>
+                                        </div>
+
+                                        <div className="bar-chart-wrapper">
+                                            {getWeeklyLogData().map((week, index) => {
+                                                const maxCount = Math.max(...getWeeklyLogData().map(w => w.count));
+                                                const heightPercent = maxCount > 0 ? (week.count / maxCount) * 100 : 0;
+
+                                                return (
+                                                    <div key={week.weekNumber} className="bar-item">
+                                                        <div
+                                                            className="bar"
+                                                            style={{ height: `${heightPercent}%` }}
+                                                            data-count={week.count}
+                                                        >
+                                                            <span className="bar-tooltip">{week.count}개</span>
+                                                        </div>
+                                                        <span className="bar-label">
+                                                            {week.weekNumber}주차
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* 하단: GitHub 스타일 활동 히트맵 */}
+                                <div className="activity-heatmap-section">
+                                    <div className="chart-header">
+                                        <h3>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                            </svg>
+                                            프로젝트 활동 기록
+                                        </h3>
+                                        <div className="heatmap-legend">
+                                            <span className="legend-label">적음</span>
+                                            <div className="legend-colors">
+                                                <span className="legend-box" style={{ backgroundColor: '#ebedf0' }} title="활동 없음"></span>
+                                                <span className="legend-box" style={{ backgroundColor: '#9be9a8' }} title="1개"></span>
+                                                <span className="legend-box" style={{ backgroundColor: '#40c463' }} title="2-4개"></span>
+                                                <span className="legend-box" style={{ backgroundColor: '#30a14e' }} title="5-9개"></span>
+                                                <span className="legend-box" style={{ backgroundColor: '#216e39' }} title="10개 이상"></span>
+                                            </div>
+                                            <span className="legend-label">많음</span>
+                                        </div>
+                                    </div>
+
+                                    {(() => {
+                                        const { weeks, months } = getActivityHeatmapData();
+
+                                        if (weeks.length === 0) {
+                                            return (
+                                                <div className="heatmap-empty">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                                    </svg>
+                                                    <p>프로젝트 기간 정보가 없습니다</p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <>
+                                                <div className="heatmap-scroll-container">
+                                                    <div className="heatmap-content">
+                                                        {/* 월 표시 */}
+                                                        <div className="heatmap-months">
+                                                            {months.map((month, index) => (
+                                                                <span
+                                                                    key={`${month.name}-${index}`}
+                                                                    style={{
+                                                                        gridColumn: month.weekIndex + 1
+                                                                    }}
+                                                                >
+                                                                    {month.name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+
+                                                        <div className="heatmap-main">
+                                                            {/* 요일 레이블 */}
+                                                            <div className="heatmap-weekdays">
+                                                                <span>일</span>
+                                                                <span>월</span>
+                                                                <span>화</span>
+                                                                <span>수</span>
+                                                                <span>목</span>
+                                                                <span>금</span>
+                                                                <span>토</span>
+                                                            </div>
+
+                                                            {/* 히트맵 그리드 */}
+                                                            <div className="heatmap-grid">
+                                                                {weeks.map((week, weekIndex) => (
+                                                                    <div key={`week-${weekIndex}`} className="heatmap-week">
+                                                                        {week.map((day, dayIndex) => {
+                                                                            if (!day.isInRange || day.count === null) {
+                                                                                return (
+                                                                                    <div
+                                                                                        key={`${weekIndex}-${dayIndex}`}
+                                                                                        className="heatmap-day empty"
+                                                                                    ></div>
+                                                                                );
+                                                                            }
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={day.date}
+                                                                                    className="heatmap-day"
+                                                                                    style={{ backgroundColor: getActivityColor(day.count) }}
+                                                                                    data-date={day.date}
+                                                                                    data-count={day.count}
+                                                                                    role="gridcell"
+                                                                                    aria-label={`${day.date}: ${day.count}개 로그`}
+                                                                                    tabIndex={0}
+                                                                                >
+                                                                                    <span className="heatmap-tooltip">
+                                                                                        <strong>{new Date(day.date).toLocaleDateString('ko-KR', {
+                                                                                            year: 'numeric',
+                                                                                            month: 'long',
+                                                                                            day: 'numeric',
+                                                                                            weekday: 'short'
+                                                                                        })}</strong>
+                                                                                        <br />
+                                                                                        <span className="tooltip-count">{day.count}개 로그</span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 스크롤 힌트 */}
+                                                    {weeks.length > 20 && (
+                                                        <div className="heatmap-scroll-hint">
+                                                            ← 좌우로 스크롤하여 전체 기록을 확인하세요 →
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* 통계 요약 */}
+                                                <div className="heatmap-stats">
+                                                    <div className="heatmap-stat-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                        </svg>
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">총 작업일</span>
+                                                            <span className="stat-value">{getActualWorkingDays()}일</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="heatmap-stat-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                                                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                                                        </svg>
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">총 로그</span>
+                                                            <span className="stat-value">{projectLog.length}개</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="heatmap-stat-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                                                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                                        </svg>
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">일평균</span>
+                                                            <span className="stat-value">
+                                                                {(projectLog.length / Math.max(getProjectDays(projectBasic), 1)).toFixed(1)}개
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="heatmap-stat-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                                        </svg>
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">최다 기록일</span>
+                                                            <span className="stat-value">{getMostLoggedDay().count}개</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         )}
                     </div>
                 )}
-                {isLogined && loginSuccess && projectBasic.status === 'C' && pageIndex !== 1 && (
+                {projectBasic.status === 'C' && pageIndex !== 1 && (
                     <div className="page-arrow-overlay">
                         <button
                             className="page-arrow-hitbox"
