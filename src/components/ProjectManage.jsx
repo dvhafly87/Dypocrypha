@@ -61,7 +61,7 @@ export default function ProjectManage() {
         }
 
         const startDate = new Date(projectBasic.created);
-        const endDate = new Date(projectBasic.endDay);
+        const endDate = new Date();
 
         // 날짜별 로그 개수 미리 계산
         const logCountByDate = {};
@@ -139,7 +139,7 @@ export default function ProjectManage() {
         if (count >= 5 && count < 10) return '#30a14e';
         return '#216e39';
     };
-    
+
     // 실제 작업 일수를 계산하는 함수
     const getActualWorkingDays = () => {
         if (!projectLog || projectLog.length === 0) return 0;
@@ -1358,7 +1358,7 @@ export default function ProjectManage() {
         }
         setShowStatusMenu(false);
     };
-
+    
     const handleDeleteProject = async () => {
 
         if (!loginSuccess || !isLogined) {
@@ -2709,23 +2709,9 @@ export default function ProjectManage() {
                                         }
 
                                         return (
-                                            <>
+                                            <div className="heatmap-wrapper">
                                                 <div className="heatmap-scroll-container">
                                                     <div className="heatmap-content">
-                                                        {/* 월 표시 */}
-                                                        <div className="heatmap-months">
-                                                            {months.map((month, index) => (
-                                                                <span
-                                                                    key={`${month.name}-${index}`}
-                                                                    style={{
-                                                                        gridColumn: month.weekIndex + 1
-                                                                    }}
-                                                                >
-                                                                    {month.name}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-
                                                         <div className="heatmap-main">
                                                             {/* 요일 레이블 */}
                                                             <div className="heatmap-weekdays">
@@ -2764,14 +2750,12 @@ export default function ProjectManage() {
                                                                                     tabIndex={0}
                                                                                 >
                                                                                     <span className="heatmap-tooltip">
-                                                                                        <strong>{new Date(day.date).toLocaleDateString('ko-KR', {
+                                                                                        {new Date(day.date).toLocaleDateString('ko-KR', {
                                                                                             year: 'numeric',
-                                                                                            month: 'long',
-                                                                                            day: 'numeric',
+                                                                                            month: '2-digit',
+                                                                                            day: '2-digit',
                                                                                             weekday: 'short'
-                                                                                        })}</strong>
-                                                                                        <br />
-                                                                                        <span className="tooltip-count">{day.count}개 로그</span>
+                                                                                        })} · 로그 {day.count}개
                                                                                     </span>
                                                                                 </div>
                                                                             );
@@ -2838,7 +2822,7 @@ export default function ProjectManage() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </>
+                                            </div>
                                         );
                                     })()}
                                 </div>
