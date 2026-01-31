@@ -159,11 +159,6 @@ export default function ProjectManage() {
         const startDate = new Date(projectBasic.created);
         const endDate = new Date(projectBasic.endDay);
 
-        console.log('=== 주차별 로그 분석 ===');
-        console.log('프로젝트 시작:', startDate);
-        console.log('프로젝트 종료:', endDate);
-        console.log('전체 로그 수:', projectLog.length);
-
         const weeks = [];
         let currentWeekStart = new Date(startDate);
         let weekNumber = 1;
@@ -188,7 +183,6 @@ export default function ProjectManage() {
         // 각 주차에 로그 수 카운트
         projectLog.forEach(log => {
             const logDate = new Date(log.logDailyDate);
-            console.log('로그 날짜:', logDate, '|', log.logDailyDate);
 
             weeks.forEach(week => {
                 // 날짜 비교를 위해 시간 제거
@@ -198,12 +192,10 @@ export default function ProjectManage() {
 
                 if (logDateOnly >= weekStartOnly && logDateOnly <= weekEndOnly) {
                     week.count++;
-                    console.log(`  -> ${week.weekNumber}주차에 카운트`);
                 }
             });
         });
 
-        console.log('주차별 결과:', weeks);
         return weeks;
     };
 
@@ -1358,7 +1350,7 @@ export default function ProjectManage() {
         }
         setShowStatusMenu(false);
     };
-    
+
     const handleDeleteProject = async () => {
 
         if (!loginSuccess || !isLogined) {
