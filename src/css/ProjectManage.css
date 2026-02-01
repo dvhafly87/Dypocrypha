@@ -151,6 +151,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -707,8 +708,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Add Member Modal */
@@ -727,6 +733,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1026,11 +1033,11 @@
     letter-spacing: -0.3px;
 }
 
-.callendar-input-log-modal > div:nth-child(2) {
+.callendar-input-log-modal>div:nth-child(2) {
     margin-bottom: 1.5rem;
 }
 
-.callendar-input-log-modal > div:nth-child(2) input {
+.callendar-input-log-modal>div:nth-child(2) input {
     width: 100%;
     padding: 0.9rem 1.1rem;
     border: 2px solid #e5e7eb;
@@ -1042,17 +1049,17 @@
     margin-bottom: 0.5rem;
 }
 
-.callendar-input-log-modal > div:nth-child(2) input:focus {
+.callendar-input-log-modal>div:nth-child(2) input:focus {
     outline: none;
     border-color: #10b981;
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
-.callendar-input-log-modal > div:nth-child(2) input::placeholder {
+.callendar-input-log-modal>div:nth-child(2) input::placeholder {
     color: #9ca3af;
 }
 
-.callendar-input-log-modal > div:nth-child(2) > div {
+.callendar-input-log-modal>div:nth-child(2)>div {
     text-align: right;
     font-size: 0.75rem;
     color: #6b7280;
@@ -1415,7 +1422,7 @@
     gap: 6px;
 }
 
-.log-active-button-wrapper > button {
+.log-active-button-wrapper>button {
     width: 56px;
     height: 32px;
     border-radius: 8px;
@@ -1426,12 +1433,12 @@
     transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
 }
 
-.log-active-button-wrapper > button:first-child {
+.log-active-button-wrapper>button:first-child {
     background-color: #2FA4A9;
     color: #fff;
 }
 
-.log-active-button-wrapper > button:first-child:hover {
+.log-active-button-wrapper>button:first-child:hover {
     background-color: #278F94;
     box-shadow: 0 4px 10px rgba(47, 164, 169, 0.35);
     transform: translateY(-1px);
@@ -1441,21 +1448,21 @@
     display: none;
 }
 
-.log-active-button-wrapper > button:first-child:hover .edit-log-btn {
+.log-active-button-wrapper>button:first-child:hover .edit-log-btn {
     display: none;
 }
 
-.log-active-button-wrapper > button:first-child:hover .btn-edit-com {
+.log-active-button-wrapper>button:first-child:hover .btn-edit-com {
     display: block;
 }
 
-.log-active-button-wrapper > button:nth-child(2) {
+.log-active-button-wrapper>button:nth-child(2) {
     background-color: transparent;
     border: 1px solid #E57373;
     color: #E57373;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover {
+.log-active-button-wrapper>button:nth-child(2):hover {
     background-color: #E57373;
     color: #fff;
     box-shadow: 0 4px 10px rgba(229, 115, 115, 0.35);
@@ -1466,15 +1473,15 @@
     display: none;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover .delete-log-btn {
+.log-active-button-wrapper>button:nth-child(2):hover .delete-log-btn {
     display: none;
 }
 
-.log-active-button-wrapper > button:nth-child(2):hover .btn-delete-com {
+.log-active-button-wrapper>button:nth-child(2):hover .btn-delete-com {
     display: block;
 }
 
-.log-active-button-wrapper > button:active {
+.log-active-button-wrapper>button:active {
     transform: translateY(0);
     box-shadow: none;
 }
@@ -1685,8 +1692,10 @@
     flex-direction: column;
     background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
     border-radius: 15px;
-    padding: 3rem 4rem;
+    padding: 3rem 4rem 0;
+    /* ← padding-bottom을 0으로 */
     overflow: hidden;
+    /* ← 그대로 유지 */
 }
 
 .project-complete-report-main-information {
@@ -1729,21 +1738,29 @@
 .project-complete-report-sub-header {
     display: flex;
     gap: 2rem;
-    margin: 2rem -4rem -3rem;
-    padding: 1.2rem 4rem;
-    border-top: 2px solid #e2e8f0;
-    border-bottom: 2px solid #e2e8f0;
+    margin: 2rem 0 0 0;
+    /* ← 음수 마진 제거, margin-top만 유지 */
+    padding: 1.2rem 0;
+    /* ← 좌우 패딩 제거 (부모 padding으로 충분) */
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    /* ← 흰색 반투명으로 변경 (그린 배경 위) */
+    border-bottom: none;
+    /* ← 아래 border 제거 */
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
-    color: #64748b;
-    background-color: #eeeeee;
+    color: rgba(255, 255, 255, 0.7);
+    /* ← 흰색 반투명 텍스트 */
+    background-color: transparent;
+    /* ← 배경 제거 (부모 그린 그대로 사용) */
     position: relative;
     z-index: 10;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
+    /* ← 그림자 제거 */
 }
 
 .selected-sub-menu {
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.6);
+    /* ← 기본 상태 흰색 반투명 */
     position: relative;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1751,7 +1768,8 @@
 
 .selected-sub-menu.active,
 .selected-sub-menu:hover {
-    color: #2e7d32;
+    color: #ffffff;
+    /* ← 활성/호버 시 순백색 */
 }
 
 .selected-sub-menu::after {
@@ -1761,7 +1779,8 @@
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #2e7d32;
+    background-color: #ffffff;
+    /* ← 밑줄도 흰색 */
     transform: scaleX(0);
     transition: transform 0.2s ease;
 }
@@ -1772,6 +1791,9 @@
 }
 
 /* Overview Section */
+.report-section-container,
+.insight-section-container,
+.timeline-section-container,
 .overview-section-container {
     width: 100%;
     max-width: 1400px;
@@ -1785,6 +1807,321 @@
     background: #f8f9fa;
     border: #eeeeee solid 2px;
 }
+
+/* TimeLine-Area */
+.timeline-section-header h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222;
+}
+
+.timeline-section-divider {
+    width: 100%;
+    height: 1px;
+    background: #e5e7eb;
+    /* #eeeeee보다 살짝 진함 */
+}
+
+.timeline-section-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-left: 2.5rem;
+}
+
+.timeline-section-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 2px;
+    height: 100%;
+    background: #d1d5db;
+}
+
+
+/* 헤더 우측 요약 배지 */
+.timeline-summary-badge {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+    background: #f3f4f6;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+.timeline-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 각 날짜 그룹 (수직선 + 카드) */
+.timeline-event {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    align-items: flex-start;
+}
+
+/* 원형 노드 (수직선 위) */
+.timeline-dot {
+    flex-shrink: 0;
+    width: 22px;
+    display: flex;
+    justify-content: center;
+    padding-top: 18px;
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-dot-inner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #d1d5db;
+    transition: all 0.25s ease;
+}
+
+.timeline-dot.milestone .timeline-dot-inner {
+    width: 18px;
+    height: 18px;
+    background: #10b981;
+    box-shadow: 0 0 0 3px #10b981, 0 0 12px rgba(16, 185, 129, 0.35);
+}
+
+.timeline-event:hover .timeline-dot-inner {
+    background: #10b981;
+    box-shadow: 0 0 0 3px #10b981;
+}
+
+/* 날짜 카드 (우측 본문) */
+.timeline-card {
+    flex: 1;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease;
+    margin-bottom: 4px;
+}
+
+.timeline-card:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* 날짜 헤더 row (클릭 가능) */
+.timeline-date-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #fafafa;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    gap: 12px;
+}
+
+.timeline-date-header:hover {
+    background: #f3f4f6;
+}
+
+.timeline-date-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.timeline-date-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    white-space: nowrap;
+}
+
+.timeline-log-count-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f59e0b;
+    background: #fef3c7;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.timeline-toggle-arrow {
+    font-size: 10px;
+    color: #9ca3af;
+    transition: transform 0.25s ease, color 0.15s;
+    flex-shrink: 0;
+}
+
+.timeline-toggle-arrow.expanded {
+    transform: rotate(180deg);
+}
+
+.timeline-date-header:hover .timeline-toggle-arrow {
+    color: #10b981;
+}
+
+/* 이벤트 목록 (접기·펼기 동작) */
+.timeline-events-list {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+
+.timeline-events-list.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.timeline-events-list.expanded {
+    max-height: 9999px;
+    opacity: 1;
+}
+
+/* ── milestone 카드 ── */
+.timeline-milestone {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.timeline-milestone:first-child {
+    border-top: none;
+}
+
+.timeline-milestone-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.timeline-milestone.milestone-start .timeline-milestone-icon {
+    background: #d1fae5;
+}
+
+.timeline-milestone.milestone-end .timeline-milestone-icon {
+    background: #d1fae5;
+}
+
+.timeline-milestone.milestone-halted .timeline-milestone-icon {
+    background: #fee2e2;
+}
+
+.timeline-milestone-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.timeline-milestone-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #10b981;
+}
+
+.timeline-milestone.milestone-halted .timeline-milestone-title {
+    color: #ef4444;
+}
+
+.timeline-milestone-time {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ── 일반 로그 카드 ── */
+.timeline-log-card {
+    padding: 13px 18px;
+    border-top: 1px solid #f3f4f6;
+    transition: background 0.15s;
+}
+
+.timeline-log-card:hover {
+    background: #f9fafb;
+}
+
+.timeline-log-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.timeline-log-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.timeline-log-card-time {
+    font-size: 12px;
+    color: #9ca3af;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.timeline-log-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeline-log-card-creator {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.timeline-log-card-role {
+    font-size: 11px;
+    font-weight: 600;
+    color: #059669;
+    background: #d1fae5;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* 빈 상태 */
+.timeline-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.timeline-empty svg {
+    margin-bottom: 16px;
+    opacity: 0.45;
+}
+
+.timeline-empty p {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0;
+}
+
 
 .overview-card-wrapper {
     display: flex;
@@ -2174,6 +2511,37 @@
     pointer-events: none;
 }
 
+.heatmap-day--clickable {
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+/* hover 강화 : 기존 hover와 겹치지 않도록 더 구체적인 셀렉토로 덮씀 */
+.heatmap-day--clickable:hover,
+.heatmap-day--clickable:focus {
+    transform: scale(1.5);
+    border: 2px solid #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+/* active (눌린 순간) */
+.heatmap-day--clickable:active {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* 히트맵 tooltip에 클릭 힌트 추가 — 기존 tooltip 하단에 작은 텍스트 표시 */
+.heatmap-day--clickable .heatmap-tooltip::before {
+    content: '클릭하여 로그 확인';
+    display: block;
+    font-size: 9px;
+    color: #6b7280;
+    margin-bottom: 3px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
 .heatmap-tooltip {
     position: absolute;
     bottom: calc(100% + 6px);
@@ -2220,8 +2588,15 @@
 }
 
 @keyframes heatmap-pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 .heatmap-empty {
@@ -2304,6 +2679,7 @@
    900px 이하 (태블릿)
    ============================================ */
 @media (max-width: 900px) {
+
     /* Base */
     .project-manage-container,
     .project-complete-report-container,
@@ -2420,13 +2796,30 @@
     .activity-heatmap-section .chart-header h3 {
         font-size: 16px;
     }
-}
 
+    .timeline-event {
+        gap: 14px;
+    }
+
+    .timeline-dot {
+        padding-top: 16px;
+    }
+
+    .timeline-date-label {
+        font-size: 14px;
+    }
+
+    .timeline-summary-badge {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+}
 
 /* ============================================
    600px 이하 (모바일)
    ============================================ */
 @media (max-width: 600px) {
+
     /* Base */
     .project-manage-container,
     .project-complete-report-container,
@@ -2466,6 +2859,18 @@
         font-size: 0.9rem;
     }
 
+    .button-wrapper {
+        flex-direction: row;
+        gap: 0.6rem;
+        width: 100%;
+    }
+
+    .project-delete-btn,
+    .project-thumb-edit-btn {
+        width: 200px;
+        text-align: center;
+    }
+
     /* Content Area */
     .project-manage-summary-area,
     .project-manage-teamValue-area {
@@ -2473,12 +2878,39 @@
         border-radius: 16px;
     }
 
+    .member-card {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 0.6rem;
+    }
+
+    .member-name {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .member-detail-wrapper {
+        grid-column: 1;
+        grid-row: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
     .member-actions {
-        flex-direction: column;
+        grid-column: 1;
+        grid-row: 3;
+        flex-direction: row;
+        gap: 0.5rem;
     }
 
     .member-action-btn {
-        width: 100%;
+        flex: 1;
+        text-align: center;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Modals */
@@ -2518,14 +2950,17 @@
 
     .project-modal-log-header {
         padding: 16px 20px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
     }
 
     .project-modal-log-header h3 {
         font-size: 16px;
-        margin-bottom: 12px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .project-modal-log-header button {
@@ -2540,18 +2975,19 @@
     .project-log-viewer-container {
         flex-direction: column;
         height: auto;
-        max-height: 550px;
+        max-height: calc(95vh - 140px);
     }
 
     .project-log-list-section {
         width: 100%;
         border-right: none;
         border-bottom: 2px solid #e5e7eb;
-        max-height: 220px;
+        max-height: 200px;
+        flex-shrink: 0;
     }
 
     .project-log-list-header {
-        padding: 14px 16px;
+        padding: 12px 16px;
     }
 
     .project-log-list-header h4 {
@@ -2564,12 +3000,12 @@
     }
 
     .project-log-list-items {
-        padding: 10px;
+        padding: 8px;
     }
 
     .project-log-list-item {
-        padding: 12px;
-        margin-bottom: 8px;
+        padding: 12px 14px;
+        margin-bottom: 6px;
     }
 
     .project-log-list-item:hover,
@@ -2579,7 +3015,7 @@
 
     .log-list-title {
         font-size: 14px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .log-list-meta {
@@ -2587,25 +3023,59 @@
     }
 
     .project-log-content-section {
-        min-height: 280px;
+        flex: 1;
+        min-height: 240px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .project-log-detail {
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .log-detail-header {
-        padding: 14px 16px;
+        padding: 12px 16px;
+        flex-shrink: 0;
+    }
+
+    .log-header-wrapper {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
     }
 
     .log-detail-header h4 {
         font-size: 15px;
-        margin-bottom: 10px;
+        margin: 0 0 8px 0;
+        flex: 1;
+        min-width: 0;
+        word-break: break-word;
+    }
+
+    .log-active-button-wrapper {
+        flex-shrink: 0;
+    }
+
+    .log-active-button-wrapper>button {
+        width: 44px;
+        height: 36px;
     }
 
     .log-detail-meta {
-        font-size: 12px;
-        gap: 12px;
+        font-size: 11px;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
     .log-detail-content {
         padding: 16px;
+        flex: 1;
+        overflow-y: auto;
     }
 
     .log-content-text {
@@ -2615,6 +3085,8 @@
 
     .project-log-empty-state {
         padding: 30px 20px;
+        height: 100%;
+        justify-content: center;
     }
 
     .project-log-empty-state svg {
@@ -2627,6 +3099,24 @@
         font-size: 14px;
     }
 
+    .special-log-content {
+        padding: 24px 16px;
+    }
+
+    .special-log-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .special-log-content h3 {
+        font-size: 17px;
+        margin-bottom: 10px;
+    }
+
+    .special-log-content p {
+        font-size: 14px;
+    }
+
     /* Calendar Input Modal */
     .callendar-input-log-modal {
         padding: 1.75rem;
@@ -2635,7 +3125,7 @@
     }
 
     .callendar-log-input-header {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.25rem;
         padding-bottom: 1rem;
     }
 
@@ -2643,11 +3133,11 @@
         font-size: 1.15rem;
     }
 
-    .callendar-input-log-modal > div:nth-child(2) {
+    .callendar-input-log-modal>div:nth-child(2) {
         margin-bottom: 1.25rem;
     }
 
-    .callendar-input-log-modal > div:nth-child(2) input {
+    .callendar-input-log-modal>div:nth-child(2) input {
         padding: 0.8rem 1rem;
         font-size: 0.9rem;
     }
@@ -2657,24 +3147,163 @@
     }
 
     .callendar-log-input-main-container .toastui-editor-defaultUI {
-        height: 350px !important;
+        height: 320px !important;
     }
 
     .log-input-button-wrapper {
-        flex-direction: column-reverse;
+        flex-direction: row;
         gap: 0.75rem;
     }
 
     .log-input-button-wrapper button {
-        width: 100%;
+        flex: 1;
         padding: 0.85rem;
         font-size: 0.9rem;
         min-width: auto;
+        min-height: 44px;
     }
 
-    /* Dashboard */
+    /* Dashboard Header */
+    .project-complete-report-header {
+        padding: 2rem 1.5rem 0;
+        /* ← padding-bottom 0 유지 */
+        border-radius: 12px;
+    }
+
+    .project-complete-report-sub-header {
+        margin: 1.5rem 0 0 0;
+        /* ← 음수 마진 없음 */
+        padding: 1rem 0;
+        gap: 1.5rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .project-complete-report-main-information {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .project-complete-report-main-information h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .project-complete-report-main-information button {
+        align-self: flex-start;
+    }
+
+    .project-complete-report-sub-information {
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 13px;
+    }
+
+    .sub-info-wrapper {
+        align-items: center;
+    }
+
+    .sub-info-wrapper svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .selected-sub-menu {
+        font-size: 0.9rem;
+        display: inline-block;
+        padding-bottom: 2px;
+    }
+
+    /* Dashboard Overview Cards */
+    .overview-section-container {
+        padding: 1.5rem 1rem;
+        gap: 1.5rem;
+    }
+
     .overview-card-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .overview-card {
+        min-width: 150px;
+        flex: 0 0 auto;
+        padding: 18px 16px;
+        border-radius: 12px;
+        gap: 8px;
+    }
+
+    .overview-card h3 {
+        font-size: 12px;
+    }
+
+    .overview-card .card-value {
+        font-size: 26px;
+    }
+
+    .overview-card .card-description {
+        font-size: 11px;
+    }
+
+    /* Dashboard Charts */
+    .overview-charts-section {
         grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .chart-container {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .chart-header {
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+    }
+
+    .chart-header h3 {
+        font-size: 15px;
+    }
+
+    .pie-chart-circle {
+        width: 180px;
+        height: 180px;
+    }
+
+    .pie-chart-visual {
+        width: 150px;
+        height: 150px;
+    }
+
+    .pie-chart-center {
+        width: 75px;
+        height: 75px;
+    }
+
+    .legend-item {
+        font-size: 13px;
+        gap: 10px;
+        padding: 6px;
+    }
+
+    .legend-name {
+        min-width: 60px;
+    }
+
+    .bar-chart-wrapper {
+        height: 180px;
+        gap: 6px;
+        padding: 12px 8px;
+    }
+
+    .bar-label {
+        font-size: 10px;
     }
 
     /* Heatmap */
@@ -2687,10 +3316,11 @@
     .activity-heatmap-section .chart-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
     }
 
     .activity-heatmap-section .chart-header h3 {
-        font-size: 16px;
+        font-size: 15px;
     }
 
     .heatmap-legend {
@@ -2698,36 +3328,59 @@
         justify-content: space-between;
     }
 
+    .heatmap-scroll-container {
+        padding-top: 40px;
+        padding-bottom: 12px;
+    }
+
     .heatmap-main {
-        gap: 6px;
+        gap: 5px;
     }
 
     .heatmap-weekdays {
-        width: 32px;
+        width: 30px;
         font-size: 10px;
-        padding-right: 6px;
+        padding-right: 5px;
     }
 
-    .heatmap-day {
-        width: 12px;
-        height: 12px;
-    }
-
-    .heatmap-week {
-        gap: 3px;
+    .heatmap-weekdays span {
+        height: 16px;
+        line-height: 16px;
     }
 
     .heatmap-grid {
         gap: 3px;
     }
 
+    .heatmap-week {
+        gap: 3px;
+    }
+
+    .heatmap-day {
+        width: 16px;
+        height: 16px;
+    }
+
     .heatmap-stats {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 18px;
+        padding-top: 18px;
     }
 
     .heatmap-stat-item {
         padding: 12px;
+        border-radius: 10px;
+        gap: 10px;
+    }
+
+    .heatmap-stat-item svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .heatmap-stat-item .stat-label {
+        font-size: 11px;
     }
 
     .heatmap-stat-item .stat-value {
@@ -2736,19 +3389,96 @@
 
     .heatmap-tooltip {
         font-size: 11px;
-        padding: 8px 12px;
+        padding: 6px 10px;
     }
 
     .heatmap-scroll-hint {
         font-size: 10px;
     }
-}
 
+    /* Timeline */
+    .timeline-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .timeline-event {
+        gap: 12px;
+    }
+
+    .timeline-dot {
+        width: 18px;
+        padding-top: 16px;
+    }
+
+    .timeline-dot-inner {
+        width: 12px;
+        height: 12px;
+    }
+
+    .timeline-dot.milestone .timeline-dot-inner {
+        width: 16px;
+        height: 16px;
+    }
+
+    .timeline-date-header {
+        padding: 12px 14px;
+    }
+
+    .timeline-date-label {
+        font-size: 13px;
+    }
+
+    .timeline-log-count-badge {
+        font-size: 11px;
+        padding: 2px 8px;
+    }
+
+    .timeline-milestone {
+        padding: 12px 14px;
+        gap: 12px;
+    }
+
+    .timeline-milestone-icon {
+        font-size: 18px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .timeline-milestone-title {
+        font-size: 13px;
+    }
+
+    .timeline-log-card {
+        padding: 11px 14px;
+    }
+
+    .timeline-log-card-title {
+        font-size: 13px;
+    }
+
+    .timeline-log-card-time {
+        font-size: 11px;
+    }
+
+    .timeline-log-card-creator {
+        font-size: 11px;
+    }
+
+    .timeline-summary-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+}
 
 /* ============================================
    400px 이하 (초소형 모바일)
    ============================================ */
 @media (max-width: 400px) {
+
     /* Base */
     .project-manage-container,
     .project-complete-report-container,
@@ -2763,16 +3493,106 @@
 
     .project-manage-overlay {
         padding: 1.25rem;
+        gap: 1rem;
     }
 
     .project-title {
         font-size: 1.4rem;
     }
 
+    .project-status-badge {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+
+    .button-wrapper {
+        gap: 0.5rem;
+    }
+
+    .project-delete-btn,
+    .project-thumb-edit-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
     /* Content Area */
     .project-manage-summary-area,
     .project-manage-teamValue-area {
         padding: 1.5rem;
+        border-radius: 14px;
+    }
+
+    .summary-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .summary-text {
+        font-size: 0.9rem;
+    }
+
+    .summary-text textarea {
+        min-height: 100px;
+        padding: 0.75rem;
+        font-size: 0.88rem;
+    }
+
+    .summary-text button {
+        padding: 0.45rem 0.85rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    .summary-label {
+        font-size: 0.7rem;
+    }
+
+    .summary-value,
+    .summary-status {
+        font-size: 0.95rem;
+    }
+
+    .skill-badge {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.82rem;
+    }
+
+    .skill-inline button {
+        min-height: 38px;
+    }
+
+    .project-duration-container {
+        font-size: 0.9rem;
+    }
+
+    .project-manage-teamValue {
+        font-size: 1.15rem;
+        padding-bottom: 1rem;
+    }
+
+    .project-manage-teamName {
+        font-size: 1rem;
+    }
+
+    .member-card {
+        padding: 0.85rem 1rem;
+    }
+
+    .member-name {
+        font-size: 0.88rem;
+    }
+
+    .member-action-btn {
+        padding: 0.45rem 0.6rem;
+        font-size: 0.75rem;
+        min-height: 36px;
+    }
+
+    .add-member-btn,
+    .non-log-add-member-btn {
+        padding: 0.85rem;
+        font-size: 0.88rem;
+        min-height: 44px;
     }
 
     /* Modals */
@@ -2782,40 +3602,299 @@
         border-radius: 16px;
     }
 
+    .project-modal-title,
+    .project-thumb-edit-modal-title {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .project-modal-label {
+        font-size: 0.85rem;
+    }
+
+    .project-modal-input {
+        padding: 0.8rem 0.9rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+
+    .project-modal-btn {
+        padding: 0.85rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+
     .project-thumb-preview {
         height: 180px;
     }
 
     .project-thumb-edit-modal-actions {
         flex-direction: column;
+        gap: 0.6rem;
     }
 
     .project-thumb-edit-modal-btn {
         width: 100%;
+        min-height: 44px;
+    }
+
+    /* Calendar Modal */
+    .callendar-modal-overlay {
+        padding: 6px;
+    }
+
+    .callendar-date-container {
+        border-radius: 10px;
+        max-height: 97vh;
+    }
+
+    .project-modal-log-header {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .project-modal-log-header h3 {
+        font-size: 15px;
+    }
+
+    .project-modal-log-header button {
+        min-width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+
+    .project-log-viewer-container {
+        max-height: calc(97vh - 120px);
+    }
+
+    .project-log-list-section {
+        max-height: 180px;
+    }
+
+    .project-log-list-header {
+        padding: 10px 12px;
+    }
+
+    .project-log-list-header h4 {
+        font-size: 13px;
+    }
+
+    .project-log-list-items {
+        padding: 6px;
+    }
+
+    .project-log-list-item {
+        padding: 10px 12px;
+        margin-bottom: 5px;
+    }
+
+    .log-list-title {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .log-list-meta {
+        font-size: 11px;
+    }
+
+    .log-detail-header {
+        padding: 10px 14px;
+    }
+
+    .log-detail-header h4 {
+        font-size: 14px;
+    }
+
+    .log-active-button-wrapper>button {
+        width: 38px;
+        height: 32px;
+    }
+
+    .log-detail-meta {
+        font-size: 10px;
+        gap: 8px;
+    }
+
+    .log-detail-content {
+        padding: 12px 14px;
+    }
+
+    .log-content-text {
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .special-log-content {
+        padding: 20px 12px;
+    }
+
+    .special-log-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .special-log-content h3 {
+        font-size: 15px;
+    }
+
+    .special-log-content p {
+        font-size: 13px;
     }
 
     /* Calendar Input Modal */
     .callendar-input-log-modal {
-        padding: 1.5rem;
-        border-radius: 16px;
+        padding: 1.25rem;
+        max-width: 97%;
+        border-radius: 14px;
+    }
+
+    .callendar-log-input-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.85rem;
     }
 
     .callendar-log-input-header h4 {
         font-size: 1.05rem;
     }
 
-    .callendar-input-log-modal > div:nth-child(2) input {
-        padding: 0.75rem 0.9rem;
+    .callendar-input-log-modal>div:nth-child(2) input {
+        padding: 0.7rem 0.85rem;
         font-size: 0.85rem;
+        min-height: 44px;
     }
 
     .callendar-log-input-main-container .toastui-editor-defaultUI {
-        height: 300px !important;
+        height: 280px !important;
     }
 
     .log-input-button-wrapper button {
-        padding: 0.8rem;
+        padding: 0.75rem;
         font-size: 0.85rem;
+        min-height: 44px;
+    }
+
+    .project-complete-report-header {
+        padding: 1.5rem 1rem 0;
+        /* ← padding-bottom 0 유지 */
+        border-radius: 10px;
+    }
+
+    .project-complete-report-sub-header {
+        margin: 1.2rem 0 0 0;
+        /* ← 음수 마진 없음 */
+        padding: 0.85rem 0;
+        gap: 1.2rem;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .project-complete-report-main-information h1 {
+        font-size: 1.3rem;
+    }
+
+    .project-complete-report-sub-information {
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    .sub-info-wrapper svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .selected-sub-menu {
+        font-size: 0.85rem;
+    }
+
+    /* Dashboard Overview Cards */
+    .overview-card-wrapper {
+        gap: 10px;
+        padding-bottom: 6px;
+    }
+
+    .overview-card {
+        min-width: 135px;
+        padding: 14px 12px;
+        gap: 6px;
+        border-radius: 10px;
+    }
+
+    .overview-card h3 {
+        font-size: 11px;
+    }
+
+    .overview-card .card-value {
+        font-size: 22px;
+    }
+
+    .overview-card .card-description {
+        font-size: 10px;
+    }
+
+    /* Dashboard Charts */
+    .chart-container {
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .chart-header {
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+    }
+
+    .chart-header h3 {
+        font-size: 14px;
+        gap: 6px;
+    }
+
+    .chart-header svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .pie-chart-circle {
+        width: 150px;
+        height: 150px;
+    }
+
+    .pie-chart-visual {
+        width: 120px;
+        height: 120px;
+    }
+
+    .pie-chart-center {
+        width: 60px;
+        height: 60px;
+    }
+
+    .legend-item {
+        font-size: 12px;
+        gap: 8px;
+        padding: 5px;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+    }
+
+    .legend-name {
+        min-width: 50px;
+        font-size: 12px;
+    }
+
+    .legend-value {
+        font-size: 11px;
+    }
+
+    .bar-chart-wrapper {
+        height: 150px;
+        gap: 4px;
+        padding: 10px 6px;
+    }
+
+    .bar-label {
+        font-size: 9px;
     }
 
     /* Heatmap */
@@ -2832,6 +3911,11 @@
         height: 16px;
     }
 
+    .heatmap-scroll-container {
+        padding-top: 35px;
+        padding-bottom: 10px;
+    }
+
     .heatmap-legend {
         font-size: 10px;
     }
@@ -2841,32 +3925,45 @@
         height: 10px;
     }
 
+    .heatmap-main {
+        gap: 4px;
+    }
+
     .heatmap-weekdays {
-        width: 28px;
+        width: 26px;
         font-size: 9px;
         padding-right: 4px;
     }
 
-    .heatmap-day {
-        width: 10px;
-        height: 10px;
-    }
-
-    .heatmap-week {
-        gap: 2px;
+    .heatmap-weekdays span {
+        height: 14px;
+        line-height: 14px;
     }
 
     .heatmap-grid {
         gap: 2px;
     }
 
+    .heatmap-week {
+        gap: 2px;
+    }
+
+    .heatmap-day {
+        width: 14px;
+        height: 14px;
+    }
+
     .heatmap-stats {
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
+        margin-top: 14px;
+        padding-top: 14px;
     }
 
     .heatmap-stat-item {
         padding: 10px;
         gap: 8px;
+        border-radius: 8px;
     }
 
     .heatmap-stat-item svg {
@@ -2875,7 +3972,7 @@
     }
 
     .heatmap-stat-item .stat-label {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .heatmap-stat-item .stat-value {
@@ -2884,35 +3981,76 @@
 
     .heatmap-tooltip {
         font-size: 10px;
-        padding: 6px 10px;
+        padding: 5px 8px;
     }
 
     .heatmap-scroll-hint {
         font-size: 9px;
         padding: 6px;
     }
-}
 
-
-/* ============================================
-   PRINT STYLES
-   ============================================ */
-@media print {
-    .activity-heatmap-section {
-        box-shadow: none;
-        border: 1px solid #e5e7eb;
-        page-break-inside: avoid;
+    /* Timeline */
+    .timeline-event {
+        gap: 10px;
     }
 
-    .heatmap-scroll-container {
-        overflow: visible;
+    .timeline-dot {
+        width: 16px;
+        padding-top: 14px;
     }
 
-    .heatmap-scroll-hint {
-        display: none;
+    .timeline-dot-inner {
+        width: 10px;
+        height: 10px;
     }
 
-    .heatmap-tooltip {
-        display: none;
+    .timeline-dot.milestone .timeline-dot-inner {
+        width: 14px;
+        height: 14px;
+    }
+
+    .timeline-date-header {
+        padding: 10px 12px;
+    }
+
+    .timeline-date-label {
+        font-size: 12px;
+    }
+
+    .timeline-milestone {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .timeline-milestone-icon {
+        font-size: 16px;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+    }
+
+    .timeline-milestone-title {
+        font-size: 12px;
+    }
+
+    .timeline-milestone-time {
+        font-size: 11px;
+    }
+
+    .timeline-log-card {
+        padding: 10px 12px;
+    }
+
+    .timeline-log-card-title {
+        font-size: 12px;
+    }
+
+    .timeline-log-card-time {
+        font-size: 10px;
+    }
+
+    .timeline-summary-badge {
+        font-size: 10px;
+        padding: 3px 8px;
     }
 }

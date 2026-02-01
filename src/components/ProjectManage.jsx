@@ -54,6 +54,69 @@ export default function ProjectManage() {
 
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
+
+    //----------------------------TIMELINE_HELPER-----------------------------------------
+    const [expandedDates, setExpandedDates] = useState({});
+    const getTimelineData = () => {
+        const events = []; // { date, type, payload }
+
+        // ① 프로젝트 시작 이벤트
+        if (projectBasic.created) {
+            events.push({
+                date: projectBasic.created.split('T')[0],
+                type: 'milestone-start',
+                payload: { datetime: projectBasic.created }
+            });
+        }
+
+        // ② 프로젝트 종료 이벤트
+        if ((projectBasic.status === 'C' || projectBasic.status === 'D') && projectBasic.endDay) {
+            events.push({
+                date: projectBasic.endDay.split('T')[0],
+                type: projectBasic.status === 'C' ? 'milestone-end' : 'milestone-halted',
+                payload: { datetime: projectBasic.endDay }
+            });
+        }
+
+        // ③ 일반 로그 이벤트
+        (projectLog || []).forEach(log => {
+            events.push({
+                date: log.logDailyDate.split('T')[0],
+                type: 'log',
+                payload: log
+            });
+        });
+
+        // 날짜별로 그룹화
+        const grouped = {};
+        events.forEach(ev => {
+            if (!grouped[ev.date]) grouped[ev.date] = [];
+            grouped[ev.date].push(ev);
+        });
+
+        // 날짜 오름차순 정렬 후 배열로 변환
+        return Object.keys(grouped)
+            .sort((a, b) => a.localeCompare(b))
+            .map(date => ({
+                date,
+                events: grouped[date].sort((a, b) => {
+                    // milestone-start 는 항상 첫 번째, milestone-end/halted 는 항상 마지막
+                    const order = { 'milestone-start': 0, 'log': 1, 'milestone-end': 2, 'milestone-halted': 2 };
+                    return (order[a.type] ?? 1) - (order[b.type] ?? 1);
+                })
+            }));
+    };
+
+    const toggleDateExpand = (dateKey) => {
+        setExpandedDates(prev => ({ ...prev, [dateKey]: !prev[dateKey] }));
+    };
+
+    // 날짜 그룹의 기본 전개 상태 : 로그가 있으면 기본 전개
+    const isDateExpanded = (dateKey) => {
+        if (expandedDates[dateKey] !== undefined) return expandedDates[dateKey];
+        return true; // 기본값: 전개 상태
+    };
+    //----------------------------TIMELINE_HELPER-----------------------------------------
     // 히트맵 데이터 생성 (주 단위 구조)
     const getActivityHeatmapData = () => {
         if (!projectBasic.created || !projectBasic.endDay) {
@@ -317,21 +380,20 @@ export default function ProjectManage() {
     const handleChangeDashBoardPage = (e) => {
         const clickpage = e.currentTarget.dataset.page;
         setDashBoardIndex(clickpage);
-        if (clickpage === 'overview') {
-
-        } else if (clickpage === 'timeline') {
-
-        } else if (clickpage === 'insight') {
-
-        }
     }
 
     const goToNextPage = () => {
-        setPageIndex(1);
+        if (pageIndex === 1) {
+            return;
+        }
+        setPageIndex(pageIndex + 1);
     };
 
     const goToPrevPage = () => {
-        setPageIndex(0);
+        if (pageIndex === 0) {
+            return;
+        }
+        setPageIndex(pageIndex - 1);
     };
 
     const navigate = useNavigate();
@@ -512,8 +574,7 @@ export default function ProjectManage() {
                 })
             });
             const result = await response.json();
-            handleApiReturnResult(response);
-
+            
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
@@ -1422,7 +1483,7 @@ export default function ProjectManage() {
 
         // 프로젝트 시작 이벤트
         events.push({
-            title: '🎉 프로젝트 시작',
+            title: '프로젝트 시작',
             date: projectBasic.created,
             backgroundColor: '#10b981',
             borderColor: '#10b981',
@@ -1471,6 +1532,18 @@ export default function ProjectManage() {
     return (
         <>
             <div className="page-container" data-index={pageIndex}>
+                {pageIndex !== 0 && projectBasic.status === 'C' && (
+                    <div className="page-arrow-overlay-left">
+                        <button
+                            className="page-arrow-hitbox"
+                            onClick={goToPrevPage}
+                        >
+                            <span className="page-arrow-icon">
+                                ‹
+                            </span>
+                        </button>
+                    </div>
+                )}
                 {pageIndex === 0 && (
                     <div className="project-manage-container">
                         <div className="project-manage-header">
@@ -2070,7 +2143,7 @@ export default function ProjectManage() {
                                                                     onClick={() => setSelectedLogId('created')}
                                                                 >
                                                                     <div className="log-list-title">
-                                                                        🎉 프로젝트 생성일
+                                                                        프로젝트 생성일
                                                                     </div>
                                                                     <div className="log-list-meta">
                                                                         <span className="log-creator">시스템</span>
@@ -2462,12 +2535,12 @@ export default function ProjectManage() {
                         </div>
                     </div>
                 )}
-                {pageIndex === 1 && (
+                {pageIndex === 1 && projectBasic.status === 'C' && (
                     <div className="project-complete-report-container">
                         <div className="project-complete-report-header">
                             <div className="project-complete-report-main-information">
                                 <h1>{projectBasic.title} 프로젝트</h1>
-                                <button> PDF </button>
+                                {/* <button> PDF </button> */}
                             </div>
                             <br />
                             <div className="project-complete-report-sub-information">
@@ -2513,18 +2586,190 @@ export default function ProjectManage() {
                                 <span className={dashboardIndex === 'insight' ? "selected-sub-menu active" : "selected-sub-menu"}
                                     data-page="insight"
                                     onClick={handleChangeDashBoardPage}>인사이트</span>
-                            </div>
-                            <div className="page-arrow-overlay-left">
-                                <button
-                                    className="page-arrow-hitbox"
-                                    onClick={goToPrevPage}
-                                >
-                                    <span className="page-arrow-icon">
-                                        ‹
-                                    </span>
-                                </button>
+                                <span className={dashboardIndex === 'report' ? "selected-sub-menu active" : "selected-sub-menu"}
+                                    data-page="report"
+                                    onClick={handleChangeDashBoardPage}>레포트</span>
                             </div>
                         </div>
+                        {dashboardIndex === 'report' && projectBasic.status === 'C' && (
+                            <div className="report-section-container">
+                                레포트 섹션
+                            </div>
+                        )}
+                        {dashboardIndex === 'insight' && projectBasic.status === 'C' && (
+                            <div className="insight-section-container">
+                                <h3>준비중</h3>
+                            </div>
+                        )}
+                        {dashboardIndex === 'timeline' && projectBasic.status === 'C' && (
+                            <div className="timeline-section-container">
+                                <div className="timeline-section-header">
+                                    <h4>프로젝트 타임라인</h4>
+                                    <span className="timeline-summary-badge">
+                                        총 {getTimelineData().length}개 날짜 · {projectLog.length}개 로그
+                                    </span>
+                                </div>
+
+                                <div className="timeline-section-divider" />
+
+                                <div className="timeline-section-content">
+                                    {getTimelineData().map((group, groupIdx) => {
+                                        const expanded = isDateExpanded(group.date);
+                                        const logCount = group.events.filter(e => e.type === 'log').length;
+                                        const hasMilestone = group.events.some(e => e.type !== 'log');
+                                        const isFirst = groupIdx === 0;
+                                        const isLast = groupIdx === getTimelineData().length - 1;
+
+                                        return (
+                                            <div key={group.date} className="timeline-event">
+                                                {/* 수직선 위의 원형 노드 */}
+                                                <div className={`timeline-dot ${hasMilestone ? 'milestone' : ''}`}>
+                                                    <div className="timeline-dot-inner" />
+                                                </div>
+
+                                                {/* 날짜 그룹 카드 */}
+                                                <div className="timeline-card">
+                                                    {/* 날짜 헤더 (클릭으로 접기/펼기) */}
+                                                    <button
+                                                        className="timeline-date-header"
+                                                        onClick={() => logCount > 0 && toggleDateExpand(group.date)}
+                                                        aria-expanded={expanded}
+                                                    >
+                                                        <div className="timeline-date-left">
+                                                            <span className="timeline-date-label">
+                                                                {new Date(group.date + 'T00:00:00').toLocaleDateString('ko-KR', {
+                                                                    year: 'numeric',
+                                                                    month: '2-digit',
+                                                                    day: '2-digit',
+                                                                    weekday: 'short'
+                                                                })}
+                                                            </span>
+                                                            {logCount > 0 && (
+                                                                <span className="timeline-log-count-badge">{logCount}개</span>
+                                                            )}
+                                                        </div>
+                                                        {logCount > 0 && (
+                                                            <span className={`timeline-toggle-arrow ${expanded ? 'expanded' : ''}`}>
+                                                                ▼
+                                                            </span>
+                                                        )}
+                                                    </button>
+
+                                                    {/* 이벤트 목록 (접기/펼기 적용) */}
+                                                    <div className={`timeline-events-list ${expanded ? 'expanded' : 'collapsed'}`}>
+                                                        {group.events.map((ev, evIdx) => {
+                                                            /* ── milestone-start ── */
+                                                            if (ev.type === 'milestone-start') {
+                                                                return (
+                                                                    <div key={`ms-start-${group.date}`} className="timeline-milestone milestone-start">
+                                                                        <div className="timeline-milestone-icon">🎉</div>
+                                                                        <div className="timeline-milestone-body">
+                                                                            <span className="timeline-milestone-title">프로젝트 시작</span>
+                                                                            <span className="timeline-milestone-time">
+                                                                                {new Date(ev.payload.datetime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            /* ── milestone-end ── */
+                                                            if (ev.type === 'milestone-end') {
+                                                                return (
+                                                                    <div key={`ms-end-${group.date}`} className="timeline-milestone milestone-end">
+                                                                        <div className="timeline-milestone-icon">✅</div>
+                                                                        <div className="timeline-milestone-body">
+                                                                            <span className="timeline-milestone-title">프로젝트 완료</span>
+                                                                            <span className="timeline-milestone-time">
+                                                                                {new Date(ev.payload.datetime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            /* ── milestone-halted ── */
+                                                            if (ev.type === 'milestone-halted') {
+                                                                return (
+                                                                    <div key={`ms-halt-${group.date}`} className="timeline-milestone milestone-halted">
+                                                                        <div className="timeline-milestone-icon">⏸️</div>
+                                                                        <div className="timeline-milestone-body">
+                                                                            <span className="timeline-milestone-title">프로젝트 중단</span>
+                                                                            <span className="timeline-milestone-time">
+                                                                                {new Date(ev.payload.datetime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            /* ── 일반 로그 ── */
+                                                            const log = ev.payload;
+                                                            return (
+                                                                <div
+                                                                    key={log.logId}
+                                                                    className="timeline-log-card timeline-log-card--clickable"
+                                                                    onClick={() => {
+                                                                        setPageIndex(0);
+                                                                        setSelectedDate(group.date);
+                                                                        setSelectedLogId(log.logId);
+                                                                        setShowCallendarModal(true);
+                                                                        setShowEditLogModal(false);
+                                                                    }}
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                                            e.preventDefault();
+                                                                            setSelectedDate(group.date);
+                                                                            setSelectedLogId(log.logId);
+                                                                            setShowCallendarModal(true);
+                                                                            setShowEditLogModal(false);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <div className="timeline-log-card-header">
+                                                                        <span className="timeline-log-card-title">
+                                                                            {log.logTitle.length > 28
+                                                                                ? log.logTitle.substring(0, 28) + '…'
+                                                                                : log.logTitle}
+                                                                        </span>
+                                                                        <span className="timeline-log-card-time">
+                                                                            {log.createdDate && new Date(log.createdDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="timeline-log-card-meta">
+                                                                        <span className="timeline-log-card-creator">
+                                                                            👤 {log.logCreator}
+                                                                        </span>
+                                                                        {projectBasic.teamValue && (
+                                                                            <span className="timeline-log-card-role">
+                                                                                {projectMember.find(m => m.pjMemberName === log.logCreator)?.pjMemberRole || '기타'}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    {/* 타임라인 데이터가 비어있는 경우 */}
+                                    {getTimelineData().length === 0 && (
+                                        <div className="timeline-empty">
+                                            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <polyline points="12 6 12 12 16 14" />
+                                            </svg>
+                                            <p>타임라인 데이터가 없습니다</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         {dashboardIndex === 'overview' && projectBasic.status === 'C' && (
                             <div className="overview-section-container">
                                 <div className="overview-card-wrapper">
@@ -2733,13 +2978,29 @@ export default function ProjectManage() {
                                                                             return (
                                                                                 <div
                                                                                     key={day.date}
-                                                                                    className="heatmap-day"
+                                                                                    className="heatmap-day heatmap-day--clickable"
                                                                                     style={{ backgroundColor: getActivityColor(day.count) }}
                                                                                     data-date={day.date}
                                                                                     data-count={day.count}
                                                                                     role="gridcell"
-                                                                                    aria-label={`${day.date}: ${day.count}개 로그`}
+                                                                                    aria-label={`${day.date}: ${day.count}개 로그. 클릭하여 상세 확인`}
                                                                                     tabIndex={0}
+                                                                                    onClick={() => {
+                                                                                        setPageIndex(0);
+                                                                                        setSelectedDate(day.date);
+                                                                                        setSelectedLogId(null);
+                                                                                        setShowCallendarModal(true);
+                                                                                        setShowEditLogModal(false);
+                                                                                    }}
+                                                                                    onKeyDown={(e) => {
+                                                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                                                            e.preventDefault();
+                                                                                            setSelectedDate(day.date);
+                                                                                            setSelectedLogId(null);
+                                                                                            setShowCallendarModal(true);
+                                                                                            setShowEditLogModal(false);
+                                                                                        }
+                                                                                    }}
                                                                                 >
                                                                                     <span className="heatmap-tooltip">
                                                                                         {new Date(day.date).toLocaleDateString('ko-KR', {
