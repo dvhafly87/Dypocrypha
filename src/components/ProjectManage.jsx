@@ -574,7 +574,7 @@ export default function ProjectManage() {
                 })
             });
             const result = await response.json();
-            
+
             if (response.status === 500) {
                 const toastData = {
                     status: 'error',
@@ -2540,7 +2540,11 @@ export default function ProjectManage() {
                         <div className="project-complete-report-header">
                             <div className="project-complete-report-main-information">
                                 <h1>{projectBasic.title} 프로젝트</h1>
-                                {/* <button> PDF </button> */}
+                                <button
+                                    className={`rpbtn ${dashboardIndex === 'report' ? 'rpbtn-visible' : 'rpbtn-hidden'}`}
+                                >
+                                    레포트 추가
+                                </button>
                             </div>
                             <br />
                             <div className="project-complete-report-sub-information">
@@ -2593,7 +2597,7 @@ export default function ProjectManage() {
                         </div>
                         {dashboardIndex === 'report' && projectBasic.status === 'C' && (
                             <div className="report-section-container">
-                                레포트 섹션
+
                             </div>
                         )}
                         {dashboardIndex === 'insight' && projectBasic.status === 'C' && (

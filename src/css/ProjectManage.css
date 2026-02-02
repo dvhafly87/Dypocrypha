@@ -1708,7 +1708,7 @@
     color: white;
 }
 
-.project-complete-report-main-information button {
+.rpbtn {
     border: #e5e7eb 0.5px solid;
     border-radius: 15px;
     font-size: 10px;
@@ -1716,10 +1716,31 @@
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
     backdrop-filter: blur(6px);
+    transition: all 0.3s ease;
 }
 
-.project-complete-report-main-information button:hover {
+.rpbtn:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+
+/* 이 아래에 추가 */
+.project-complete-report-main-information button.rpbtn-hidden {
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
+.project-complete-report-main-information button.rpbtn-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
 }
 
 .project-complete-report-sub-information {
