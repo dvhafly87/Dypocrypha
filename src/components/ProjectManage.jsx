@@ -54,6 +54,139 @@ export default function ProjectManage() {
 
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
+    const [projectReports, setProjectReports] = useState([]);
+    //------------------------- PROJECT_REPORT HELPER ---------------------------
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [showReportDetailModal, setShowReportDetailModal] = useState(false);
+    const [selectedReportId, setSelectedReportId] = useState(null);
+    const [reportTitle, setReportTitle] = useState('');
+    const [reportVideoFile, setReportVideoFile] = useState(null);
+    const [videoPreview, setVideoPreview] = useState(null);
+    const reportEditorRef = useRef();
+
+    // 영상 파일 선택 핸들러
+    const handleVideoSelect = (e) => {
+        const file = e.target.files[0];
+
+        if (!file) {
+            setReportVideoFile(null);
+            setVideoPreview(null);
+            return;
+        }
+
+        // 파일 크기 체크 (예: 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+            addToast('영상 파일 크기는 100MB를 초과할 수 없습니다.', 'warning');
+            e.target.value = '';
+            return;
+        }
+
+        // 비디오 파일 타입 체크
+        if (!file.type.startsWith('video/')) {
+            addToast('영상 파일만 업로드 가능합니다.', 'warning');
+            e.target.value = '';
+            return;
+        }
+
+        setReportVideoFile(file);
+
+        // 미리보기 생성
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setVideoPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // 레포트 작성/수정
+    const handleSaveReport = async () => {
+        if (!reportTitle || reportTitle.trim().length === 0) {
+            addToast("레포트 제목을 입력해주세요", "warning");
+            return;
+        }
+
+        if (reportTitle.length > 50) {
+            addToast("레포트 제목은 50자를 초과할 수 없습니다", "warning");
+            return;
+        }
+
+        const editorInstance = reportEditorRef.current?.getInstance();
+        const content = editorInstance?.getMarkdown()?.trim();
+
+        if (!content) {
+            addToast("내용을 입력해주세요", "warning");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('reportProjectId', projectId);
+        formData.append('reportTitle', reportTitle);
+        formData.append('reportContent', content);
+
+        if (selectedReportId) {
+            formData.append('reportId', selectedReportId);
+        }
+
+        if (reportVideoFile) {
+            formData.append('reportVideoFile', reportVideoFile);
+        }
+
+        try {
+            const url = selectedReportId
+                ? `${API.API_BASE_URL}/project/report/update`
+                : `${API.API_BASE_URL}/project/report/create`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.reportSaveStatus) {
+                addToast(
+                    selectedReportId ? '레포트가 수정되었습니다' : '레포트가 작성되었습니다',
+                    'success'
+                );
+                setShowReportModal(false);
+                window.location.reload();
+            } else {
+                addToast(result.reportSaveMessage || '레포트 저장에 실패했습니다', 'error');
+            }
+        } catch (error) {
+            handleNetworkError(error, "레포트 저장 중 에러가 발생했습니다");
+        }
+    };
+
+    // 레포트 삭제
+    const handleDeleteReport = async (reportId) => {
+        if (!window.confirm('이 레포트를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/project/report/delete`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reportId })
+            });
+
+            const result = await response.json();
+
+            if (result.reportDeleteStatus) {
+                addToast('레포트가 삭제되었습니다', 'success');
+                setProjectReports(prev => prev.filter(r => r.id !== reportId));
+            } else {
+                addToast(result.reportDeleteMessage || '삭제에 실패했습니다', 'error');
+            }
+        } catch (error) {
+            handleNetworkError(error, "레포트 삭제 중 에러가 발생했습니다");
+        }
+    };
+
+    //------------------------- PROJECT_REPORT HELPER ---------------------------
 
     //----------------------------TIMELINE_HELPER-----------------------------------------
     const [expandedDates, setExpandedDates] = useState({});
@@ -2597,7 +2730,7 @@ export default function ProjectManage() {
                         </div>
                         {dashboardIndex === 'report' && projectBasic.status === 'C' && (
                             <div className="report-section-container">
-
+                                섹션 추가
                             </div>
                         )}
                         {dashboardIndex === 'insight' && projectBasic.status === 'C' && (
