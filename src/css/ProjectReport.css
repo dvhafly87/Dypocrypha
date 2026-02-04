@@ -1,0 +1,205 @@
+/* ProjectReport.css */
+:root {
+    --primary-color: #4a90e2;
+    --primary-hover: #357abd;
+    --bg-color: #f8f9fa;
+    --border-color: #e1e4e8;
+    --text-main: #333;
+    --text-sub: #666;
+    --white: #ffffff;
+}
+
+.report-insert-container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    padding: 40px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 수정된 헤더 스타일 */
+.report-header {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+    /* 섹션 간격 조절 */
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    /* 제출 버튼과 동일한 색상 */
+    border-radius: 15px;
+    /* 요청하신 둥근 모서리 */
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+    box-sizing: border-box;
+}
+
+.report-header h2 {
+    font-size: 24px;
+    color: var(--white);
+    /* 배경이 진하므로 글자는 흰색으로 */
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* 에디터 섹션 상단 곡률과 맞추기 위해 마진 조정 */
+.report-editor-section {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    /* 에디터 박스도 15px로 통일하면 더 일체감 있어요 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+}
+
+/* 동영상 업로드 버튼 섹션 */
+.video-upload-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f0f4f8;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+}
+
+.video-upload-btn {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.video-upload-btn svg {
+    width: 40px;
+    /* 아이콘 크기 적정 조절 */
+    height: 40px;
+    stroke: var(--primary-color);
+}
+
+.video-upload-btn svg path,
+.video-upload-btn svg circle {
+    stroke: var(--primary-color);
+}
+
+.video-upload-btn:hover {
+    transform: scale(1.1);
+}
+
+.upload-info {
+    font-size: 14px;
+    color: var(--text-sub);
+}
+
+/* 하단 버튼 액션 */
+.report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.btn-cancel,
+.btn-submit {
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-cancel {
+    background-color: #e0e0e0;
+    color: #444;
+}
+
+.btn-cancel:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-submit {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+/* ------------------------------------------------------
+   📱 Responsive Design (Media Queries)
+------------------------------------------------------ */
+
+/* 1. 태블릿 및 작은 스크린 (900px 이하) */
+@media (max-width: 900px) {
+    .report-insert-container {
+        padding: 20px 15px;
+    }
+
+    .report-header h2 {
+        font-size: 24px;
+    }
+}
+
+/* 2. 모바일 (600px 이하) */
+@media (max-width: 600px) {
+    .report-header {
+        padding: 20px;
+        border-radius: 12px;
+        /* 모바일에서는 살짝 덜 둥글게 */
+    }
+
+    .report-header h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .report-editor-section {
+        padding: 15px;
+    }
+
+    .video-upload-section {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+        align-items: center;
+    }
+
+    .report-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* 토스트 UI 에디터 높이 조절 */
+    .toastui-editor-defaultUI {
+        height: 450px !important;
+    }
+}
+
+/* 3. 초소형 모바일 (400px 이하) */
+@media (max-width: 400px) {
+    .report-header h2 {
+        font-size: 20px;
+    }
+
+    .upload-info {
+        font-size: 12px;
+    }
+
+    .toastui-editor-defaultUI {
+        height: 350px !important;
+    }
+}

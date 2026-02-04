@@ -2675,6 +2675,7 @@ export default function ProjectManage() {
                                 <h1>{projectBasic.title} 프로젝트</h1>
                                 <button
                                     className={`rpbtn ${dashboardIndex === 'report' ? 'rpbtn-visible' : 'rpbtn-hidden'}`}
+                                    onClick={() => navigate(`/project/complete/report/${projectId}`)}
                                 >
                                     레포트 추가
                                 </button>
@@ -2730,7 +2731,7 @@ export default function ProjectManage() {
                         </div>
                         {dashboardIndex === 'report' && projectBasic.status === 'C' && (
                             <div className="report-section-container">
-                                섹션 추가
+                               
                             </div>
                         )}
                         {dashboardIndex === 'insight' && projectBasic.status === 'C' && (
