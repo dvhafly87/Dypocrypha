@@ -948,6 +948,8 @@ export default function ProjectManage() {
     const adapter = async (blob, callback) => {
         const uploader = onUploadImage({
             blob,
+            projectValue: true,
+            projectReportValue: false,
             onSuccess: ({ default: url }) => {
                 callback(url, 'image'); // string URL만 넘김
             },

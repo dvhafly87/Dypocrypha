@@ -1,13 +1,21 @@
 import API from '../config/apiConfig.js';
 
-export const onUploadImage = ({ blob, onSuccess, onError, signal }) => {
+export const onUploadImage = ({
+    blob,
+    onSuccess,
+    onError,
+    signal,
+    projectValue = false,
+    projectReportValue = false
+}) => {
     const controller = new AbortController();
 
     const upload = async () => {
         try {
             const formData = new FormData();
             formData.append('image', blob, blob.name ?? 'image.png');
-            formData.append('projectValue', 'true');
+            formData.append('projectValue', projectValue);
+            formData.append('projectReportValue', projectReportValue);
 
             const response = await fetch(
                 `${API.API_BASE_URL}/api/upload/image`,

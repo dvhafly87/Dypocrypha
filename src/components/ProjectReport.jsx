@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Editor } from '@toast-ui/react-editor';
 import { useToast } from '../components/ToastContext';
 import '@toast-ui/editor/dist/toastui-editor.css';
+import { onUploadImage } from '../util/onUploadImage.js';
 import API from '../config/apiConfig.js';
 
 import '../css/ProjectReport.css';
@@ -13,22 +14,21 @@ export default function ProjectReport() {
     const navigate = useNavigate();
     const editorRef = useRef();
 
-    // 이미지 업로드 핸들러
-    const handleImageUpload = async (blob, callback) => {
-        const formData = new FormData();
-        formData.append('image', blob);
-        formData.append('projectId', projectId);
+    const adapter = async (blob, callback) => {
+        const uploader = onUploadImage({
+            blob,
+            projectValue: false,
+            projectReportValue: true,
+            onSuccess: ({ default: url }) => {
+                callback(url, 'image'); 
+            },
+            onError: (err) => {
+                console.error(err);
+                addToast(err.message, 'error');
+            }
+        });
 
-        try {
-            const response = await fetch('/api/upload/image', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-            callback(data.url, blob.name);
-        } catch (error) {
-            console.error('Image upload failed:', error);
-        }
+        await uploader.upload();
     };
 
     const handleVideoUpload = async (e) => {
@@ -51,7 +51,7 @@ export default function ProjectReport() {
         formData.append('projectId', projectId);
 
         try {
-            const response = await fetch(`${API.API_BASE_URL}/api/upload/vid`, {
+            const response = await fetch(`${API.API_BASE_URL}/api/upload/video`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData
@@ -145,7 +145,7 @@ export default function ProjectReport() {
 
                 <Editor
                     ref={editorRef}
-                    initialValue={`# ${projectId}\n\n`}
+                    initialValue=""
                     initialEditType="markdown"
                     previewStyle="vertical"
                     height="600px"
@@ -158,7 +158,7 @@ export default function ProjectReport() {
                         // 'wysiwyg' 버튼을 제외한 툴바
                     ]}
                     hooks={{
-                        addImageBlobHook: handleImageUpload
+                        addImageBlobHook: adapter
                     }}
                     useCommandShortcut={true}
                     customHTMLSanitizer={(html) => html}
