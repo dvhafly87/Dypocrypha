@@ -11,6 +11,7 @@ import '../css/ProjectReport.css';
 export default function ProjectReport() {
     const { projectId } = useParams();
     const { addToast } = useToast();
+    const [reportTitle, setReportTitle] = useState('');
     const navigate = useNavigate();
     const editorRef = useRef();
 
@@ -20,7 +21,7 @@ export default function ProjectReport() {
             projectValue: false,
             projectReportValue: true,
             onSuccess: ({ default: url }) => {
-                callback(url, 'image'); 
+                callback(url, 'image');
             },
             onError: (err) => {
                 console.error(err);
@@ -92,30 +93,68 @@ export default function ProjectReport() {
     };
 
     // 레포트 제출
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const editor = editorRef.current.getInstance();
         const content = editor.getMarkdown();
+        try {
+            // 서버로 레포트 제출
+            const response = await fetch(`${API.API_BASE_URL}/project/complete/report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    projectId,
+                    reportTitle,
+                    content
+                })
+            })
 
-        // 서버로 레포트 제출
-        fetch('/api/project/report', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                projectId,
-                content
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                addToast('레포트가 성공적으로 제출되었습니다.', 'success');
-                navigate(`/project/${projectId}`);
-            })
-            .catch(error => {
-                console.error('Submit failed:', error);
-                addToast('레포트 제출에 실패했습니다.', 'error');
-            });
+            const result = await response.json();
+
+            if (response.status === 500) {
+                const toastData = {
+                    status: 'error',
+                    message: result.reportSubmitMessage || "서버 통신 불가"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 400 || response.status === 404) {
+                addToast(result.reportSubmitMessage || '레포트 제출에 실패했습니다.', 'error');
+                return;
+            } else if (response.status === 403) {
+                const toastData = {
+                    status: 'warning',
+                    message: result.reportSubmitMessage || "로그인이 필요한 서비스입니다."
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login');
+                return;
+            } else if (response.status === 200) {
+                const toastData = {
+                    status: 'success',
+                    message: result.reportSubmitMessage || "등록되었습니다"
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate(`/project/manage/${projectId}`)
+            }
+        } catch (error) {
+            addToast('레포트 내용을 불러오는데 실패했습니다.', 'error');
+            return;
+        }
+
+
+        if (response.status === 500) {
+            const toastData = {
+                status: 'error',
+                message: result.logUpdateMessage || "서버 통신 불가"
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/');
+            return;
+        }
+
     };
 
     return (
@@ -142,7 +181,11 @@ export default function ProjectReport() {
                     />
                     <span className="upload-info">동영상을 업로드하면 에디터에 자동으로 삽입됩니다.</span>
                 </div>
-
+                <input
+                    type="text"
+                    placeholder="제목을 입력하세요 ... "
+                    value={reportTitle}
+                    onChange={(e) => setReportTitle(e.target.value)} />
                 <Editor
                     ref={editorRef}
                     initialValue=""
