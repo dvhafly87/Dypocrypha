@@ -96,6 +96,12 @@ export default function ProjectReport() {
     const handleSubmit = async () => {
         const editor = editorRef.current.getInstance();
         const content = editor.getMarkdown();
+
+        if(!content) {
+            addToast('내용을 입력해주세요', 'error');
+            return;
+        }   
+
         try {
             // 서버로 레포트 제출
             const response = await fetch(`${API.API_BASE_URL}/project/complete/report`, {
@@ -107,7 +113,8 @@ export default function ProjectReport() {
                     projectId,
                     reportTitle,
                     content
-                })
+                }),
+                credentials: 'include'
             })
 
             const result = await response.json();
@@ -123,13 +130,16 @@ export default function ProjectReport() {
             } else if (response.status === 400 || response.status === 404) {
                 addToast(result.reportSubmitMessage || '레포트 제출에 실패했습니다.', 'error');
                 return;
-            } else if (response.status === 403) {
+            } else if (response.status === 401) {
                 const toastData = {
                     status: 'warning',
                     message: result.reportSubmitMessage || "로그인이 필요한 서비스입니다."
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/login');
+                return;
+            } else if (response.status === 403) {
+                addToast(result.reportSubmitMessage || '권한이 없습니다.', 'error');
                 return;
             } else if (response.status === 200) {
                 const toastData = {
@@ -138,23 +148,12 @@ export default function ProjectReport() {
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate(`/project/manage/${projectId}`)
+                return;
             }
         } catch (error) {
             addToast('레포트 내용을 불러오는데 실패했습니다.', 'error');
             return;
         }
-
-
-        if (response.status === 500) {
-            const toastData = {
-                status: 'error',
-                message: result.logUpdateMessage || "서버 통신 불가"
-            };
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/');
-            return;
-        }
-
     };
 
     return (
@@ -183,6 +182,7 @@ export default function ProjectReport() {
                 </div>
                 <input
                     type="text"
+                    className="report-title-input"
                     placeholder="제목을 입력하세요 ... "
                     value={reportTitle}
                     onChange={(e) => setReportTitle(e.target.value)} />
