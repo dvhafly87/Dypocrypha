@@ -55,6 +55,7 @@ export default function ProjectManage() {
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
     const [projectReports, setProjectReports] = useState([]);
+    const [projectCompleteReports, setProjectCompleteReports] = useState([]);
     //------------------------- PROJECT_REPORT HELPER ---------------------------
     const [showReportModal, setShowReportModal] = useState(false);
     const [showReportDetailModal, setShowReportDetailModal] = useState(false);
@@ -1325,7 +1326,9 @@ export default function ProjectManage() {
             showCallendarModal ||
             showEditProjectThumbModal ||
             showAddMemberModal ||
-            showEditLogModal;
+            showEditLogModal ||
+            showReportModal ||           // 추가
+            showReportDetailModal;       // 추가
 
         if (isAnyModalOpen) {
             document.body.style.overflow = 'hidden';
@@ -1336,7 +1339,15 @@ export default function ProjectManage() {
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [showInputCallendarLogModal, showCallendarModal, showEditProjectThumbModal, showAddMemberModal, showEditLogModal]);
+    }, [
+        showInputCallendarLogModal,
+        showCallendarModal,
+        showEditProjectThumbModal,
+        showAddMemberModal,
+        showEditLogModal,
+        showReportModal,           // 추가
+        showReportDetailModal      // 추가
+    ]);
 
     const statusMenuRef = useRef(null);
 
@@ -1450,6 +1461,12 @@ export default function ProjectManage() {
                         setProjectLog(result.projectCallendarLog);
                     } else {
                         setProjectLog([]);
+                    }
+
+                    if (result.projectReport != null) {
+                        setProjectCompleteReports(result.projectReport);
+                    } else {
+                        setProjectCompleteReports([]);
                     }
 
                 } else {
@@ -2733,7 +2750,164 @@ export default function ProjectManage() {
                         </div>
                         {dashboardIndex === 'report' && projectBasic.status === 'C' && (
                             <div className="report-section-container">
-                               
+                                {/* 헤더 */}
+                                <div className="timeline-section-header">
+                                    <h4>프로젝트 레포트</h4>
+                                    <span className="timeline-summary-badge">
+                                        총 {projectCompleteReports.length}개의 레포트
+                                    </span>
+                                </div>
+
+                                <div className="timeline-section-divider" />
+
+                                {/* 레포트 카드 그리드 */}
+                                {projectCompleteReports.length > 0 ? (
+                                    <div className="report-cards-grid">
+                                        {projectCompleteReports.map((report) => (
+                                            <div
+                                                key={report.reportId}
+                                                className="report-card"
+                                                onClick={() => {
+                                                    setSelectedReportId(report.reportId);
+                                                    setShowReportDetailModal(true);
+                                                }}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        setSelectedReportId(report.reportId);
+                                                        setShowReportDetailModal(true);
+                                                    }
+                                                }}
+                                            >
+                                                {/* 카드 헤더 */}
+                                                <div className="report-card-header">
+                                                    <h3 className="report-card-title">
+                                                        {report.reportTitle}
+                                                    </h3>
+                                                    <div className="report-card-actions">
+                                                        {permissionGrade === 'L' && (
+                                                            <>
+                                                                <button
+                                                                    className="report-action-btn edit"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedReportId(report.reportId);
+                                                                        setReportTitle(report.reportTitle);
+                                                                        reportEditorRef.current?.getInstance()?.setMarkdown(report.reportContent || '');
+                                                                        setShowReportModal(true);
+                                                                    }}
+                                                                    aria-label="레포트 수정"
+                                                                >
+                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" />
+                                                                        <path d="M14.06 4.94l3.75 3.75" strokeLinecap="round" />
+                                                                    </svg>
+                                                                </button>
+                                                                <button
+                                                                    className="report-action-btn delete"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteReport(report.reportId);
+                                                                    }}
+                                                                    aria-label="레포트 삭제"
+                                                                >
+                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                        <path d="M4 7h16" strokeLinecap="round" />
+                                                                        <path d="M9 7V4h6v3" strokeLinejoin="round" />
+                                                                        <rect x="6" y="7" width="12" height="13" rx="2" />
+                                                                        <path d="M10 11v6M14 11v6" strokeLinecap="round" />
+                                                                    </svg>
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* 카드 본문 미리보기 - Viewer 사용 */}
+                                                <div className="report-card-preview-viewer">
+                                                    <Viewer
+                                                        key={`preview-${report.reportId}`}
+                                                        initialValue={report.reportContent?.substring(0, 200) || '내용 없음'}
+                                                    />
+                                                    {report.reportContent?.length > 200 && (
+                                                        <div className="report-preview-fade">...</div>
+                                                    )}
+                                                </div>
+
+                                                {/* 카드 푸터 */}
+                                                <div className="report-card-footer">
+                                                    <span className="report-card-date">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                        </svg>
+                                                        {new Date(report.reportCreated).toLocaleDateString('ko-KR', {
+                                                            year: 'numeric',
+                                                            month: '2-digit',
+                                                            day: '2-digit'
+                                                        })}
+                                                    </span>
+                                                    <span className="report-card-more">자세히 보기 →</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="timeline-empty">
+                                        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <p>작성된 레포트가 없습니다</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 레포트 상세보기 모달 */}
+                        {showReportDetailModal && selectedReportId && (
+                            <div
+                                className="project-modal-overlay"
+                                onClick={() => {
+                                    setShowReportDetailModal(false);
+                                    setSelectedReportId(null);
+                                }}
+                            >
+                                <div
+                                    className="callendar-input-log-modal"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ maxWidth: '1000px' }}
+                                >
+                                    {(() => {
+                                        const report = projectCompleteReports.find(r => r.reportId === selectedReportId);
+                                        if (!report) return null;
+
+                                        return (
+                                            <>
+                                                <div className="callendar-log-input-header">
+                                                    <h4>{report.reportTitle}</h4>
+                                                    <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>
+                                                        작성일: {new Date(report.reportCreated).toLocaleDateString('ko-KR', {
+                                                            year: 'numeric',
+                                                            month: '2-digit',
+                                                            day: '2-digit'
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                <div className="log-detail-content" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                                                    <Viewer
+                                                        key={`detail-${report.reportId}`}
+                                                        initialValue={report.reportContent || ''}
+                                                    />
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         )}
                         {dashboardIndex === 'insight' && projectBasic.status === 'C' && (
