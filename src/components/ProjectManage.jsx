@@ -4,6 +4,7 @@ import { useApiError } from '../util/ResultHandler.js';
 
 import { useToast } from '../components/ToastContext';
 import { useAuth } from '../context/AuthContext.jsx';
+
 import API from '../config/apiConfig.js';
 import '../css/ProjectManage.css';
 import FullCalendar from '@fullcalendar/react';
@@ -50,7 +51,7 @@ export default function ProjectManage() {
 
     const { projectId } = useParams();
     const { addToast } = useToast();
-    const { isLogined, loginSuccess } = useAuth();
+    const { isLogined, loginSuccess, logout } = useAuth();
 
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
@@ -162,28 +163,59 @@ export default function ProjectManage() {
 
     // 레포트 삭제
     const handleDeleteReport = async (reportId) => {
-        if (!window.confirm('이 레포트를 삭제하시겠습니까?')) {
-            return;
-        }
-
         try {
             const response = await fetch(`${API.API_BASE_URL}/project/report/delete`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reportId })
+                body: JSON.stringify({
+                    reportId
+                })
             });
 
             const result = await response.json();
+            let toastData;
 
-            if (result.reportDeleteStatus) {
-                addToast('레포트가 삭제되었습니다', 'success');
-                setProjectReports(prev => prev.filter(r => r.id !== reportId));
-            } else {
-                addToast(result.reportDeleteMessage || '삭제에 실패했습니다', 'error');
+            if (response.status === 500) {
+                toastData = {
+                    status: 'error',
+                    message: result.reportDeleteMessage || "서버 통신 불가"
+                }
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/');
+                return;
+            } else if (response.status === 400 || response.status === 404) {
+                toastData = {
+                    status: 'error',
+                    message: result.reportDeleteMessage
+                }
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                logout();
+                navigate('/');
+                return;
+            } else if (response.status === 401) {
+                toastData = {
+                    status: 'error',
+                    message: result.reportDeleteMessage
+                }
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login');
+                return;
+            } else if (response.status === 403) {
+                addToast(result.reportDeleteMessage, "error");
+                return;
+            } else if (response.ok && result.reportDeleteStatus) {
+                toastData = {
+                    status: 'success',
+                    message: result.reportDeleteMessage
+                }
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                window.location.reload();
+                return;
             }
         } catch (error) {
             handleNetworkError(error, "레포트 삭제 중 에러가 발생했습니다");
+            return;
         }
     };
 
