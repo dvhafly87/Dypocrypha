@@ -2824,11 +2824,7 @@ export default function ProjectManage() {
                                                                 <button
                                                                     className="report-action-btn edit"
                                                                     onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setSelectedReportId(report.reportId);
-                                                                        setReportTitle(report.reportTitle);
-                                                                        reportEditorRef.current?.getInstance()?.setMarkdown(report.reportContent || '');
-                                                                        setShowReportModal(true);
+                                                                        navigate(`/project/report/update/${report.reportId}/${projectId}`)
                                                                     }}
                                                                     aria-label="레포트 수정"
                                                                 >

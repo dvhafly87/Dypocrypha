@@ -21,6 +21,7 @@ import ProjectManage from './components/ProjectManage.jsx';
 import ProjectReport from './components/ProjectReport';
 
 import PrivateWriter from './util/Private-Board-Content.jsx';
+import ReportEditor from './components/ProjectReportEdit.jsx';
 
 
 import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
@@ -53,6 +54,7 @@ export default function App() {
 
               <Route path="/project" element={<ProjectHome />} />
               <Route path="/project/manage/:projectId" element={<ProjectManage />} />
+              <Route path="/project/report/update/:reportId/:projectId" element={<ReportEditor />} />
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
 
             </Routes>
