@@ -65,21 +65,15 @@ export default function ProjectMain() {
   const handleThumbChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 이미지 파일인지 확인
       if (!file.type.startsWith('image/')) {
         addToast('이미지 파일만 업로드 가능합니다.', 'warning');
         return;
       }
-
-      // 파일 크기 체크 (5MB 제한)
       if (file.size > 10 * 1024 * 1024) {
         addToast('파일 크기는 10MB 이하여야 합니다.', 'warning');
         return;
       }
-
       setProjectThumb(file);
-
-      // 미리보기 생성
       const reader = new FileReader();
       reader.onloadend = () => {
         setThumbPreview(reader.result);
@@ -107,7 +101,6 @@ export default function ProjectMain() {
     if (skillStack) {
       formData.append('skillStack', skillStack);
     }
-
     if (projectThumb) {
       formData.append('projectThumb', projectThumb);
     }
@@ -120,10 +113,7 @@ export default function ProjectMain() {
       });
 
       if (!response.ok) {
-        const toastData = {
-          status: 'warning',
-          message: "서버 통신 불가"
-        };
+        const toastData = { status: 'warning', message: "서버 통신 불가" };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         navigate('/');
         return;
@@ -135,17 +125,13 @@ export default function ProjectMain() {
         addToast('프로젝트가 생성되었습니다.', 'success');
         setAddProjectModalOpen(false);
         resetForm();
-        // 프로젝트 목록 새로고침
         getProjectInformation();
       } else {
         setAddProjectModalOpen(false);
         addToast(result.createPJMessage, 'warning');
       }
     } catch (error) {
-      const toastData = {
-        status: 'warning',
-        message: "서버 통신 불가"
-      };
+      const toastData = { status: 'warning', message: "서버 통신 불가" };
       localStorage.setItem('redirectToast', JSON.stringify(toastData));
       navigate('/');
       return;
@@ -172,16 +158,11 @@ export default function ProjectMain() {
     try {
       const response = await fetch(`${API.API_BASE_URL}/project/getAllData`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
-        const toastData = {
-          status: 'warning',
-          message: '프로젝트 목록을 불러올 수 없습니다.'
-        };
+        const toastData = { status: 'warning', message: '프로젝트 목록을 불러올 수 없습니다.' };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         window.location.href = '/';
       }
@@ -191,19 +172,13 @@ export default function ProjectMain() {
       if (result.projectDataStatus) {
         setProjectInfo(result.projectDataBool ? result.projectData : []);
       } else {
-        const toastData = {
-          status: 'warning',
-          message: result.projectDataMessage
-        };
+        const toastData = { status: 'warning', message: result.projectDataMessage };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
         window.location.href = '/';
       }
     } catch (error) {
       console.error('Token validation error:', error);
-      const toastData = {
-        status: 'error',
-        message: '프로젝트 페이지 useEffect API 에러'
-      };
+      const toastData = { status: 'error', message: '프로젝트 페이지 useEffect API 에러' };
       localStorage.setItem('redirectToast', JSON.stringify(toastData));
       window.location.href = '/';
     }
@@ -213,14 +188,25 @@ export default function ProjectMain() {
     getProjectInformation();
   }, []);
 
-  const hasProject = projectInfo.length > 0
+  const hasProject = projectInfo.length > 0;
 
-  // ProjectMain.jsx의 상태에 추가할 부분
-  const [viewMode, setViewMode] = useState('card'); // 'card' or 'list'
+  const [viewMode, setViewMode] = useState('card');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 검색 필터링된 프로젝트
+  // ✅ 상태 필터 (null = 전체, 'I'/'C'/'H'/'D' = 특정 상태)
+  const [statusFilter, setStatusFilter] = useState(null);
+
+  // 상태 박스 클릭 핸들러 - 같은 걸 다시 클릭하면 해제
+  const handleStatusBoxClick = (statusCode) => {
+    setStatusFilter(prev => prev === statusCode ? null : statusCode);
+  };
+
+  // 검색어 + 상태 필터 동시 적용
   const filteredProjects = projectInfo.filter(project => {
+    // 상태 필터 적용
+    if (statusFilter && project.status !== statusFilter) return false;
+
+    // 검색어 필터 적용
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -232,17 +218,14 @@ export default function ProjectMain() {
     );
   });
 
-  // 검색 핸들러 수정
   const handleSearch = (e) => {
     e.preventDefault();
   };
 
-  // 프로젝트 클릭 핸들러
   const handleProjectClick = (projectId) => {
     navigate(`/project/manage/${projectId}`);
   };
 
-  // 상태 라벨 가져오기
   const getStatusLabel = (status) => {
     const statusMap = {
       'I': { label: '진행중', color: '#2196f3' },
@@ -253,7 +236,6 @@ export default function ProjectMain() {
     return statusMap[status] || { label: '알 수 없음', color: '#999' };
   };
 
-  // 날짜 포맷팅
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -272,31 +254,64 @@ export default function ProjectMain() {
             <h2 className="project-title">프로젝트</h2>
             <span className="project-sub-title">
               전체 프로젝트 {projectInfo.length}건
+              {/* ✅ 필터 활성화 중일 때 안내 텍스트 표시 */}
+              {statusFilter && (
+                <span className="status-filter-active-hint">
+                  &nbsp;·&nbsp;{getStatusLabel(statusFilter).label} 필터 적용 중
+                  <button
+                    className="status-filter-clear-btn"
+                    onClick={() => setStatusFilter(null)}
+                  >
+                    ✕ 해제
+                  </button>
+                </span>
+              )}
             </span>
           </div>
 
           <div className="project-header-right">
-            <div className="project-status-box complete">
+            {/* ✅ 완료 - 클릭 가능한 상태 박스 */}
+            <div
+              className={`project-status-box complete ${statusFilter === 'C' ? 'status-active' : ''}`}
+              onClick={() => handleStatusBoxClick('C')}
+              title="완료 프로젝트만 보기"
+            >
               <span className="count">{completed}</span>
               <span className="label">완료</span>
             </div>
 
-            <div className="project-status-box progress">
+            {/* ✅ 진행중 */}
+            <div
+              className={`project-status-box progress ${statusFilter === 'I' ? 'status-active' : ''}`}
+              onClick={() => handleStatusBoxClick('I')}
+              title="진행중 프로젝트만 보기"
+            >
               <span className="count">{inProgress}</span>
               <span className="label">진행중</span>
             </div>
 
-            <div className="project-status-box progress">
+            {/* ✅ 대기 */}
+            <div
+              className={`project-status-box progress ${statusFilter === 'H' ? 'status-active' : ''}`}
+              onClick={() => handleStatusBoxClick('H')}
+              title="대기 프로젝트만 보기"
+            >
               <span className="count">{hold}</span>
               <span className="label">대기</span>
             </div>
 
-            <div className="project-status-box progress">
+            {/* ✅ 중단 */}
+            <div
+              className={`project-status-box progress ${statusFilter === 'D' ? 'status-active' : ''}`}
+              onClick={() => handleStatusBoxClick('D')}
+              title="중단 프로젝트만 보기"
+            >
               <span className="count">{dropped}</span>
               <span className="label">중단</span>
             </div>
           </div>
         </div>
+
         <div className="project-content-container">
           <div className="project-main-content-container">
             <div className="project-main-content-header">
@@ -309,16 +324,7 @@ export default function ProjectMain() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <button type="submit">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="11" cy="11" r="8" />
                       <path d="m21 21-4.35-4.35" />
                     </svg>
@@ -350,6 +356,7 @@ export default function ProjectMain() {
                 <button className="add-new-project" onClick={addNewProject}>새 프로젝트 생성 +</button>
               </div>
             </div>
+
             {!hasProject && (
               <div className="project-non-list-container">
                 <h3>현재 생성된 프로젝트가 없습니다.</h3>
@@ -365,8 +372,17 @@ export default function ProjectMain() {
                       <circle cx="11" cy="11" r="8" />
                       <path d="m21 21-4.35-4.35" />
                     </svg>
-                    <h3>검색 결과가 없습니다</h3>
-                    <p>다른 검색어로 시도해보세요</p>
+                    {/* ✅ 상태 필터 vs 검색어 필터에 따라 메시지 분기 */}
+                    <h3>
+                      {statusFilter
+                        ? `'${getStatusLabel(statusFilter).label}' 상태의 프로젝트가 없습니다`
+                        : '검색 결과가 없습니다'}
+                    </h3>
+                    <p>
+                      {statusFilter
+                        ? '다른 상태를 선택하거나 필터를 해제해보세요'
+                        : '다른 검색어로 시도해보세요'}
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -406,8 +422,7 @@ export default function ProjectMain() {
 
                                 {!project.teamValue && (
                                   <div className="project-card-team">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                       <circle cx="12" cy="7" r="4" />
                                       <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2" />
                                     </svg>
@@ -445,11 +460,8 @@ export default function ProjectMain() {
                                     </svg>
                                     {project.pjCategory}
                                   </span>
-
                                   <span className="project-card-date">
-                                    {project.status === 'C' ?
-                                      formatDate(project.endDay) : formatDate(project.created)
-                                    }
+                                    {project.status === 'C' ? formatDate(project.endDay) : formatDate(project.created)}
                                   </span>
                                 </div>
                               </div>
@@ -495,7 +507,6 @@ export default function ProjectMain() {
                                 <p className="project-list-summary">{project.summary}</p>
 
                                 <div className="project-list-meta">
-
                                   <div className="project-list-category">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -506,14 +517,14 @@ export default function ProjectMain() {
 
                                   {!project.teamValue && (
                                     <div className="project-list-team">
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="7" r="4" />
                                         <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2" />
                                       </svg>
                                       <span>{project.starter}</span>
                                     </div>
                                   )}
+
                                   {project.teamValue && project.teamName && (
                                     <div className="project-list-team">
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -707,5 +718,5 @@ export default function ProjectMain() {
         </>
       )}
     </>
-  )
+  );
 }

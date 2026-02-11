@@ -177,36 +177,36 @@ export default function ReportEditor() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     reportId,
-                    reportProjectId: projectId,
+                    projectId,
                     reportTitle,
-                    reportContent: content
+                    content
                 })
             });
 
             const result = await response.json();
 
             if (response.status === 500) {
-                const toastData = { status: 'error', message: result.reportSaveMessage || '서버 통신 불가' };
+                const toastData = { status: 'error', message: result.reportUpdateMessage || '서버 통신 불가' };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/');
                 return;
             } else if (response.status === 400 || response.status === 404) {
-                addToast(result.reportSaveMessage || '수정에 실패했습니다.', 'error');
+                addToast(result.reportUpdateMessage || '수정에 실패했습니다.', 'error');
                 return;
             } else if (response.status === 401) {
-                const toastData = { status: 'warning', message: result.reportSaveMessage || '로그인이 필요한 서비스입니다.' };
+                const toastData = { status: 'warning', message: result.reportUpdateMessage || '로그인이 필요한 서비스입니다.' };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/login');
                 return;
             } else if (response.status === 403) {
-                addToast(result.reportSaveMessage || '권한이 없습니다.', 'error');
+                addToast(result.reportUpdateMessage || '권한이 없습니다.', 'error');
                 return;
-            } else if (response.ok && result.reportSaveStatus) {
-                const toastData = { status: 'success', message: result.reportSaveMessage || '수정되었습니다' };
+            } else if (response.ok && result.reportUpdateStatus) {
+                const toastData = { status: 'success', message: result.reportUpdateMessage || '수정되었습니다' };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate(`/project/manage/${projectId}`);
                 return;
-            }
+            } 
         } catch (error) {
             addToast('레포트 수정 중 오류가 발생했습니다.', 'error');
         } finally {

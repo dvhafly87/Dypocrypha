@@ -2031,3 +2031,73 @@
         font-size: 0.85rem;
     }
 }
+
+/* ==================== 상태 필터 추가 스타일 ==================== */
+
+/* 상태 박스 - 클릭 가능하게 */
+.project-status-box {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.project-status-box:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-status-box:active {
+    transform: translateY(0);
+}
+
+/* 활성화된 상태 박스 */
+.project-status-box.status-active {
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: #1b5e20 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.9) !important;
+}
+
+.project-status-box.status-active .count,
+.project-status-box.status-active .label {
+    color: #1b5e20;
+    opacity: 1;
+}
+
+/* 필터 활성화 힌트 텍스트 */
+.status-filter-active-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    opacity: 0.95;
+    animation: fadeInUp 0.3s ease;
+}
+
+/* 필터 해제 버튼 */
+.status-filter-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.status-filter-clear-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.7);
+    transform: scale(1.05);
+}
+
+.status-filter-clear-btn:active {
+    transform: scale(0.97);
+}
