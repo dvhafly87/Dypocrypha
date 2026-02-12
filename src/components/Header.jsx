@@ -96,7 +96,6 @@ export default function Header() {
         <Link to="/board">게시판</Link>
         <Link to="/project">프로젝트</Link>
         <Link to="/test3">아카이브</Link>
-        <Link to="/test4">AI</Link>
       </nav>
 
       {/* 사이드바 오버레이 - 항상 렌더링하되 클래스로 제어 */}
@@ -144,7 +143,6 @@ export default function Header() {
           <Link to="/board" onClick={closeSidebar}>게시판</Link>
           <Link to="/project" onClick={closeSidebar}>프로젝트</Link>
           <Link to="/test3" onClick={closeSidebar}>아카이브</Link>
-          <Link to="/test4" onClick={closeSidebar}>AI</Link>
         </nav>
       </aside>
     </>

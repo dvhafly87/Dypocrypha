@@ -8,8 +8,7 @@
 }
 
 .main-upper-section-wrapper,
-.main-middle-section-wrapper,
-.main-lower-section-wrapper {
+.main-middle-section-wrapper {
     display: flex;
     flex-direction: row;
     gap: 1.5rem;
@@ -354,49 +353,9 @@
     margin: 0;
 }
 
-/* YouTube 영역 */
-.youtube-newer-iframe-container {
-    flex: 2;
-    border-radius: 16px;
-    padding: 2rem;
-    background: white;
-    box-shadow: 0 2px 8px rgba(34, 139, 87, 0.08);
-    border: 1px solid #e8f5e9;
-    transition: all 0.3s ease;
-}
-
-.youtube-newer-iframe-container:hover {
-    box-shadow: 0 8px 24px rgba(34, 139, 87, 0.12);
-}
-
-.youtube-newer-iframe-container h2 {
-    color: #1b5e20;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    border-left: 4px solid #4caf50;
-    padding-left: 1rem;
-}
-
-.youtube-newer-iframe-container .iframe-wrapper {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-}
-
-.youtube-newer-iframe-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-}
-
-/* ====== 메인 페이지 하단 영역 ====== */
+/* 아카이브 영역 */
 .archive-container {
-    flex: 3;
+    flex: 2;
     padding: 2rem;
     border-radius: 16px;
     background: white;
@@ -416,57 +375,6 @@
     font-weight: 600;
     border-left: 4px solid #4caf50;
     padding-left: 1rem;
-}
-
-.go-ai-chatbotpage-container {
-    flex: 2;
-    padding: 2rem;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    box-shadow: 0 2px 8px rgba(34, 139, 87, 0.08);
-    border: 1px solid #4caf50;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.go-ai-chatbotpage-container:hover {
-    box-shadow: 0 12px 32px rgba(34, 139, 87, 0.2);
-    transform: translateY(-4px);
-    border-color: #2e7d32;
-}
-
-.go-ai-chatbotpage-container h2 {
-    color: #1b5e20;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.go-ai-chatbotpage-container button,
-.go-ai-chatbotpage-container a {
-    background: #4caf50;
-    color: white;
-    border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 1rem;
-}
-
-.go-ai-chatbotpage-container button:hover,
-.go-ai-chatbotpage-container a:hover {
-    background: #2e7d32;
-    transform: scale(1.05);
 }
 
 /* ========================================
@@ -523,8 +431,7 @@
     }
     
     .main-upper-section-wrapper,
-    .main-middle-section-wrapper,
-    .main-lower-section-wrapper {
+    .main-middle-section-wrapper {
         flex-direction: column;
     }
     
@@ -556,11 +463,9 @@
         padding: 0.35rem 0.8rem;
     }
     
-    /* 최근 게시글 테이블 */
+    /* 최근 게시글 및 아카이브 */
     .recently-posted-section,
-    .youtube-newer-iframe-container,
-    .archive-container,
-    .go-ai-chatbotpage-container {
+    .archive-container {
         margin-left: 0;
     }
     
@@ -600,17 +505,14 @@
     }
     
     .main-upper-section-wrapper,
-    .main-middle-section-wrapper,
-    .main-lower-section-wrapper {
+    .main-middle-section-wrapper {
         flex-direction: column;
         gap: 1rem;
     }
     
     .personal-project-slider,
     .recently-posted-section,
-    .youtube-newer-iframe-container,
-    .archive-container,
-    .go-ai-chatbotpage-container {
+    .archive-container {
         padding: 1.5rem;
     }
     
@@ -703,17 +605,14 @@
     }
     
     .main-upper-section-wrapper,
-    .main-middle-section-wrapper,
-    .main-lower-section-wrapper {
+    .main-middle-section-wrapper {
         flex-direction: column;
         gap: 0.75rem;
     }
     
     .personal-project-slider,
     .recently-posted-section,
-    .youtube-newer-iframe-container,
-    .archive-container,
-    .go-ai-chatbotpage-container {
+    .archive-container {
         padding: 1.25rem;
     }
     
@@ -832,22 +731,9 @@
         font-size: 0.85rem;
     }
     
-    /* YouTube 섹션 */
-    .youtube-newer-iframe-container h2 {
+    /* 아카이브 */
+    .archive-container h2 {
         font-size: 1.2rem;
-        margin-bottom: 1rem;
-    }
-    
-    /* 하단 섹션 */
-    .archive-container h2,
-    .go-ai-chatbotpage-container h2 {
-        font-size: 1.2rem;
-    }
-    
-    .go-ai-chatbotpage-container button,
-    .go-ai-chatbotpage-container a {
-        padding: 0.65rem 1.5rem;
-        font-size: 0.9rem;
     }
 }
 

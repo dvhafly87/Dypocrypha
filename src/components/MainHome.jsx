@@ -5,8 +5,6 @@ import { useToast } from '../components/ToastContext.jsx';
 import '../css/MainHome.css';
 
 import ProjectSlider from '../components/ProjectSlider.jsx'
-import DOAI from '../img/doge.jpeg';
-import DoBanner from '../img/dogae.jpeg';
 
 import API from '../config/apiConfig.js';
 
@@ -164,24 +162,6 @@ export default function MainHome() {
                         )}
                     </div>
                     
-                    <div className="youtube-newer-iframe-container">
-                        <h2>최근 채널 업로드 영상</h2>
-                        <div className="iframe-wrapper">
-                            <iframe
-                                src={`https://www.youtube.com/embed/o1c_yLFXCig?si=zHe8lVUM95E-pLEH`}
-                                frameBorder="0"
-                                allowFullScreen
-                            />
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="main-lower-section-wrapper">
-                    <div className="go-ai-chatbotpage-container">
-                        <h2>The Chat bot of Dypocrypha</h2>
-                        <img src={DOAI} alt="AI 챗봇 이미지"/>
-                        <Link to="/dypoai">대화하기</Link>
-                    </div>
                     <div className="archive-container">
                         <h2>아카이브</h2>
                         {/* 아직은 내용이 없고 공간만 잡아놓기 용 */}
