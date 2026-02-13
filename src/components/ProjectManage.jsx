@@ -1151,7 +1151,7 @@ export default function ProjectManage() {
         const date = new Date(dateString);
 
         return date.toLocaleDateString('ko-KR', {
-            timeZone: 'UTC',   
+            timeZone: 'UTC',
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -1719,6 +1719,22 @@ export default function ProjectManage() {
 
     return (
         <>
+            <style>{`
+            .toastui-editor-contents li > p {
+                margin: 0 !important;
+                padding: 0 !important;
+                display: inline !important;
+            }
+            .toastui-editor-contents ul,
+            .toastui-editor-contents ol {
+                margin: 8px 0 !important;
+                padding-left: 24px !important;
+            }
+            .toastui-editor-contents li {
+                margin: 2px 0 !important;
+                padding-left: 0 !important;
+            }
+            `}</style>
             <div className="page-container" data-index={pageIndex}>
                 {pageIndex !== 0 && projectBasic.status === 'C' && (
                     <div className="page-arrow-overlay-left">
@@ -2487,10 +2503,21 @@ export default function ProjectManage() {
                                                                 </div>
                                                                 <div className="log-detail-content">
                                                                     <div className="log-content-text">
-                                                                        <Viewer
-                                                                            key={selectedLog.logId}
-                                                                            initialValue={selectedLog.logContent || ''}
-                                                                        />
+                                                                        <div className="custom-viewer-wrapper">
+                                                                            <Viewer
+                                                                                key={selectedLog.logId}
+                                                                                initialValue={selectedLog.logContent || ''}
+                                                                                customHTMLRenderer={{
+                                                                                    listItem(node, { entering }) {
+                                                                                        return {
+                                                                                            type: entering ? 'openTag' : 'closeTag',
+                                                                                            tagName: 'li',
+                                                                                            outerNewLine: true,
+                                                                                        };
+                                                                                    },
+                                                                                }}
+                                                                            />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -2859,10 +2886,21 @@ export default function ProjectManage() {
 
                                                 {/* 카드 본문 미리보기 - Viewer 사용 */}
                                                 <div className="report-card-preview-viewer">
-                                                    <Viewer
-                                                        key={`preview-${report.reportId}`}
-                                                        initialValue={report.reportContent?.substring(0, 200) || '내용 없음'}
-                                                    />
+                                                    <div className="custom-viewer-wrapper">
+                                                        <Viewer
+                                                            key={`preview-${report.reportId}`}
+                                                            initialValue={report.reportContent?.substring(0, 200) || '내용 없음'}
+                                                            customHTMLRenderer={{
+                                                                listItem(node, { entering }) {
+                                                                    return {
+                                                                        type: entering ? 'openTag' : 'closeTag',
+                                                                        tagName: 'li',
+                                                                        outerNewLine: true,
+                                                                    };
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
                                                     {report.reportContent?.length > 200 && (
                                                         <div className="report-preview-fade">...</div>
                                                     )}
@@ -2931,10 +2969,21 @@ export default function ProjectManage() {
                                                 </div>
 
                                                 <div className="log-detail-content" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                                                    <Viewer
-                                                        key={`detail-${report.reportId}`}
-                                                        initialValue={report.reportContent || ''}
-                                                    />
+                                                    <div className="custom-viewer-wrapper">
+                                                        <Viewer
+                                                            key={`detail-${report.reportId}`}
+                                                            initialValue={report.reportContent || ''}
+                                                            customHTMLRenderer={{
+                                                                listItem(node, { entering }) {
+                                                                    return {
+                                                                        type: entering ? 'openTag' : 'closeTag',
+                                                                        tagName: 'li',
+                                                                        outerNewLine: true,
+                                                                    };
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </>
                                         );

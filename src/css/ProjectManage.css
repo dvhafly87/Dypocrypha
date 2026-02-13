@@ -1279,7 +1279,7 @@
 
 /* Log List Section */
 .project-log-list-section {
-    width: 38%;
+    width: 20%;
     border-right: 2px solid #e5e7eb;
     display: flex;
     flex-direction: column;
@@ -4319,4 +4319,8 @@
         align-items: flex-start;
         gap: 8px;
     }
+}
+
+.custom-viewer-wrapper div p{
+    display:none;
 }
