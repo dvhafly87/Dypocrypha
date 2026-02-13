@@ -1147,13 +1147,17 @@ export default function ProjectManage() {
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
+
         const date = new Date(dateString);
+
         return date.toLocaleDateString('ko-KR', {
+            timeZone: 'UTC',   
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit'
+            day: '2-digit',
         });
     };
+
 
     const handleChangeGrade = async (memberId, currentGrade) => {
         const newGrade = currentGrade === 'L' ? 'M' : 'L';

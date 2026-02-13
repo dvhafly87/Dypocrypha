@@ -26,6 +26,8 @@ import ReportEditor from './components/ProjectReportEdit.jsx';
 
 import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
 
+import Archive from './components/Archive.jsx';
+
 import './css/App.css'
 
 export default function App() {
@@ -56,6 +58,8 @@ export default function App() {
               <Route path="/project/manage/:projectId" element={<ProjectManage />} />
               <Route path="/project/report/update/:reportId/:projectId" element={<ReportEditor />} />
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
+
+              <Route path="/archive" element={<Archive />}/>
 
             </Routes>
           </AuthProvider>
