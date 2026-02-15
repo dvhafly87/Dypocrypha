@@ -6,8 +6,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../css/Archive.css';
 
 export default function Archive() {
+
+    // ------------------------------- 1.페이지 접근 시 토스트 메시지 확인 및 표시 섹션 ------------------------------//
+    const { addToast } = useToast(); //토스트 메시지 관리용
+    // 페이지 접근시 토스트 메시지 확인 및 표시
+    useEffect(() => {
+        const storedToastData = localStorage.getItem('redirectToast');
+        if (storedToastData) {
+            try {
+                const toastData = JSON.parse(storedToastData);
+                addToast(toastData.message, toastData.status);
+                localStorage.removeItem('redirectToast');
+            } catch (error) {
+                console.error("Failed to parse redirectToast from localStorage:", error);
+                localStorage.removeItem('redirectToast');
+            }
+        }
+    }, [addToast]);
+    // ------------------------------- 페이지 접근 시 토스트 메시지 확인 및 표시 섹션 끝 ------------------------------//
+
+    // ------------------------------- 2.페이지 state 및 핸들러 정의 섹션 ------------------------------//
     const navigate = useNavigate(); //네비게이션
-    const { addToast } = useToast(); //토스트
+    const fileInputRef = useRef(null);
+
     const { isLogined, loginSuccess, logout } = useAuth();
 
     const [files, setFiles] = useState([]); // 업로드된 파일 목록
@@ -16,9 +37,12 @@ export default function Archive() {
     const [availableExtensions, setAvailableExtensions] = useState(['all']); // 사용 가능한 확장자 목록
 
     const dropdownRef = useRef(null);
+    // ------------------------------- 페이지 state 및 핸들러 정의 섹션 끝 ------------------------------//
 
-    //------------------------------- 파일 업로드 핸들러 영역 섹션 -------------------------------//
+    //-------------------------------- 3.파일 업로드 핸들러 섹션 ------------------------------//
     const handleUpload = () => {
+
+        // 비 로그인 스테이터스 확인 처리
         if (!isLogined || !loginSuccess) {
             const toastData = {
                 status: 'warning',
@@ -29,7 +53,22 @@ export default function Archive() {
             return;
         }
 
+        // 파일 선택 input 창 열기
+        fileInputRef.current.click();
     };
+
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        navigate('/archive/upload', {
+            state: { file }
+        });
+    };
+    //-------------------------------- 파일 업로드 핸들러 섹션 끝 ------------------------------//
+
+
+
 
     // 파일 목록이 변경될 때마다 확장자 추출
     useEffect(() => {
@@ -126,6 +165,12 @@ export default function Archive() {
                     {isLogined && loginSuccess && (
                         <button className="upload-btn" onClick={handleUpload}>
                             + 업로드
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleFileSelect}
+                            />
                         </button>
                     )}
                 </div>

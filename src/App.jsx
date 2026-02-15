@@ -27,6 +27,7 @@ import ReportEditor from './components/ProjectReportEdit.jsx';
 import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
 
 import Archive from './components/Archive.jsx';
+import ArchiveUpload from './components/ArchiveUpload.jsx';
 
 import './css/App.css'
 
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
 
               <Route path="/archive" element={<Archive />}/>
+              <Route path="/archive/upload" element={<ArchiveUpload />} />
 
             </Routes>
           </AuthProvider>
