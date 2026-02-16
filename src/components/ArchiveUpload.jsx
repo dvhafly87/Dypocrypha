@@ -8,7 +8,7 @@ import '../css/ArchiveUpload.css';
 export default function ArchiveUpload() {
     const location = useLocation();
     const { addToast } = useToast();
-    const { isLogined, loginSuccess } = useAuth();
+    const { isLogined, loginSuccess, logout } = useAuth();
     const navigate = useNavigate();
     const file = location.state?.file;
     const fileInputRef = useRef(null);
@@ -138,10 +138,39 @@ export default function ArchiveUpload() {
         return '📁';
     };
 
+    const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300MB
+
     const handleUpload = async () => {
         // 파일명 검증
         if (!fileName.trim()) {
             addToast('파일명을 입력해주세요', 'warning');
+            return;
+        }
+
+        // 파일 크기 검증
+        if (selectedFile.size > MAX_FILE_SIZE) {
+            addToast('파일 크기는 300MB를 초과할 수 없습니다', 'warning');
+            return;
+        }
+
+        if (!fileExtension || fileExtension.trim() === "" || !fileExtension.includes('.')) {
+            addToast('유효한 파일 확장자가 없습니다. 파일을 다시 선택해주세요.', 'warning');
+            return;
+        }
+
+        const invalidChars = /[\\/:*?"<>|]/;
+        if (invalidChars.test(fileName)) {
+            addToast('파일명에 특수문자(\\ / : * ? " < > |)를 포함할 수 없습니다.', 'warning');
+            return;
+        }
+
+        if (!isLogined || !loginSuccess) {
+            const toastData = {
+                status: 'error',
+                message: "로그인이 필요한 서비스입니다"
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/login');
             return;
         }
 
@@ -157,19 +186,74 @@ export default function ArchiveUpload() {
             }
         }
 
-        // 업로드 로직 구현
-        const uploadData = {
-            file: selectedFile,
-            fileName: fileName + fileExtension,
-            isEncrypted,
-            password: isEncrypted ? password : null
-        };
+        const formData = new FormData();
 
-        console.log('Upload data:', uploadData);
-        // TODO: 실제 업로드 API 호출
+        formData.append('uploadFile', selectedFile);
+        formData.append('uploadFileName', fileName + fileExtension);
+        formData.append('uploadFileIsEncrypted', isEncrypted);
 
-        addToast('파일이 업로드되었습니다', 'success');
-        navigate('/archive');
+        if (isEncrypted) {
+            formData.append('uploadFileAccessPassword', password);
+        }
+
+        if (formData.get('uploadFileName').length > 255) {
+            addToast('파일명은 255자 이하로 입력해주세요', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch('/archives/main/upload', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result == null) throw new Error('파일 업로드에 실패했습니다');
+
+            if (response.status === 500) { //백엔드 서버 애플리케이션 또는 DB 통신 문제
+                const toastData = {
+                    status: 'error',
+                    message: result.uploadMessage || '서버 통신 불가' // 메시지가 없으면 백엔드 서버 애플리케이션 실행 x 
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/archive');
+                return;
+            } else if (response.status === 400) { //value 조작 요청
+                const toastData = {
+                    status: 'error',
+                    message: result.uploadMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                logout();
+                navigate('/archive');
+            } else if (response.status === 401) { //비로그인
+                const toastData = {
+                    status: 'error',
+                    message: result.uploadMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/login');
+            } else if (response.ok) { //업로드 성공
+                if (result.uploadStatus) {
+                    const toastData = {
+                        status: 'success',
+                        message: result.uploadMessage
+                    };
+                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                    navigate('/archive');
+                }
+            }
+        } catch (error) {
+            const toastData = {
+                status: 'error',
+                message: error.message || '파일 업로드에 실패했습니다'
+            };
+            localStorage.setItem('redirectToast', JSON.stringify(toastData));
+            navigate('/archive');
+            return;
+        }
     };
 
     const isUploadDisabled = !fileName.trim() ||
