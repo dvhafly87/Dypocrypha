@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../components/ToastContext';
+
+import API from '../config/apiConfig.js';
+
 import React, { useState, useEffect, useRef } from 'react';
 
 import '../css/ArchiveUpload.css';
@@ -138,7 +141,7 @@ export default function ArchiveUpload() {
         return '📁';
     };
 
-    const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300MB
+    const MAX_FILE_SIZE = 300 * 1024 * 1024;
 
     const handleUpload = async () => {
         // 파일명 검증
@@ -189,7 +192,8 @@ export default function ArchiveUpload() {
         const formData = new FormData();
 
         formData.append('uploadFile', selectedFile);
-        formData.append('uploadFileName', fileName + fileExtension);
+        formData.append('uploadFileName', fileName);
+        formData.append('uploadFileExtension', fileExtension)
         formData.append('uploadFileIsEncrypted', isEncrypted);
 
         if (isEncrypted) {
@@ -202,7 +206,7 @@ export default function ArchiveUpload() {
         }
 
         try {
-            const response = await fetch('/archives/main/upload', {
+            const response = await fetch(`${API.API_BASE_URL}/archive/main/upload`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData

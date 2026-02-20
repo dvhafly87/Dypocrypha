@@ -91,7 +91,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
-    z-index: 100;
+    z-index: 1000;
     animation: dropdownFadeIn 0.2s ease;
 }
 
@@ -100,6 +100,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -167,5 +168,194 @@
 }
 
 .archive-uploaded-viewer-container {
-    min-height: 400px;
+    flex: 1;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    align-content: start;
+    padding: 0.5rem;
+}
+
+.archive-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    height: 200px;
+    /* 추가 */
+}
+
+.archive-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #4caf50;
+    z-index: 1;
+}
+
+.archive-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.archive-card-icon {
+    font-size: 2rem;
+    color: #4caf50;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.archive-card-lock {
+    font-size: 0.75rem;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.archive-card-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.archive-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-top: auto;
+}
+
+.archive-card-ext {
+    display: inline-block;
+    background: #f0fdf4;
+    color: #2e7d32;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.72rem;
+    width: fit-content;
+}
+
+.archive-scroll-trigger {
+    grid-column: 1 / -1;
+    height: 100px;
+}
+
+.archive-empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 5rem 0;
+    color: #9ca3af;
+}
+
+.archive-empty-icon {
+    font-size: 3rem;
+}
+
+.archive-empty-text {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.archive-card-preview-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.archive-card-preview-video {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.file-search-form {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 320px;
+}
+
+.file-search-form input {
+    width: 100%;
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.file-search-form input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.file-search-form input:focus {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+.archive-card-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 기존과 동일하게 유지, title 속성으로 툴팁 */
+}
+
+.archive-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-top: auto;
+}
+
+.archive-card-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.archive-card-meta-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #9ca3af;
+    font-size: 0.74rem;
+}
+
+.archive-card-dl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4caf50;
 }

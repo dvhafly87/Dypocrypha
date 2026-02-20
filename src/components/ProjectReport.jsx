@@ -212,7 +212,7 @@ export default function ProjectReport() {
                         취소
                     </button>
                     <button className="btn-submit" onClick={handleSubmit}>
-                        레포트 제출
+                        레포트 작성
                     </button>
                 </div>
             </div>
