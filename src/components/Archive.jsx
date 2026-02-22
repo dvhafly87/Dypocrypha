@@ -61,6 +61,10 @@ export default function Archive() {
         loadFiles(pageRef.current);
     };
 
+    const somthing = () => {
+    
+    }
+
     // 초기 로드
     useEffect(() => {
         loadFiles(0);
