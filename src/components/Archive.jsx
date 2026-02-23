@@ -29,6 +29,21 @@ export default function Archive() {
     const isLoadingRef = useRef(false);
     const pageRef = useRef(0);
 
+    //리다이렉트 토스트 이펙트
+    useEffect(() => {
+        const storedToastData = localStorage.getItem('redirectToast');
+        if (storedToastData) {
+            try {
+                const toastData = JSON.parse(storedToastData);
+                addToast(toastData.message, toastData.status);
+                localStorage.removeItem('redirectToast');
+            } catch (error) {
+                console.error("Failed to parse redirectToast from localStorage:", error);
+                localStorage.removeItem('redirectToast');
+            }
+        }
+    }, [addToast]);
+
     // ----------------------------------------------------------------
     // 데이터 로드
     // ----------------------------------------------------------------
@@ -60,10 +75,6 @@ export default function Archive() {
         pageRef.current += 1;
         loadFiles(pageRef.current);
     };
-
-    const somthing = () => {
-    
-    }
 
     // 초기 로드
     useEffect(() => {
@@ -268,9 +279,6 @@ export default function Archive() {
         </svg>
     );
 
-    const isImageExt = (ext) => ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-    const isVideoExt = (ext) => ['.mp4', '.avi', '.mov'].includes(ext);
-
     // ----------------------------------------------------------------
     // Render
     // ----------------------------------------------------------------
@@ -346,7 +354,7 @@ export default function Archive() {
                 ) : (
                     <>
                         {filteredFiles.map((file, index) => (
-                            <div className="archive-card" key={index}>
+                            <div className="archive-card" key={index} onClick={() => navigate(`/archive/fileSelect/${file.fileUuidName}`)}>
                                 <div className="archive-card-top">
                                     {/* 좌: 파일명 */}
                                     <div className="archive-card-name" title={file.fileName}>

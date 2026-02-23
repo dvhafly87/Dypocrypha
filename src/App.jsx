@@ -28,6 +28,7 @@ import TokenWrapper from './Accesswrapper/ResetTokenWrapper.jsx'
 
 import Archive from './components/Archive.jsx';
 import ArchiveUpload from './components/ArchiveUpload.jsx';
+import ArchiveContent from './components/UploadFileContent.jsx';
 
 import './css/App.css'
 
@@ -61,6 +62,7 @@ export default function App() {
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
 
               <Route path="/archive" element={<Archive />}/>
+              <Route path="/archive/fileSelect/:fileUuid" element={<ArchiveContent/>} />ㄴ
               <Route path="/archive/upload" element={<ArchiveUpload />} />
 
             </Routes>

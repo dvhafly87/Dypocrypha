@@ -169,8 +169,7 @@
 
 .archive-uploaded-viewer-container {
     flex: 1;
-    max-height: calc(100vh - 220px);
-    /* 헤더 높이 + 패딩 여유 */
+    max-height: 600px;
     overflow-y: auto;
     overflow-x: hidden;
     display: grid;
@@ -376,7 +375,6 @@
 @media (max-width: 900px) {
     .archive-uploaded-viewer-container {
         grid-template-columns: repeat(3, 1fr);
-        max-height: calc(100vh - 240px);
     }
 
     .archive-main-container {
@@ -400,10 +398,6 @@
 /* 750px 이하 (헤더 세로 전환) */
 /* ========================= */
 @media (max-width: 750px) {
-    .archive-uploaded-viewer-container {
-        max-height: calc(100vh - 300px);
-    }
-
     .archive-header {
         flex-direction: column;
         gap: 0;
@@ -431,7 +425,6 @@
 /* ========================= */
 @media (max-width: 600px) {
     .archive-uploaded-viewer-container {
-        max-height: calc(100vh - 320px);
         grid-template-columns: 1fr;
         gap: 1rem;
     }
@@ -460,7 +453,6 @@
 @media (max-width: 400px) {
     .archive-uploaded-viewer-container {
         grid-template-columns: 1fr;
-        max-height: calc(100vh - 280px);
     }
 
     .archive-main-container {
