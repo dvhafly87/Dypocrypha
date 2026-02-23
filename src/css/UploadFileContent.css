@@ -1,0 +1,473 @@
+.file-content-main-container {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 3rem;
+    gap: 2rem;
+}
+
+/* ---------------------------------------------------------------- */
+/* 헤더 */
+/* ---------------------------------------------------------------- */
+.file-content-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    justify-content: space-between;
+    border-radius: 15px;
+    padding: 1.5rem 2rem;
+}
+
+.file-content-header-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.file-content-main-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.file-content-sub-title {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin: 0;
+}
+
+.file-content-back-btn {
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.file-content-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------------------------- */
+/* 비밀번호 인증 */
+/* ---------------------------------------------------------------- */
+.file-password-auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+}
+
+.file-password-auth-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2.5rem 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 420px;
+}
+
+.file-password-lock-icon {
+    color: #4caf50;
+    display: flex;
+    align-items: center;
+}
+
+.file-password-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.file-password-desc {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+    text-align: center;
+}
+
+.file-password-input-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.file-password-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.file-password-input:focus {
+    border-color: #4caf50;
+}
+
+.file-password-submit-btn {
+    padding: 0.75rem 1.5rem;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.file-password-submit-btn:hover {
+    background: #45a049;
+}
+
+.file-password-submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- */
+/* 파일 상세 */
+/* ---------------------------------------------------------------- */
+.select-file-viewer-container {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    padding: 2rem;
+    height: 58vh;
+}
+
+/* 좌: 미리보기 */
+.file-detail-preview-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.file-detail-preview-wrapper {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+.file-detail-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.file-detail-preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+.file-detail-preview-pdf {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.file-detail-audio-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    width: 100%;
+}
+
+.file-detail-audio {
+    width: 100%;
+    max-width: 320px;
+}
+
+.file-detail-preview-icon {
+    color: #4caf50;
+    display: flex;
+    align-items: center;
+}
+
+/* 우: 정보 */
+.file-detail-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 420px;
+}
+
+.file-detail-info-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* 파일명 */
+.file-detail-name-group {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.file-detail-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.file-detail-ext {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-left: 0.25rem;
+}
+.file-detail-name-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.file-detail-delete-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0.25rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.file-detail-delete-icon-btn:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.file-detail-lock-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 구분선 */
+.file-detail-divider {
+    height: 1px;
+    background: #f0f0f0;
+}
+
+/* 메타 행 */
+.file-detail-meta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.file-detail-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-detail-meta-label {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.file-detail-meta-value {
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 600;
+}
+
+.file-detail-ext-badge {
+    display: inline-block;
+    background: #f0fdf4;
+    color: #2e7d32;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* 다운로드 카운트 */
+.file-detail-dl-count-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #4caf50;
+}
+
+/* 다운로드 버튼 */
+.file-detail-action-area {
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.file-detail-download-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.875rem;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.file-detail-download-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.file-detail-download-btn:active {
+    transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------- */
+/* 반응형 */
+/* ---------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .file-content-main-container {
+        padding: 1.5rem 2rem;
+    }
+
+    .select-file-viewer-container {
+        flex-direction: column;
+        height: auto;
+        gap: 2rem;
+        padding: 1.5rem;
+    }
+
+    .file-detail-preview-wrapper {
+        height: 300px;
+    }
+
+    .file-detail-info-section {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .file-content-main-container {
+        padding: 1rem 1.5rem;
+        gap: 1.25rem;
+    }
+
+    .file-content-header {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+    }
+
+    .file-content-main-title {
+        font-size: 1.3rem;
+    }
+
+    .file-content-back-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.85rem;
+    }
+
+    .select-file-viewer-container {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+
+    .file-detail-preview-wrapper {
+        height: 240px;
+    }
+
+    .file-detail-name {
+        font-size: 1.1rem;
+    }
+
+    .file-password-auth-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .file-password-input-wrapper {
+        flex-direction: column;
+    }
+
+    .file-password-submit-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .file-content-main-container {
+        padding: 0.75rem 1rem;
+        gap: 1rem;
+    }
+
+    .file-content-header {
+        padding: 0.875rem 1rem;
+    }
+
+    .file-content-main-title {
+        font-size: 1.2rem;
+    }
+
+    .file-content-sub-title {
+        font-size: 0.8rem;
+    }
+
+    .select-file-viewer-container {
+        padding: 0.75rem;
+    }
+
+    .file-detail-preview-wrapper {
+        height: 200px;
+    }
+}

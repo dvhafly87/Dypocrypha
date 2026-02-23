@@ -169,7 +169,7 @@
 
 .archive-uploaded-viewer-container {
     flex: 1;
-    max-height: calc(100vh - 220px);
+    max-height: 600px;
     /* 헤더 높이 + 패딩 여유 */
     overflow-y: auto;
     overflow-x: hidden;
