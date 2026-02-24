@@ -114,7 +114,7 @@ function PasswordAuthSection({ onSuccess }) {
                     navigate('/login');
                     return;
                 } else if (response.status === 403) {
-                    addToast(result.verifyMessage || "비밀번호가 틀립니다");
+                    addToast(result.verifyMessage || "비밀번호가 틀립니다", 'error');
                     return;
                 }
                 throw new Error(result.verifyMessage || "서버 통신 불가");
@@ -173,6 +173,9 @@ function PasswordAuthSection({ onSuccess }) {
 // 파일 상세 뷰
 // ----------------------------------------------------------------
 function FileDetailSection({ fileInfo }) {
+    const { addToast } = useToast();
+    const { fileUuid } = useParams();
+    const navigate = useNavigate();
     const fileUrl = `${API.API_BASE_URL}/archive/file/${fileInfo.fileUuidName}`;
     const ext = fileInfo.fileExtension?.toLowerCase();
 
@@ -188,20 +191,70 @@ function FileDetailSection({ fileInfo }) {
         a.click();
     };
 
+    const handleDeleteFile = async () => {
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/archive/file/delete`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileUuid })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: result.fileDeleteMessage }));
+                    navigate('/login');
+                    return;
+                } else if (response.status === 403) {
+                    addToast(result.fileDeleteMessage || "삭제 권한이 없습니다", "error");
+                    return;
+                }
+                throw new Error(result.fileDeleteMessage || "서버 통신 에러");
+            } else {
+                localStorage.setItem('redirectToast', JSON.stringify({ status: 'success', message: result.fileDeleteMessage }));
+                navigate('/archive');
+            }
+        } catch (error) {
+            localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: error.message }));
+            navigate('/');
+            return;
+        }
+    }
+
     return (
         <div className="select-file-viewer-container">
             {/* 좌: 미리보기 */}
             <div className="file-detail-preview-section">
                 <div className="file-detail-preview-wrapper">
                     {isImage && (
-                        <img src={fileUrl} alt={fileInfo.fileMainName} className="file-detail-preview-img" />
+                        <div className="file-detail-image-wrapper">
+                            <img className="file-detail-preview-img-bg" src={fileUrl} alt="" />
+                            <img className="file-detail-preview-img" src={fileUrl} alt={fileInfo.fileMainName} />
+                        </div>
                     )}
                     {isVideo && (
                         <video src={fileUrl} controls className="file-detail-preview-video" />
                     )}
                     {isAudio && (
                         <div className="file-detail-audio-wrapper">
-                            <span className="file-detail-preview-icon">{getFileIcon(ext, 72)}</span>
+                            {fileInfo.mp3FileThumb !== null ? (
+                                <>
+                                    <img
+                                        className="mp3-thumbnail-bg"
+                                        src={`${API.API_BASE_URL}/archive/file/mp3/${fileInfo.mp3FileThumb}`}
+                                        alt=""
+                                    />
+                                    <img
+                                        className="mp3-thumbnail"
+                                        src={`${API.API_BASE_URL}/archive/file/mp3/${fileInfo.mp3FileThumb}`}
+                                        alt={fileInfo.mp3FileThumb}
+                                    />
+                                </>
+                            ) : (
+                                <span className="file-detail-preview-icon">{getFileIcon(ext, 72)}</span>
+                            )}
                             <audio src={fileUrl} controls className="file-detail-audio" />
                         </div>
                     )}
@@ -224,7 +277,7 @@ function FileDetailSection({ fileInfo }) {
                             <div className="file-detail-divider" />
                             <span className="file-detail-ext">{fileInfo.fileExtension}</span>
                         </div>
-                        <button className="file-detail-delete-icon-btn">
+                        <button className="file-detail-delete-icon-btn" onClick={handleDeleteFile}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="3 6 5 6 21 6" />

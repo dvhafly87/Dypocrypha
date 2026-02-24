@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../components/ToastContext';
 import API from '../config/apiConfig.js';
+import DOGO from '../img/dogae.jpeg';
 import '../css/Archive.css';
 
 export default function Archive() {
@@ -373,6 +374,8 @@ export default function Archive() {
                                                 <img src={`${API.API_BASE_URL}/archive/file/${file.fileUuidName}`} className="archive-card-preview-img" alt={file.fileName} />
                                             ) : !file.isEncrypted && ['.mp4', '.avi', '.mov'].includes(file.fileExtension) ? (
                                                 <video src={`${API.API_BASE_URL}/archive/file/${file.fileUuidName}`} className="archive-card-preview-video" muted />
+                                            ) : !file.isEncrypted && ['.mp3'].includes(file.fileExtension) && file.mp3FileThumb !== null ? (
+                                                 <img src={`${API.API_BASE_URL}/archive/file/mp3/${file.mp3FileThumb}`} className="archive-card-preview-img" alt={file.mp3FileThumb} />
                                             ) : (
                                                 getFileIcon(file.fileExtension)
                                             )}

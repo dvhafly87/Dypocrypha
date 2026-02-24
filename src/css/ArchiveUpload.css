@@ -333,6 +333,70 @@
     accent-color: #4caf50;
 }
 
+.file-mp3-thumbnail-uploader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-mp3-thumbnail-uploader label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.thumbnail-drop-zone {
+    border: 2px dashed #4caf50;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    background-color: #f8fff8;
+    transition: background-color 0.2s;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.thumbnail-drop-zone:hover {
+    background-color: #e8f5e9;
+}
+
+.thumbnail-placeholder {
+    color: #999;
+    font-size: 0.95rem;
+}
+
+.thumbnail-preview-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.thumbnail-file-name {
+    font-size: 0.95rem;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.thumbnail-remove-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 0.25rem;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.thumbnail-remove-btn:hover {
+    color: #f44336;
+}
+
 /* 태블릿 (900px 이하) */
 @media (max-width: 900px) {
     .upload-confirmation-container {

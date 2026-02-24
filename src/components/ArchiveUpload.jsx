@@ -27,6 +27,39 @@ export default function ArchiveUpload() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
+    //mp3 파일 썸네일
+    const [thumbnailFile, setThumbnailFile] = useState(null);
+    const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(null);
+    const thumbnailInputRef = useRef(null);
+
+    //mp3 썸네일 관련 핸들러 제작 섹션
+    const handleThumbnailChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const MAX_SIZE = 10 * 1024 * 1024; // 50MB
+
+        if (file.size > MAX_SIZE) {
+            addToast('mp3 썸네일은 10MB 이하만 업로드 가능합니다', 'warning');
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            addToast('이미지 파일만 업로드 가능합니다', 'warning');
+            return;
+        }
+
+        setThumbnailFile(file);
+        const url = URL.createObjectURL(file);
+        setThumbnailPreviewUrl(url);
+    };
+
+    const handleThumbnailRemove = () => {
+        setThumbnailFile(null);
+        setThumbnailPreviewUrl(null);
+        if (thumbnailInputRef.current) thumbnailInputRef.current.value = '';
+    };
+
     //자물쇠 svg
     const LockIcon = ({ isLocked }) => (
         <svg
@@ -200,6 +233,10 @@ export default function ArchiveUpload() {
             formData.append('uploadFileAccessPassword', password);
         }
 
+        if (fileExtension.toLowerCase() === '.mp3' && thumbnailFile) {
+            formData.append('uploadFileThumbnail', thumbnailFile);
+        }
+
         if (formData.get('uploadFileName').length > 255) {
             addToast('파일명은 255자 이하로 입력해주세요', 'warning');
             return;
@@ -275,6 +312,9 @@ export default function ArchiveUpload() {
                             <img src={previewUrl} alt="미리보기" className="upload-preview-image" />
                         ) : selectedFile?.type.startsWith('video/') ? (
                             <video src={previewUrl} controls className="upload-preview-video" />
+                        ) : fileExtension.toLowerCase() === '.mp3' && thumbnailPreviewUrl ? (
+                            // mp3 + 썸네일 있을 때
+                            <img src={thumbnailPreviewUrl} alt="썸네일 미리보기" className="upload-preview-image" />
                         ) : (
                             <div className="upload-preview-icon">
                                 <span className="file-icon">{getFileIcon()}</span>
@@ -307,7 +347,37 @@ export default function ArchiveUpload() {
                                 <span className="file-extension">{fileExtension}</span>
                             </div>
                         </div>
-
+                        {fileExtension.toLowerCase() === '.mp3' && (
+                            <div className="file-mp3-thumbnail-uploader">
+                                <label>앨범 썸네일</label>
+                                <div
+                                    className="thumbnail-drop-zone"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                >
+                                    {thumbnailFile ? (
+                                        <div className="thumbnail-preview-info">
+                                            <span className="thumbnail-file-name">🖼️ {thumbnailFile.name}</span>
+                                            <button
+                                                type="button"
+                                                className="thumbnail-remove-btn"
+                                                onClick={(e) => { e.stopPropagation(); handleThumbnailRemove(); }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <span className="thumbnail-placeholder">클릭하여 이미지 선택</span>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={thumbnailInputRef}
+                                    onChange={handleThumbnailChange}
+                                    style={{ display: 'none' }}
+                                />
+                            </div>
+                        )}
                         <div className="encryption-section">
                             <div className="encryption-toggle">
                                 <label className="encryption-checkbox-label">
