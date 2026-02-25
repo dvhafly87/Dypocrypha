@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import ProfileContainer from '../components/ProfileContainer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
 import '../css/Header.css';
 
@@ -24,7 +26,7 @@ export default function Header() {
   const isRecorded = useRef(false);
 
   useEffect(() => {
-    if (isRecorded.current) return; 
+    if (isRecorded.current) return;
 
     const fetchVisitorStats = async () => {
       try {
@@ -35,7 +37,7 @@ export default function Header() {
         if (response.ok) {
           const data = await response.json();
           setTotalVisitors(data.todayCount);
-          isRecorded.current = true; 
+          isRecorded.current = true;
         }
       } catch (error) {
         console.error("방문자 데이터를 가져오는데 실패했습니다:", error);
@@ -43,6 +45,43 @@ export default function Header() {
     };
 
     fetchVisitorStats();
+  }, []);
+
+  const onlineUsersRef = useRef(0);
+
+  useEffect(() => {
+    onlineUsersRef.current = onlineUsers;
+  }, [onlineUsers]);
+
+  const clientRef = useRef(null);
+
+  useEffect(() => {
+    if (clientRef.current) return; // 이미 연결되면 무시
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${API.API_BASE_URL}/ws`),
+      reconnectDelay: 5000,
+    });
+
+    client.onConnect = () => {
+      console.log('STOMP CONNECTED'); // 이게 찍히는지 먼저 확인
+      const subscription = client.subscribe('/topic/online-users', (message) => {
+        console.log("메시지 도착:", message.body);
+        const data = JSON.parse(message.body);
+        setOnlineUsers(data.count);
+      });
+      
+      client.publish({
+        destination: '/app/request-count'
+      });
+
+      console.log("구독 시작됨:", subscription.id);
+    };
+
+    client.activate();
+    clientRef.current = client;
+
+    return () => client.deactivate();
   }, []);
 
   const handleSearchKey = (e) => {
@@ -135,7 +174,7 @@ export default function Header() {
           <img src={DOGE} alt="로고" />
           <Link to="/">Dypocrypha</Link>
           <div className="visitor-badge">
-            <span className="visitor-total">{totalVisitors}</span> 
+            <span className="visitor-total">{totalVisitors}</span>
             <span className="visitor-online">•{onlineUsers}</span>
           </div>
         </div>
