@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { useToast } from '../components/ToastContext.jsx';
+import { useNavigate } from 'react-router-dom';
 import ProfileContainer from '../components/ProfileContainer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import API from '../config/apiConfig.js';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 import '../css/Header.css';
 
@@ -10,8 +15,63 @@ import SIC from '../img/sic.jpg';
 
 export default function Header() {
   const { isLogined } = useAuth();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchAllKey, setSearchAllKey] = useState('');
+  const [totalVisitors, setTotalVisitors] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState(0);
+
+  const isRecorded = useRef(false);
+
+  useEffect(() => {
+    if (isRecorded.current) return; 
+
+    const fetchVisitorStats = async () => {
+      try {
+        const response = await fetch('/main/visitor/record', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTodayVisitors(data.todayCount);
+          isRecorded.current = true; 
+        }
+      } catch (error) {
+        console.error("방문자 데이터를 가져오는데 실패했습니다:", error);
+      }
+    };
+
+    fetchVisitorStats();
+  }, []);
+  const handleSearchKey = (e) => {
+    e.preventDefault();
+
+    if (!searchAllKey.trim()) {
+      addToast("검색어를 입력해주세요", "error");
+      return;
+    }
+
+    if (searchAllKey.length > 50) {
+      addToast("검색어는 50자 제한입니다.", "warning");
+      return;
+    }
+
+    if (searchAllKey.length < 2) {
+      addToast("최소 2자 이상의 검색어를 입력해주세요", "warning");
+      return;
+    }
+
+    navigate(`/all/search/${encodeURIComponent(searchAllKey)}`);
+    closeSidebar();
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchAllKey(value.slice(0, 50));
+  };
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -62,8 +122,8 @@ export default function Header() {
     <>
       <header className="main-header">
         {/* 햄버거 메뉴 (모바일만) */}
-        <button 
-          className="hamburger-btn" 
+        <button
+          className="hamburger-btn"
           onClick={toggleSidebar}
           aria-label="메뉴 열기"
           aria-expanded={isSidebarOpen}
@@ -72,24 +132,44 @@ export default function Header() {
           <span></span>
           <span></span>
         </button>
-
         <div className="brand-box">
-          <img src={DOGE} alt="Dypocrypha 로고" />
+          <img src={DOGE} alt="로고" />
           <Link to="/">Dypocrypha</Link>
+          <div className="visitor-badge">
+            <span className="visitor-total">{totalVisitors}</span> {/* 방문자수 카운트 빨간색 */}
+            <span className="visitor-online">•{onlineUsers}</span> {/* 접속자수 카운트 초록색 */}
+          </div>
         </div>
-        
+
         {/* 데스크톱 검색창 */}
-        <form className="search-box desktop-search">
-          <input type="text" placeholder="키워드 입력" name="search" autoComplete='off'/>
+        <form className="search-box desktop-search" onSubmit={handleSearchKey}>
+          <div className="input-wrapper">
+            <input
+              type="text"
+              placeholder="키워드 입력"
+              name="search"
+              autoComplete="off"
+              value={searchAllKey}
+              onChange={handleSearchChange}
+              maxLength={50}
+            />
+            <span
+              className={`char-counter ${searchAllKey.length >= 45 ? 'warning' : ''
+                }`}
+            >
+              {searchAllKey.length}/50
+            </span>
+          </div>
+
           <button type="submit" className="search-btn">
             <img src={SIC} alt="검색" className="search-icon" />
           </button>
         </form>
-        
+
         {/* 데스크톱 로그인/프로필 (모바일에서 CSS로 숨김) */}
         {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
       </header>
-      
+
       {/* <nav className="sub-nav" style={{ top: topValue }}> */}
       <nav className="sub-nav">
         <Link to="/">홈</Link>
@@ -99,19 +179,19 @@ export default function Header() {
       </nav>
 
       {/* 사이드바 오버레이 - 항상 렌더링하되 클래스로 제어 */}
-      <div 
-        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} 
+      <div
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
         onClick={closeSidebar}
         aria-hidden={!isSidebarOpen}
       ></div>
 
       {/* 모바일 사이드바 - 항상 렌더링하되 클래스로 제어 */}
-      <aside 
+      <aside
         className={`mobile-sidebar ${isSidebarOpen ? 'open' : ''}`}
         aria-hidden={!isSidebarOpen}
       >
         <div className="sidebar-header">
-        
+
         </div>
 
         {/* 모바일 로그인/프로필 영역 */}
@@ -119,8 +199,8 @@ export default function Header() {
           {isLogined ? (
             <ProfileContainer />
           ) : (
-            <Link 
-              className="move-agreeAndlogin sidebar-login" 
+            <Link
+              className="move-agreeAndlogin sidebar-login"
               to="/login"
               onClick={closeSidebar}
             >
@@ -130,8 +210,25 @@ export default function Header() {
         </div>
 
         {/* 사이드바 검색창 */}
-        <form className="search-box mobile-search">
-          <input type="text" placeholder="키워드 입력" name="search" autoComplete="off"/>
+        <form className="search-box mobile-search" onSubmit={handleSearchKey}>
+          <div className="input-wrapper">
+            <input
+              type="text"
+              placeholder="키워드 입력"
+              name="search"
+              autoComplete="off"
+              value={searchAllKey}
+              onChange={handleSearchChange}
+              maxLength={50}
+            />
+            <span
+              className={`char-counter ${searchAllKey.length >= 45 ? 'warning' : ''
+                }`}
+            >
+              {searchAllKey.length}/50
+            </span>
+          </div>
+
           <button type="submit" className="search-btn">
             <img src={SIC} alt="검색" className="search-icon" />
           </button>

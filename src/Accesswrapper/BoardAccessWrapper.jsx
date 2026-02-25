@@ -6,7 +6,7 @@ import PrivateBoardPage from '../components/Private-Board-Content.jsx';
 import API from '../config/apiConfig';
 import '../css/PrivateAccess.css';
 
-export default function BoardPrivatePostAccess({ boardId, boardName }) {
+export default function BoardPrivatePostAccess({ boardId, boardName, boardDescription}) {
     const navigate = useNavigate();
     const { addToast } = useToast();
     const [verifyResult, setVerifyResult] = useState(false);
@@ -115,6 +115,7 @@ export default function BoardPrivatePostAccess({ boardId, boardName }) {
         <PrivateBoardPage 
             boardId={boardId} 
             boardName={boardName}
+            boardDescription={boardDescription}
         />
         : 
         <div className="private-board-access-container">

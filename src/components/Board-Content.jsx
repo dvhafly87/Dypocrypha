@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import API from '../config/apiConfig';
 import '../css/BoardPost.css';
 
-export default function BoardPost({ boardId, boardName }) {
+export default function BoardPost({ boardId, boardName, boardDescription }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [isComport, setIsComport] = useState(window.innerWidth <= 1300);
@@ -19,6 +19,18 @@ export default function BoardPost({ boardId, boardName }) {
     const updated = new Date(updatedAt).getTime();
     return (updated - created) > 1000;
   };
+
+  const [postSearchQuery, setPostSearchQuery] = useState('');
+
+  // 검색 필터링
+  const filteredPosts = posts.filter(post =>
+    post.postTitle.toLowerCase().includes(postSearchQuery.toLowerCase()) ||
+    post.postAuthor?.toLowerCase().includes(postSearchQuery.toLowerCase())
+  );
+
+  // 이후 pinnedPosts, normalPosts를 posts 대신 filteredPosts 기준으로 변경
+  const pinnedPosts = filteredPosts.filter(post => post.postIsPinned);
+  const normalPosts = filteredPosts.filter(post => !post.postIsPinned);
 
   let postsPerPage = 6;
 
@@ -159,10 +171,6 @@ export default function BoardPost({ boardId, boardName }) {
     navigate('/board');
   };
 
-  // 고정 게시글과 일반 게시글 분리
-  const pinnedPosts = posts.filter(post => post.postIsPinned);
-  const normalPosts = posts.filter(post => !post.postIsPinned);
-
   // 페이지네이션 계산
   postsPerPage = postsPerPage - pinnedPosts.length;
 
@@ -179,9 +187,32 @@ export default function BoardPost({ boardId, boardName }) {
     <div className="board-post-container">
       {/* 헤더 */}
       <div className="board-post-header">
+        {/* 좌: 게시판 이름 + 툴팁 */}
         <div className="board-post-header-left">
-          <h1 className="board-post-title">{boardName}</h1>
+          <div className="board-title-tooltip-wrapper">
+            <h1 className="board-post-title">{boardName}</h1>
+            {boardDescription && (
+              <span className="board-info-icon">
+                !
+                <div className="board-tooltip-bubble">
+                  <div className="board-tooltip-arrow" />
+                  {boardDescription}
+                </div>
+              </span>
+            )}
+          </div>
           <p className="board-post-meta">전체 게시글 {posts.length}개</p>
+        </div>
+
+        {/* 중앙: 게시글 검색창 */}
+        <div className="board-post-search-wrapper">
+          <input
+            type="text"
+            className="board-post-search-input"
+            placeholder="게시글 검색..."
+            value={postSearchQuery}
+            onChange={(e) => setPostSearchQuery(e.target.value)}
+          />
         </div>
         <div className="board-post-header-right">
           <button className="btn-write-post" onClick={handleWritePost}>
@@ -216,6 +247,16 @@ export default function BoardPost({ boardId, boardName }) {
                 <td colSpan="6" className="board-post-empty">
                   <div className="board-post-empty-icon">📝</div>
                   <h3 className="board-post-empty-title">게시글이 없습니다</h3>
+                </td>
+              </tr>
+            ) : pinnedPosts.length === 0 && normalPosts.length === 0 ? (
+              // ↑ 검색 결과 없을 때
+              <tr>
+                <td colSpan="6" className="board-post-empty">
+                  <div className="board-post-empty-icon">🔍</div>
+                  <h3 className="board-post-empty-title">
+                    "{postSearchQuery}"에 해당하는 게시글이 없습니다
+                  </h3>
                 </td>
               </tr>
             ) : (

@@ -1,9 +1,9 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import {useToast} from '../components/ToastContext.jsx';
+import { useToast } from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import BoardPost from '../components/Board-Content.jsx';
-import BoardAccessWrapper  from '../Accesswrapper/BoardAccessWrapper.jsx';
+import BoardAccessWrapper from '../Accesswrapper/BoardAccessWrapper.jsx';
 
 import API from '../config/apiConfig.js';
 import SIC from '../img/sic.jpg';
@@ -19,26 +19,26 @@ const storageWithExpiry = {
     };
     localStorage.setItem(key, JSON.stringify(item));
   },
-  
+
   getItem: (key) => {
     const itemStr = localStorage.getItem(key);
     if (!itemStr) return null;
-    
+
     try {
       const item = JSON.parse(itemStr);
       const now = new Date();
-      
+
       if (now.getTime() > item.expiry) {
         localStorage.removeItem(key);
         return null;
       }
-      
+
       return item.value;
     } catch (e) {
       return itemStr;
     }
   },
-  
+
   removeItem: (key) => {
     localStorage.removeItem(key);
   }
@@ -48,10 +48,12 @@ export default function BoardMain() {
   const BOARD_ID_KEY = 'selectedBoardId';
   const BOARD_NAME_KEY = 'selectedBoardName';
   const BOARD_PTD_KEY = 'selectedBoardPtd';
+  const BOARD_DEC_KEY = 'selectedBoardDec';
   const navigate = useNavigate();
   const [boardChoice, setBoardChoice] = useState();
   const [boardChoiceName, setBoardChoiceName] = useState();
   const [boardChoiceProtect, setBoardChoiceProtect] = useState(false);
+  const [boardChoiceDescription, setBoardChoiceDescription] = useState();
   const [boardList, setBoardList] = useState([]);
   const [filteredBoardList, setFilteredBoardList] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,107 +64,109 @@ export default function BoardMain() {
   const [boardDescription, setBoardDescription] = useState('');
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [boardPassword, setBoardPassword] = useState('');
-  
+
   const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth <= 1300);
-  
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState('');
-  
-useEffect(() => {
-  const storedToastData = localStorage.getItem('redirectToast');
-  if (storedToastData) {
+
+  useEffect(() => {
+    const storedToastData = localStorage.getItem('redirectToast');
+    if (storedToastData) {
       try {
-          const toastData = JSON.parse(storedToastData);
-          addToast(toastData.message, toastData.status);
-          localStorage.removeItem('redirectToast');
+        const toastData = JSON.parse(storedToastData);
+        addToast(toastData.message, toastData.status);
+        localStorage.removeItem('redirectToast');
       } catch (error) {
-          console.error("Failed to parse redirectToast from localStorage:", error);
-          localStorage.removeItem('redirectToast');
+        console.error("Failed to parse redirectToast from localStorage:", error);
+        localStorage.removeItem('redirectToast');
       }
-  }
-}, [addToast]);
-
-useEffect(() => {
-  const handleResize = () => {
-    setIsNarrowScreen(window.innerWidth <= 1300);
-  };
-
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
-
-useEffect(() => {
-  const boardListCalling = async () => {
-    try {
-
-      const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if(!response.ok){
-        const toastData = {
-          status: 'warning',
-          message: "서버 통신 불가"
-        };
-        localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/');
-        return;
-      }
-
-      const result = await response.json();
-
-      if(result.boardListresult){
-        setBoardList(result.boardList);
-        setFilteredBoardList(result.boardList);
-        
-        const savedBoardId = storageWithExpiry.getItem(BOARD_ID_KEY);
-        const savedBoardName = storageWithExpiry.getItem(BOARD_NAME_KEY);
-        const savedBoardPtd = storageWithExpiry.getItem(BOARD_PTD_KEY);
-       
-        if (savedBoardId) {
-          setBoardChoice(parseInt(savedBoardId, 10));
-          setBoardChoiceName(savedBoardName);
-          
-          let protectValue = false;
-          if (savedBoardPtd === 'true' || savedBoardPtd === '1') {
-            protectValue = true;
-          } else if (savedBoardPtd === 'false' || savedBoardPtd === '0') {
-            protectValue = false;
-          } else {
-            protectValue = parseInt(savedBoardPtd, 10) === 1;
-          }
-          setBoardChoiceProtect(protectValue);
-        }
-      } else {
-        const toastData = {
-          status: 'warning',
-          message: "게시판 조회 에러"
-        };
-        localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('에러 발생:', error);
-      const toastData = {
-        status: 'warning',
-        message: "게시판 조회 불가"
-      };
-      localStorage.setItem('redirectToast', JSON.stringify(toastData));
-      navigate('/');
     }
-  };
-  boardListCalling();
-}, [navigate, addToast]);
+  }, [addToast]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsNarrowScreen(window.innerWidth <= 1300);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const boardListCalling = async () => {
+      try {
+
+        const response = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+          const toastData = {
+            status: 'warning',
+            message: "서버 통신 불가"
+          };
+          localStorage.setItem('redirectToast', JSON.stringify(toastData));
+          navigate('/');
+          return;
+        }
+
+        const result = await response.json();
+
+        if (result.boardListresult) {
+          setBoardList(result.boardList);
+          setFilteredBoardList(result.boardList);
+
+          const savedBoardId = storageWithExpiry.getItem(BOARD_ID_KEY);
+          const savedBoardName = storageWithExpiry.getItem(BOARD_NAME_KEY);
+          const savedBoardPtd = storageWithExpiry.getItem(BOARD_PTD_KEY);
+          const savedBoardDec = storageWithExpiry.getItem(BOARD_DEC_KEY);
+
+          if (savedBoardId) {
+            setBoardChoice(parseInt(savedBoardId, 10));
+            setBoardChoiceName(savedBoardName);
+            setBoardChoiceDescription(savedBoardDec || '');
+
+            let protectValue = false;
+            if (savedBoardPtd === 'true' || savedBoardPtd === '1') {
+              protectValue = true;
+            } else if (savedBoardPtd === 'false' || savedBoardPtd === '0') {
+              protectValue = false;
+            } else {
+              protectValue = parseInt(savedBoardPtd, 10) === 1;
+            }
+            setBoardChoiceProtect(protectValue);
+          }
+        } else {
+          const toastData = {
+            status: 'warning',
+            message: "게시판 조회 에러"
+          };
+          localStorage.setItem('redirectToast', JSON.stringify(toastData));
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('에러 발생:', error);
+        const toastData = {
+          status: 'warning',
+          message: "게시판 조회 불가"
+        };
+        localStorage.setItem('redirectToast', JSON.stringify(toastData));
+        navigate('/');
+      }
+    };
+    boardListCalling();
+  }, [navigate, addToast]);
 
   // 검색 필터링 로직
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setFilteredBoardList(boardList);
     } else {
-      const filtered = boardList.filter(board => 
+      const filtered = boardList.filter(board =>
         board.boardName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (board.boardDescription && board.boardDescription.toLowerCase().includes(searchQuery.toLowerCase())) ||
         board.boardCreator.toLowerCase().includes(searchQuery.toLowerCase())
@@ -173,12 +177,12 @@ useEffect(() => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    
+
     if (filteredBoardList.length === 0) {
       addToast("검색 결과가 없습니다", "warning");
     } else if (filteredBoardList.length === 1) {
       const board = filteredBoardList[0];
-      boardChoicer(board.boardPriId, board.boardName, board.boardProtected);
+      boardChoicer(board.boardPriId, board.boardName, board.boardProtected, board.boardDec);
       addToast(`"${board.boardName}" 게시판으로 이동합니다`, "success");
     } else {
       addToast(`${filteredBoardList.length}개의 게시판을 찾았습니다`, "success");
@@ -191,7 +195,7 @@ useEffect(() => {
   };
 
   const addNewBoard = () => {
-    if(!isLogined) {
+    if (!isLogined) {
       addToast("로그인이 필요합니다", "warning");
     } else {
       setIsModalOpen(true);
@@ -208,7 +212,7 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const response = await fetch(`${API.API_BASE_URL}/board/newBoard`, {
       method: 'POST',
       credentials: 'include',
@@ -218,10 +222,10 @@ useEffect(() => {
         addBoardDescription: boardDescription,
         addBoardProtected: isPasswordProtected,
         addBoardPassword: boardPassword
-      }) 
+      })
     });
 
-    if(!response.ok){
+    if (!response.ok) {
       const toastData = {
         status: 'warning',
         message: "서버 통신 불가"
@@ -232,7 +236,7 @@ useEffect(() => {
 
     const result = await response.json();
 
-    if(result.boardStatus){
+    if (result.boardStatus) {
       addToast(result.boardMessage, "success");
       closeModal();
       const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
@@ -241,7 +245,7 @@ useEffect(() => {
         headers: { 'Content-Type': 'application/json' },
       });
       const listResult = await listResponse.json();
-      if(listResult.boardListresult){
+      if (listResult.boardListresult) {
         setBoardList(listResult.boardList);
         setFilteredBoardList(listResult.boardList);
       }
@@ -253,7 +257,7 @@ useEffect(() => {
 
   const openDeleteModal = (board, e) => {
     e.stopPropagation();
-    if(!isLogined) {
+    if (!isLogined) {
       addToast("로그인이 필요합니다", "warning");
       return;
     }
@@ -267,31 +271,36 @@ useEffect(() => {
     setDeletePassword('');
   };
 
-  const boardChoicer = (id, name, ptd) => {
-    let newId, newName, newPtd;
+  const boardChoicer = (id, name, ptd, dec) => {
+    let newId, newName, newPtd, newDec;
 
-    if (id === boardChoice) { 
+    if (id === boardChoice) {
       newId = null;
       newName = null;
       newPtd = null;
+      newDec = null;
     } else {
       newId = id;
       newName = name;
       newPtd = ptd;
+      newDec = dec;
     }
 
     setBoardChoice(newId);
     setBoardChoiceName(newName);
-    setBoardChoiceProtect(newPtd); 
+    setBoardChoiceProtect(newPtd);
+    setBoardChoiceDescription(newDec);
 
     if (newId !== null) {
       storageWithExpiry.setItem(BOARD_ID_KEY, newId.toString());
       storageWithExpiry.setItem(BOARD_NAME_KEY, newName);
       storageWithExpiry.setItem(BOARD_PTD_KEY, newPtd.toString());
+      storageWithExpiry.setItem(BOARD_DEC_KEY, newDec || '');  // ← 추가
     } else {
       storageWithExpiry.removeItem(BOARD_ID_KEY);
       storageWithExpiry.removeItem(BOARD_NAME_KEY);
       storageWithExpiry.removeItem(BOARD_PTD_KEY);
+      storageWithExpiry.removeItem(BOARD_DEC_KEY);  // ← 추가
     }
 
     if (window.innerWidth <= 600 && id !== null) {
@@ -308,8 +317,8 @@ useEffect(() => {
     e.preventDefault();
 
     let response;
-    
-    if(boardToDelete.boardProtected) {
+
+    if (boardToDelete.boardProtected) {
       response = await fetch(`${API.API_BASE_URL}/private/deleteBoard`, {
         method: 'POST',
         credentials: 'include',
@@ -320,7 +329,7 @@ useEffect(() => {
           deleteBoardCreator: boardToDelete.boardCreator,
           deleteBoardProtected: boardToDelete.boardProtected,
           deleteBoardPassword: deletePassword
-        }) 
+        })
       });
     } else {
       response = await fetch(`${API.API_BASE_URL}/board/deleteBoard`, {
@@ -333,11 +342,11 @@ useEffect(() => {
           deleteBoardCreator: boardToDelete.boardCreator,
           deleteBoardProtected: boardToDelete.boardProtected,
           deleteBoardPassword: deletePassword
-        }) 
+        })
       });
     }
 
-    if(!response.ok){
+    if (!response.ok) {
       const toastData = {
         status: 'warning',
         message: "서버 통신 불가"
@@ -349,16 +358,19 @@ useEffect(() => {
 
     const result = await response.json();
 
-    if(result.deleteStatus){
+    if (result.deleteStatus) {
       addToast(result.deleteMessage, "success");
 
       storageWithExpiry.removeItem(BOARD_ID_KEY);
       storageWithExpiry.removeItem(BOARD_NAME_KEY);
       storageWithExpiry.removeItem(BOARD_PTD_KEY);
-    
+      storageWithExpiry.removeItem(BOARD_DEC_KEY);
+
+
       setBoardChoice(null);
       setBoardChoiceName(null);
       setBoardChoiceProtect(false);
+      setBoardChoiceDescription(null);
 
       closeDeleteModal();
       const listResponse = await fetch(`${API.API_BASE_URL}/board/listcalling`, {
@@ -367,7 +379,7 @@ useEffect(() => {
         headers: { 'Content-Type': 'application/json' },
       });
       const listResult = await listResponse.json();
-      if(listResult.boardListresult){
+      if (listResult.boardListresult) {
         setBoardList(listResult.boardList);
         setFilteredBoardList(listResult.boardList);
       }
@@ -392,62 +404,62 @@ useEffect(() => {
           <h2>게시판</h2>
         </div>
         <div className="sidebar-actions">
-            <div className="board-search-container">
-              <form className="board-search-form" onSubmit={handleSearchSubmit}>
-                <input 
-                  type="text" 
-                  placeholder="게시판 검색" 
-                  name="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button 
-                    type="button" 
-                    className="board-search-clear"
-                    onClick={handleSearchClear}
-                    title="검색어 지우기"
-                  >
-                    ×
-                  </button>
-                )}
-                <button type="submit" className="board-search-button" title="검색">
-                  <img src={SIC} alt="검색" className="search-icon" />
-                </button>
-              </form>
+          <div className="board-search-container">
+            <form className="board-search-form" onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                placeholder="게시판 검색"
+                name="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               {searchQuery && (
-                <div className="search-result-info">
-                  {filteredBoardList.length}개 발견
-                </div>
+                <button
+                  type="button"
+                  className="board-search-clear"
+                  onClick={handleSearchClear}
+                  title="검색어 지우기"
+                >
+                  ×
+                </button>
               )}
-            </div>
-            <button className="sidebar-actions-button" onClick={addNewBoard}>
-              + 새 게시판 생성
-            </button>
+              <button type="submit" className="board-search-button" title="검색">
+                <img src={SIC} alt="검색" className="search-icon" />
+              </button>
+            </form>
+            {searchQuery && (
+              <div className="search-result-info">
+                {filteredBoardList.length}개 발견
+              </div>
+            )}
+          </div>
+          <button className="sidebar-actions-button" onClick={addNewBoard}>
+            + 새 게시판 생성
+          </button>
         </div>
-        
+
         <div className="sidebar-boardList">
           {filteredBoardList.length > 0 ? (
             filteredBoardList.map((board) => (
-              <div 
-                key={board.boardPriId} 
+              <div
+                key={board.boardPriId}
                 className={boardChoice == board.boardPriId ? "board-list-item item-activate" : "board-list-item"}
-                onClick={() => boardChoicer(board.boardPriId, board.boardName, board.boardProtected)}
+                onClick={() => boardChoicer(board.boardPriId, board.boardName, board.boardProtected, board.boardDec)}
               >
                 <div className="board-list-content">
                   <div className="board-list-header">
                     <div className="board-title-wrapper">
                       {board.boardProtected && (
                         <span className="lock-icon">
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="14" 
-                            height="14" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                           >
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -460,20 +472,20 @@ useEffect(() => {
                       </span>
                     </div>
                     {isLogined && board.boardPriId !== 1 && board.boardName !== '자유게시판' && (
-                      <button 
+                      <button
                         className="delete-board-button"
                         onClick={(e) => openDeleteModal(board, e)}
                         title="게시판 삭제"
                       >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="18" 
-                          height="18" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
                           strokeLinejoin="round"
                         >
                           <polyline points="3 6 5 6 21 6"></polyline>
@@ -510,36 +522,38 @@ useEffect(() => {
           )}
         </div>
       </div>
-      
+
       <div className={boardChoice == null ? "board-main-container" : "board-main-container-choice"}>
-        {boardChoice == null 
-        ? 
+        {boardChoice == null
+          ?
           <>
             <div className="board-main-placeholder">
               <h3>게시판을 선택해주세요</h3>
               <p>왼쪽 사이드바에서 게시판을 선택하거나 새로운 게시판을 생성하세요.</p>
             </div>
-          </> 
-          : 
-          boardChoiceProtect ? 
-          <>
-            <div>
-              <BoardAccessWrapper 
-                  boardId={boardChoice} 
-                  boardName={boardChoiceName}
-              />
-            </div>
           </>
           :
+          boardChoiceProtect ?
             <>
               <div>
-                <BoardPost 
-                    boardId={boardChoice} 
-                    boardName={boardChoiceName}
+                <BoardAccessWrapper
+                  boardId={boardChoice}
+                  boardName={boardChoiceName}
+                  boardDescription={boardChoiceDescription}
                 />
               </div>
             </>
-          }
+            :
+            <>
+              <div>
+                <BoardPost
+                  boardId={boardChoice}
+                  boardName={boardChoiceName}
+                  boardDescription={boardChoiceDescription}
+                />
+              </div>
+            </>
+        }
       </div>
 
       {isModalOpen && (

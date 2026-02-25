@@ -2,9 +2,11 @@
     width: 100%;
     box-sizing: border-box;
     display: flex;
+    height: 85vh;
     flex-direction: column;
     padding: 2rem 3rem;
     gap: 2rem;
+    overflow:scroll;
 }
 
 .main-upper-section-wrapper,
@@ -247,15 +249,15 @@
 
 /* 게시판 이름 열 */
 .recently-posted-section th:nth-child(1),
-.recently-posted-section td:nth-child(1) { 
-    width: 15%; 
+.recently-posted-section td:nth-child(1) {
+    width: 15%;
     color: #4caf50;
     font-weight: 500;
 }
 
 /* 제목 열 */
 .recently-posted-section th:nth-child(2),
-.recently-posted-section td:nth-child(2) { 
+.recently-posted-section td:nth-child(2) {
     width: 40%;
     text-align: left;
     font-weight: 500;
@@ -263,14 +265,14 @@
 
 /* 작성자 열 */
 .recently-posted-section th:nth-child(3),
-.recently-posted-section td:nth-child(3) { 
-    width: 15%; 
+.recently-posted-section td:nth-child(3) {
+    width: 15%;
     color: #666;
 }
 
 /* 작성일 열 */
 .recently-posted-section th:nth-child(4),
-.recently-posted-section td:nth-child(4) { 
+.recently-posted-section td:nth-child(4) {
     width: 15%;
     color: #757575;
     font-size: 0.9rem;
@@ -278,7 +280,7 @@
 
 /* 조회수 열 */
 .recently-posted-section th:nth-child(5),
-.recently-posted-section td:nth-child(5) { 
+.recently-posted-section td:nth-child(5) {
     width: 15%;
     color: #757575;
 }
@@ -321,8 +323,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-text {
@@ -377,366 +384,6 @@
     padding-left: 1rem;
 }
 
-/* ========================================
-   반응형 미디어 쿼리
-======================================== */
-
-/* 대형 데스크톱 (1201px 이상) */
-@media (min-width: 1201px) {
-    .personal-project-slider .project-image-cell {
-        height: 326px;
-    }
-}
-
-/* 중형 데스크톱 (901px ~ 1200px) */
-@media (min-width: 901px) and (max-width: 1200px) {
-    .main-home-container {
-        padding: 1.75rem 2.5rem;
-    }
-    
-    .personal-project-slider .project-image-cell {
-        height: 345px;
-    }
-    
-    .recently-posted-section th:nth-child(1),
-    .recently-posted-section td:nth-child(1) { 
-        width: 12%; 
-    }
-    
-    .recently-posted-section th:nth-child(2),
-    .recently-posted-section td:nth-child(2) { 
-        width: 38%;
-    }
-    
-    .recently-posted-section th:nth-child(3),
-    .recently-posted-section td:nth-child(3) { 
-        width: 18%; 
-    }
-    
-    .recently-posted-section th:nth-child(4),
-    .recently-posted-section td:nth-child(4) { 
-        width: 17%;
-    }
-    
-    .recently-posted-section th:nth-child(5),
-    .recently-posted-section td:nth-child(5) { 
-        width: 15%;
-    }
-}
-
-/* 태블릿 (601px ~ 900px) */
-@media (min-width: 601px) and (max-width: 900px) {
-    .main-home-container {
-        padding: 1.5rem 2rem;
-    }
-    
-    .main-upper-section-wrapper,
-    .main-middle-section-wrapper {
-        flex-direction: column;
-    }
-    
-    /* 프로젝트 영역 */
-    .personal-project-slider th:first-child,
-    .personal-project-slider td:first-child {
-        width: 70%;
-    }
-    
-    .personal-project-slider th:last-child,
-    .personal-project-slider td:last-child {
-        width: 30%;
-    }
-    
-    .personal-project-slider .project-image-cell {
-        height: 380px;
-    }
-    
-    .personal-project-slider .project-info-cell {
-        padding: 0.9rem 1.3rem;
-    }
-    
-    .personal-project-slider .project-info-value {
-        font-size: 0.9rem;
-    }
-    
-    .personal-project-slider .stack-tag {
-        font-size: 0.8rem;
-        padding: 0.35rem 0.8rem;
-    }
-    
-    /* 최근 게시글 및 아카이브 */
-    .recently-posted-section,
-    .archive-container {
-        margin-left: 0;
-    }
-    
-    .recently-posted-section th:nth-child(1),
-    .recently-posted-section td:nth-child(1) { 
-        width: 12%; 
-    }
-    
-    .recently-posted-section th:nth-child(2),
-    .recently-posted-section td:nth-child(2) { 
-        width: 35%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    .recently-posted-section th:nth-child(3),
-    .recently-posted-section td:nth-child(3) { 
-        width: 18%; 
-    }
-    
-    .recently-posted-section th:nth-child(4),
-    .recently-posted-section td:nth-child(4) { 
-        width: 20%;
-    }
-    
-    .recently-posted-section th:nth-child(5),
-    .recently-posted-section td:nth-child(5) { 
-        width: 15%;
-    }
-}
-
-/* 모바일 (481px ~ 600px) */
-@media (min-width: 481px) and (max-width: 600px) {
-    .main-home-container {
-        padding: 1rem 1.5rem;
-    }
-    
-    .main-upper-section-wrapper,
-    .main-middle-section-wrapper {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .personal-project-slider,
-    .recently-posted-section,
-    .archive-container {
-        padding: 1.5rem;
-    }
-    
-    /* 프로젝트 테이블을 세로 배치로 변경 */
-    .personal-project-slider table,
-    .personal-project-slider thead,
-    .personal-project-slider tbody,
-    .personal-project-slider tr {
-        display: block;
-        width: 100%;
-    }
-    
-    .personal-project-slider thead {
-        display: none;
-    }
-    
-    .personal-project-slider td {
-        display: block;
-        width: 100% !important;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .personal-project-slider .project-image-cell {
-        height: 220px;
-        padding: 0 !important;
-    }
-    
-    .personal-project-slider .project-banner-img {
-        border-radius: 8px;
-    }
-    
-    /* 최근 게시글 테이블 조정 */
-    .recently-posted-section table {
-        font-size: 0.85rem;
-    }
-    
-    .recently-posted-section th,
-    .recently-posted-section td {
-        padding: 0.75rem 0.5rem;
-    }
-    
-    /* 게시판 이름 열 숨기기 */
-    .recently-posted-section th:nth-child(1),
-    .recently-posted-section td:nth-child(1) {
-        display: none;
-    }
-    
-    .recently-posted-section th:nth-child(2),
-    .recently-posted-section td:nth-child(2) {
-        width: 40%;
-        font-size: 0.85rem;
-    }
-    
-    .recently-posted-section th:nth-child(3),
-    .recently-posted-section td:nth-child(3) {
-        width: 20%;
-        font-size: 0.8rem;
-    }
-    
-    .recently-posted-section th:nth-child(4),
-    .recently-posted-section td:nth-child(4) {
-        width: 25%;
-        font-size: 0.8rem;
-    }
-    
-    .recently-posted-section th:nth-child(5),
-    .recently-posted-section td:nth-child(5) {
-        width: 15%;
-        font-size: 0.8rem;
-    }
-    
-    .no-posts-container {
-        padding: 2rem;
-    }
-    
-    .no-posts-message {
-        font-size: 1rem;
-    }
-    
-    .no-posts-submessage {
-        font-size: 0.9rem;
-    }
-}
-
-/* 소형 모바일 (320px ~ 480px) */
-@media (max-width: 480px) {
-    .main-home-container {
-        padding: 0.75rem 1rem;
-    }
-    
-    .main-upper-section-wrapper,
-    .main-middle-section-wrapper {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .personal-project-slider,
-    .recently-posted-section,
-    .archive-container {
-        padding: 1.25rem;
-    }
-    
-    /* 프로젝트 슬라이더 헤더 */
-    .personal-project-slider h2 {
-        font-size: 1.2rem;
-        padding: 1.25rem 1.5rem;
-    }
-    
-    /* 프로젝트 테이블 세로 배치 */
-    .personal-project-slider table,
-    .personal-project-slider thead,
-    .personal-project-slider tbody,
-    .personal-project-slider tr {
-        display: block;
-        width: 100%;
-    }
-    
-    .personal-project-slider thead {
-        display: none;
-    }
-    
-    .personal-project-slider td {
-        display: block;
-        width: 100% !important;
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .personal-project-slider .project-image-cell {
-        height: 180px;
-        padding: 0 !important;
-    }
-    
-    .personal-project-slider .project-banner-img {
-        border-radius: 6px;
-    }
-    
-    .personal-project-slider .project-info-label {
-        font-size: 0.7rem;
-    }
-    
-    .personal-project-slider .project-info-value {
-        font-size: 0.85rem;
-    }
-    
-    .personal-project-slider .stack-tag {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.7rem;
-    }
-    
-    /* 최근 게시글 섹션 */
-    .recently-post-header h2 {
-        font-size: 1.2rem;
-    }
-    
-    .recently-posted-section table {
-        font-size: 0.8rem;
-    }
-    
-    .recently-posted-section th,
-    .recently-posted-section td {
-        padding: 0.65rem 0.35rem;
-    }
-    
-    /* 게시판 이름, 작성일 열 숨기기 */
-    .recently-posted-section th:nth-child(1),
-    .recently-posted-section td:nth-child(1),
-    .recently-posted-section th:nth-child(4),
-    .recently-posted-section td:nth-child(4) {
-        display: none;
-    }
-    
-    .recently-posted-section th:nth-child(2),
-    .recently-posted-section td:nth-child(2) {
-        width: 50%;
-        font-size: 0.8rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    .recently-posted-section th:nth-child(3),
-    .recently-posted-section td:nth-child(3) {
-        width: 30%;
-        font-size: 0.75rem;
-    }
-    
-    .recently-posted-section th:nth-child(5),
-    .recently-posted-section td:nth-child(5) {
-        width: 20%;
-        font-size: 0.75rem;
-    }
-    
-    /* 로딩 및 빈 상태 */
-    .loading-container,
-    .no-posts-container {
-        padding: 2rem 1rem;
-    }
-    
-    .loading-spinner {
-        width: 35px;
-        height: 35px;
-        border-width: 3px;
-    }
-    
-    .loading-text {
-        font-size: 0.85rem;
-    }
-    
-    .no-posts-message {
-        font-size: 0.95rem;
-    }
-    
-    .no-posts-submessage {
-        font-size: 0.85rem;
-    }
-    
-    /* 아카이브 */
-    .archive-container h2 {
-        font-size: 1.2rem;
-    }
-}
-
 /* 서버 에러 상태 */
 .server-error-container {
     display: flex;
@@ -766,21 +413,476 @@
     margin: 0;
 }
 
-/* 서버 에러 반응형 */
+/* ====== 메인 아카이브 카드 리스트 ====== */
+.main-archive-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.main-archive-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #e8f5e9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.main-archive-card:hover {
+    background: #f1f8f1;
+    border-color: #4caf50;
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 #4caf50;
+}
+
+/* 미리보기 박스 */
+.main-archive-card-preview {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4caf50;
+}
+
+.main-archive-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.main-archive-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4caf50;
+}
+
+/* 정보 영역 */
+.main-archive-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    /* ellipsis 작동용 */
+}
+
+.main-archive-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.main-archive-ext-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+}
+
+.main-archive-lock-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #fff3e0;
+    color: #e65100;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+}
+
+.main-archive-filename {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1b5e20;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.main-archive-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* ========================================
+   반응형 미디어 쿼리
+======================================== */
+
+/* ── 1000px 이하 (좁은 데스크톱 / 태블릿 가로) ── */
+@media (max-width: 1000px) {
+    .main-home-container {
+        padding: 1.75rem 2rem;
+    }
+
+    /* 중간 섹션 세로 배치 */
+    .main-middle-section-wrapper {
+        flex-direction: column;
+    }
+
+    /* 섹션 비율 초기화 — 전체 너비로 */
+    .recently-posted-section,
+    .archive-container {
+        flex: none;
+        width: 100%;
+    }
+
+    /* 게시글 열 너비 재조정 — 전체 너비 활용 */
+    .recently-posted-section th:nth-child(1),
+    .recently-posted-section td:nth-child(1) {
+        width: 12%;
+    }
+
+    .recently-posted-section th:nth-child(2),
+    .recently-posted-section td:nth-child(2) {
+        width: 42%;
+    }
+
+    .recently-posted-section th:nth-child(3),
+    .recently-posted-section td:nth-child(3) {
+        width: 16%;
+    }
+
+    .recently-posted-section th:nth-child(4),
+    .recently-posted-section td:nth-child(4) {
+        width: 16%;
+    }
+
+    .recently-posted-section th:nth-child(5),
+    .recently-posted-section td:nth-child(5) {
+        width: 14%;
+    }
+
+    /* 아카이브 — 넓어진 너비 활용해서 3열 그리드 */
+    .main-archive-card-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .main-archive-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.875rem;
+    }
+
+    .main-archive-card-preview {
+        width: 100%;
+        height: 90px;
+    }
+
+    .main-archive-meta {
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+}
+
+/* ── 900px 이하 (태블릿) ── */
+@media (max-width: 900px) {
+    .main-home-container {
+        padding: 1.5rem 2rem;
+        gap: 1.5rem;
+    }
+
+    /* 중간 섹션 세로 배치 */
+    .main-middle-section-wrapper {
+        flex-direction: column;
+    }
+
+    /* 게시글 섹션 비율 초기화 */
+    .recently-posted-section,
+    .archive-container {
+        flex: none;
+        width: 100%;
+    }
+
+    /* 게시글 테이블 열 너비 조정 */
+    .recently-posted-section th:nth-child(1),
+    .recently-posted-section td:nth-child(1) {
+        width: 13%;
+    }
+
+    .recently-posted-section th:nth-child(2),
+    .recently-posted-section td:nth-child(2) {
+        width: 37%;
+    }
+
+    .recently-posted-section th:nth-child(3),
+    .recently-posted-section td:nth-child(3) {
+        width: 18%;
+    }
+
+    .recently-posted-section th:nth-child(4),
+    .recently-posted-section td:nth-child(4) {
+        width: 18%;
+    }
+
+    .recently-posted-section th:nth-child(5),
+    .recently-posted-section td:nth-child(5) {
+        width: 14%;
+    }
+
+    /* 아카이브 카드 — 3열 가로 그리드로 전환 */
+    .main-archive-card-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .main-archive-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.875rem;
+    }
+
+    .main-archive-card-preview {
+        width: 100%;
+        height: 80px;
+    }
+
+    .main-archive-meta {
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+}
+
+/* ── 600px 이하 (모바일) ── */
 @media (max-width: 600px) {
+    .main-home-container {
+        padding: 1rem 1.25rem;
+        gap: 1rem;
+    }
+
+    .main-upper-section-wrapper,
+    .main-middle-section-wrapper {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .recently-posted-section,
+    .archive-container {
+        padding: 1.25rem;
+    }
+
+    /* h2 크기 */
+    .recently-post-header h2,
+    .archive-container h2 {
+        font-size: 1.2rem;
+    }
+
+    /* 게시글 테이블 — 게시판 이름 열 숨김 */
+    .recently-posted-section table {
+        font-size: 0.85rem;
+    }
+
+    .recently-posted-section th,
+    .recently-posted-section td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .recently-posted-section th:nth-child(1),
+    .recently-posted-section td:nth-child(1) {
+        display: none;
+    }
+
+    .recently-posted-section th:nth-child(2),
+    .recently-posted-section td:nth-child(2) {
+        width: 42%;
+        font-size: 0.85rem;
+    }
+
+    .recently-posted-section th:nth-child(3),
+    .recently-posted-section td:nth-child(3) {
+        width: 20%;
+        font-size: 0.82rem;
+    }
+
+    .recently-posted-section th:nth-child(4),
+    .recently-posted-section td:nth-child(4) {
+        width: 23%;
+        font-size: 0.82rem;
+    }
+
+    .recently-posted-section th:nth-child(5),
+    .recently-posted-section td:nth-child(5) {
+        width: 15%;
+        font-size: 0.82rem;
+    }
+
+    /* 아카이브 카드 — 2열 그리드 */
+    .main-archive-card-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .main-archive-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .main-archive-card-preview {
+        width: 100%;
+        height: 70px;
+    }
+
+    .main-archive-filename {
+        font-size: 0.8rem;
+    }
+
+    .main-archive-meta {
+        flex-direction: column;
+        gap: 0.1rem;
+        font-size: 0.7rem;
+    }
+
+    /* 빈 상태 / 에러 */
+    .no-posts-container,
     .server-error-container {
         padding: 2rem 1rem;
     }
-    
+
+    .no-posts-message {
+        font-size: 1rem;
+    }
+
+    .no-posts-submessage {
+        font-size: 0.9rem;
+    }
+
     .server-error-icon {
         font-size: 2.5rem;
     }
-    
+
     .server-error-message {
         font-size: 1rem;
     }
-    
+
     .server-error-submessage {
-        font-size: 0.9rem;
+        font-size: 0.88rem;
+    }
+}
+
+/* ── 400px 이하 (초소형 모바일) ── */
+@media (max-width: 400px) {
+    .main-home-container {
+        padding: 0.75rem 0.875rem;
+        gap: 0.75rem;
+    }
+
+    .recently-posted-section,
+    .archive-container {
+        padding: 1rem;
+    }
+
+    /* 게시글 테이블 — 게시판 이름 + 작성일 열 모두 숨김 */
+    .recently-posted-section table {
+        font-size: 0.78rem;
+    }
+
+    .recently-posted-section th,
+    .recently-posted-section td {
+        padding: 0.6rem 0.35rem;
+    }
+
+    .recently-posted-section th:nth-child(1),
+    .recently-posted-section td:nth-child(1),
+    .recently-posted-section th:nth-child(4),
+    .recently-posted-section td:nth-child(4) {
+        display: none;
+    }
+
+    .recently-posted-section th:nth-child(2),
+    .recently-posted-section td:nth-child(2) {
+        width: 52%;
+        font-size: 0.78rem;
+    }
+
+    .recently-posted-section th:nth-child(3),
+    .recently-posted-section td:nth-child(3) {
+        width: 28%;
+        font-size: 0.75rem;
+    }
+
+    .recently-posted-section th:nth-child(5),
+    .recently-posted-section td:nth-child(5) {
+        width: 20%;
+        font-size: 0.75rem;
+    }
+
+    /* 아카이브 카드 — 1열로 변경 + 가로 레이아웃 복귀 */
+    .main-archive-card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .main-archive-card {
+        flex-direction: row;
+        align-items: center;
+        padding: 0.65rem;
+        gap: 0.75rem;
+    }
+
+    .main-archive-card-preview {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+    }
+
+    .main-archive-filename {
+        font-size: 0.78rem;
+    }
+
+    .main-archive-ext-badge,
+    .main-archive-lock-badge {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.35rem;
+    }
+
+    .main-archive-meta {
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 0.68rem;
+    }
+
+    /* h2 */
+    .recently-post-header h2,
+    .archive-container h2 {
+        font-size: 1.1rem;
+    }
+
+    /* 빈 상태 */
+    .no-posts-container,
+    .server-error-container {
+        padding: 1.5rem 0.75rem;
+    }
+
+    .no-posts-message {
+        font-size: 0.92rem;
+    }
+
+    .server-error-icon {
+        font-size: 2rem;
     }
 }

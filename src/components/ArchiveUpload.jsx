@@ -349,7 +349,7 @@ export default function ArchiveUpload() {
                         </div>
                         {fileExtension.toLowerCase() === '.mp3' && (
                             <div className="file-mp3-thumbnail-uploader">
-                                <label>앨범 썸네일</label>
+                                <label>mp3 썸네일</label>
                                 <div
                                     className="thumbnail-drop-zone"
                                     onClick={() => thumbnailInputRef.current?.click()}

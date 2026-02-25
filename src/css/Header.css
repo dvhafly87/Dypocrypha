@@ -281,6 +281,32 @@
   color: #1B5E20;
 }
 
+.input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 55px;
+  /* 카운터 공간 확보 */
+}
+
+.char-counter {
+  position: absolute;
+  right: 8px;
+  font-size: 0.7rem;
+  color: #888;
+  pointer-events: none;
+}
+
+.char-counter.warning {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
 /* ========== 태블릿 (900px 이하) ========== */
 @media (max-width: 900px) {
   .main-header {
@@ -440,6 +466,7 @@ body.sidebar-open {
 
 /* ========== 접근성 개선 ========== */
 @media (prefers-reduced-motion: reduce) {
+
   .mobile-sidebar,
   .sidebar-overlay,
   .hamburger-btn span {

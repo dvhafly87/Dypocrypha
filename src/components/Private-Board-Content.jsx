@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import API from '../config/apiConfig';
 import '../css/BoardPost.css';
 
-export default function PrivateBoardPost({ boardId, boardName }) {
+export default function PrivateBoardPost({ boardId, boardName, boardDescription }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [isComport, setIsComport] = useState(window.innerWidth <= 1300);
@@ -20,22 +20,34 @@ export default function PrivateBoardPost({ boardId, boardName }) {
     return (updated - created) > 1000;
   };
 
+  const [postSearchQuery, setPostSearchQuery] = useState('');
+
+  // 검색 필터링
+  const filteredPosts = posts.filter(post =>
+    post.postTitle.toLowerCase().includes(postSearchQuery.toLowerCase()) ||
+    post.postAuthor?.toLowerCase().includes(postSearchQuery.toLowerCase())
+  );
+
+  // 이후 pinnedPosts, normalPosts를 posts 대신 filteredPosts 기준으로 변경
+  const pinnedPosts = filteredPosts.filter(post => post.postIsPinned);
+  const normalPosts = filteredPosts.filter(post => !post.postIsPinned);
+
   let postsPerPage = 6;
 
   postsPerPage = isMobile ? 5 : 6;
   const maxLength = Math.floor((window.innerWidth * 0.8) / 8);
   const minSwipeDistance = 50;
- 
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 600);
-      setIsComport(window.innerWidth <= 1300); 
+      setIsComport(window.innerWidth <= 1300);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
+
   useEffect(() => {
     const boardPostCalling = async () => {
       try {
@@ -95,21 +107,21 @@ export default function PrivateBoardPost({ boardId, boardName }) {
     }
     return title;
   };
-  
+
   const formatDate = (dateString) => {
     // Z를 제거하고 한국 시간으로 파싱
     const dateWithoutZ = dateString.replace('Z', '');
     const date = new Date(dateWithoutZ);
     const today = new Date();
-    
+
     const dateYear = date.getFullYear();
     const dateMonth = date.getMonth();
     const dateDay = date.getDate();
-    
+
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
     const todayDay = today.getDate();
-    
+
     if (dateYear === todayYear && dateMonth === todayMonth && dateDay === todayDay) {
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -126,18 +138,18 @@ export default function PrivateBoardPost({ boardId, boardName }) {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
-  
+
   const onTouchMove = (e) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
-  
+
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe && currentPage < totalPages) {
       handlePageChange(currentPage + 1);
     }
@@ -158,10 +170,6 @@ export default function PrivateBoardPost({ boardId, boardName }) {
     navigate('/board');
   };
 
-  // 고정 게시글과 일반 게시글 분리
-  const pinnedPosts = posts.filter(post => post.postIsPinned);
-  const normalPosts = posts.filter(post => !post.postIsPinned);
-
   // 페이지네이션 계산
   postsPerPage = postsPerPage - pinnedPosts.length;
 
@@ -179,8 +187,30 @@ export default function PrivateBoardPost({ boardId, boardName }) {
       {/* 헤더 */}
       <div className="board-post-header">
         <div className="board-post-header-left">
-          <h1 className="board-post-title">{boardName}</h1>
+          <div className="board-title-tooltip-wrapper">
+            <h1 className="board-post-title">{boardName}</h1>
+            {boardDescription && (
+              <span className="board-info-icon">
+                !
+                <div className="board-tooltip-bubble">
+                  <div className="board-tooltip-arrow" />
+                  {boardDescription}
+                </div>
+              </span>
+            )}
+          </div>
           <p className="board-post-meta">전체 게시글 {posts.length}개</p>
+        </div>
+
+        {/* 중앙: 게시글 검색창 */}
+        <div className="board-post-search-wrapper">
+          <input
+            type="text"
+            className="board-post-search-input"
+            placeholder="게시글 검색..."
+            value={postSearchQuery}
+            onChange={(e) => setPostSearchQuery(e.target.value)}
+          />
         </div>
         <div className="board-post-header-right">
           <button className="btn-write-post" onClick={handleWritePost}>
@@ -194,18 +224,18 @@ export default function PrivateBoardPost({ boardId, boardName }) {
       </div>
 
       {/* 게시글 목록 */}
-      <div 
-      className="board-post-list-container"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}>
+      <div
+        className="board-post-list-container"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}>
         <table className="board-post-table">
           <thead className="board-post-table-header">
             <tr>
               <th>번호</th>
               <th>제목</th>
               <th>작성자</th>
-              <th>작성일</th> 
+              <th>작성일</th>
               <th>조회</th>
             </tr>
           </thead>
@@ -215,6 +245,16 @@ export default function PrivateBoardPost({ boardId, boardName }) {
                 <td colSpan="6" className="board-post-empty">
                   <div className="board-post-empty-icon">📝</div>
                   <h3 className="board-post-empty-title">게시글이 없습니다</h3>
+                </td>
+              </tr>
+            ) : pinnedPosts.length === 0 && normalPosts.length === 0 ? (
+              // ↑ 검색 결과 없을 때
+              <tr>
+                <td colSpan="6" className="board-post-empty">
+                  <div className="board-post-empty-icon">🔍</div>
+                  <h3 className="board-post-empty-title">
+                    "{postSearchQuery}"에 해당하는 게시글이 없습니다
+                  </h3>
                 </td>
               </tr>
             ) : (
@@ -249,9 +289,9 @@ export default function PrivateBoardPost({ boardId, boardName }) {
                             {(() => {
                               const date = new Date(post.updatedAt.replace('Z', ''));
                               const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() && 
-                                            date.getMonth() === today.getMonth() && 
-                                            date.getDate() === today.getDate();
+                              const isToday = date.getFullYear() === today.getFullYear() &&
+                                date.getMonth() === today.getMonth() &&
+                                date.getDate() === today.getDate();
                               return isToday ? '수정됨 ' : '수정일 ';
                             })()}
                           </span>
@@ -289,9 +329,9 @@ export default function PrivateBoardPost({ boardId, boardName }) {
                             {(() => {
                               const date = new Date(post.updatedAt.replace('Z', ''));
                               const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() && 
-                                            date.getMonth() === today.getMonth() && 
-                                            date.getDate() === today.getDate();
+                              const isToday = date.getFullYear() === today.getFullYear() &&
+                                date.getMonth() === today.getMonth() &&
+                                date.getDate() === today.getDate();
                               return isToday ? '수정됨 ' : '수정일 ';
                             })()}
                           </span>
@@ -303,13 +343,13 @@ export default function PrivateBoardPost({ boardId, boardName }) {
                   );
                 })}
 
-                {Array.from({ 
-                  length: Math.max(0, postsPerPage - currentPosts.length) 
+                {Array.from({
+                  length: Math.max(0, postsPerPage - currentPosts.length)
                 }).map((_, index) => (
                   <tr key={`empty-${index}`} className="board-post-row-empty">
-                    <td colSpan="6" style={{ 
+                    <td colSpan="6" style={{
                       height: isMobile ? '60px' : '70px',
-                      borderBottom: '1px solid #f0f0f0' 
+                      borderBottom: '1px solid #f0f0f0'
                     }}></td>
                   </tr>
                 ))}

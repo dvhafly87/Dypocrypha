@@ -450,655 +450,123 @@
 .board-post-row:nth-child(5) {
     animation-delay: 0.17s;
 }
-
-/* ========================================
-   미디어 쿼리 - 1345px 이하
-======================================== */
-@media (max-width: 1345px) {
-    .board-post-header {
-        width: auto;
-        max-width: 70vw;
-    }
-
-    .board-post-notice-badge {
-        font-size: 0.6rem;
-    }
-    .board-post-title-cell {
-        flex-direction: row !important;
-        align-items: center;
-        white-space: normal;
-    }
-
-    .board-post-row td span {
-        font-size: 0.6rem;
-    }
-    
-    .board-post-table-header th:nth-child(2) {
-        min-width: 180px;
-    }
-    
-    .board-post-title-text {
-        white-space: normal;
-        word-break: keep-all;
-    }
+.board-title-tooltip-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-/* ========================================
-   미디어 쿼리 - 1100px 이하
-======================================== */
-@media (max-width: 1100px) {
-    .board-post-container {
-        min-width: 65vw;
-    }
-    
-    .board-post-table-header {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    .board-post-title-cell {
-        flex-direction: row !important;
-        align-items: center;
-        white-space: normal;
-    }
-    
-    .board-post-table-header th:nth-child(2) {
-        min-width: 150px;
-    }
-    
-    .board-post-title-text {
-        white-space: normal;
-        word-break: keep-all;
-    }
+.board-info-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: default;
 }
 
-/* ========================================
-   태블릿 (900px 이하)
-======================================== */
-@media (max-width: 900px) {
-    .board-post-container {
-        padding: 1.5rem 2rem;
-        gap: 1.5rem;
-        min-width: 60vw;
-    }
-
-    .board-post-header {
-        padding: 1.25rem 1.75rem;
-        width: auto;
-    }
-
-    .board-post-title {
-        font-size: 1.5rem;
-    }
-
-    .board-post-meta {
-        font-size: 0.85rem;
-    }
-
-    .btn-write-post {
-        padding: 0.65rem 1.25rem;
-        font-size: 0.9rem;
-    }
-
-    .btn-write-post svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .board-post-table-header th {
-        padding: 0.875rem 0.875rem;
-        font-size: 0.85rem;
-    }
-
-    .board-post-row td {
-        padding: 1rem 0.875rem;
-        font-size: 0.85rem;
-    }
-
-    .board-post-table-header th:nth-child(2) {
-        min-width: 140px;
-    }
-
-    .board-post-table-header th:nth-child(4) {
-        width: 140px;
-    }
-
-    .board-post-table-header th:nth-child(5) {
-        width: 60px;
-    }
-
-    .board-post-table-header th:nth-child(6) {
-        width: 70px;
-    }
+.board-info-icon:hover .board-tooltip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-@media (max-width: 850px) {
-    .board-post-container {
-        width: 475px;
-    }
+.board-tooltip-bubble {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #1b5e20;
+    color: white;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    max-width: 240px;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    pointer-events: none;
 }
 
-/* ========================================
-   태블릿 (773px 이하)
-======================================== */
-@media (min-width: 601px) and (max-width: 775px) {
-    .board-post-container {
-        padding: 1rem;
-        gap: 1.25rem;
-        min-height: 70vh;
-        width: auto;
-    }
-
-    .board-post-header {
-        padding: 1.15rem 1.6rem;
-        width: auto;
-        flex-direction: row;
-        align-items: center;
-        border-radius: 16px;
-    }
-
-    .board-post-header-left {
-        flex: 1;
-    }
-
-    .board-post-header-right {
-        flex-shrink: 0;
-    }
-
-    .board-post-title {
-        font-size: 1.4rem;
-        letter-spacing: -0.4px;
-    }
-
-    .board-post-meta {
-        font-size: 0.83rem;
-    }
-
-    .btn-write-post {
-        font-size: 0.88rem;
-        padding: 0.62rem 1.15rem;
-        gap: 0.45rem;
-        border-radius: 9px;
-    }
-
-    .btn-write-post svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .board-post-list-container {
-        border-radius: 10px;
-    }
-
-    .board-post-table {
-        min-width: 100%;
-    }
-
-    .board-post-table-header th {
-        padding: 0.85rem 0.75rem;
-        font-size: 0.83rem;
-    }
-
-    .board-post-table-header th:first-child {
-        width: 65px;
-    }
-
-    .board-post-table-header th:nth-child(2) {
-        width: auto;
-        min-width: 90px;
-    }
-
-    .board-post-table-header th:nth-child(3) {
-        width: 90px;
-    }
-
-    .board-post-table-header th:nth-child(4) {
-        width: 110px;
-    }
-
-    .board-post-table-header th:nth-child(5) {
-        width: 55px;
-    }
-
-    .board-post-table-header th:nth-child(6) {
-        width: 60px;
-    }
-
-    .board-post-row td {
-        padding: 1.05rem 0.75rem;
-        font-size: 0.83rem;
-    }
-
-    .board-post-number {
-        font-size: 0.78rem;
-    }
-
-    .board-post-notice-badge {
-        padding: 0.22rem 0.68rem;
-        font-size: 0.5rem;
-    }
-
-    .board-post-title-cell {
-        gap: 0.4rem;
-        flex-direction: row;
-        align-items: center;
-    }
-
-    .board-post-title-text {
-        font-size: 0.88rem;
-        line-height: 1.4;
-        word-break: keep-all;
-        overflow-wrap: break-word;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .board-post-image-indicator {
-        font-size: 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .board-post-author {
-        font-size: 0.8rem;
-        max-width: 85px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .board-post-date {
-        font-size: 0.78rem;
-        white-space: nowrap;
-    }
-
-    .board-post-views {
-        font-size: 0.78rem;
-    }
-
-    .board-post-images {
-        font-size: 0.78rem;
-    }
-
-    .board-post-empty {
-        padding: 3.3rem 1rem;
-    }
-
-    .board-post-empty-icon {
-        font-size: 3.3rem;
-        margin-bottom: 0.85rem;
-    }
-
-    .board-post-empty-title {
-        font-size: 1.05rem;
-    }
-
-    .board-post-loading-spinner {
-        width: 37px;
-        height: 37px;
-    }
-
-    .board-post-loading-text {
-        font-size: 0.87rem;
-    }
-
-    .board-post-pagination {
-        gap: 0.4rem;
-        padding: 0.95rem 0;
-    }
-
-    .pagination-button {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.85rem;
-        border-radius: 6px;
-    }
-
-    .pagination-button:not(.pagination-button-active):not(:disabled):nth-child(n+9):nth-last-child(n+3) {
-        display: none;
-    }
-
-    .board-post-row {
-        animation-delay: 0.03s;
-    }
-
-    .board-post-row:nth-child(2) {
-        animation-delay: 0.06s;
-    }
-
-    .board-post-row:nth-child(3) {
-        animation-delay: 0.09s;
-    }
-
-    .board-post-row:nth-child(4) {
-        animation-delay: 0.12s;
-    }
-
-    .board-post-row:nth-child(5) {
-        animation-delay: 0.15s;
-    }
-
-    .board-post-row:nth-child(6) {
-        animation-delay: 0.18s;
-    }
+.board-tooltip-arrow {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #1b5e20;
 }
 
-/* ========================================
-   모바일 (600px 이하)
-======================================== */
-@media (max-width: 600px) {
-    .board-post-container {
-        padding: 1rem 0;
-        gap: 1rem;
-        max-width: 100%;
-        width: 100%;
-        min-width: 87.5vw;
-        min-height: 60vh;
-    }
-
-    .board-post-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-        padding: 1rem 1.25rem;
-        max-width: 100%;
-        border-radius: 12px;
-    }
-
-    .board-post-header-left {
-        width: 100%;
-    }
-
-    .board-post-header-right {
-        width: 100%;
-        justify-content: flex-end;
-    }
-
-    .board-post-title {
-        font-size: 1.25rem;
-        letter-spacing: -0.3px;
-    }
-
-    .board-post-meta {
-        font-size: 0.8rem;
-    }
-
-    .btn-write-post {
-        font-size: 0.85rem;
-        padding: 0.6rem 1rem;
-    }
-
-    .btn-write-post svg {
-        width: 15px;
-        height: 15px;
-    }
-
-    .board-post-list-container {
-        border-radius: 8px;
-    }
-
-    /* .board-post-table-header th:nth-child(4),
-    .board-post-row td:nth-child(4) {
-        display: none;
-    } */
-
-    .board-post-table-header th {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.8rem;
-    }
-
-    .board-post-table-header th:first-child {
-        width: 50px;
-        padding-left: 0.75rem;
-    }
-
-    .board-post-table-header th:nth-child(2) {
-        width: auto;
-        min-width: 120px;
-        padding-left: 0.75rem;
-    }
-
-    .board-post-table-header th:nth-child(3) {
-        width: 70px;
-    }
-
-    .board-post-table-header th:nth-child(5) {
-        width: 50px;
-    }
-
-    .board-post-table-header th:nth-child(6) {
-        width: 50px;
-    }
-
-    .board-post-row td {
-        padding: 0.875rem 0.5rem;
-        font-size: 0.8rem;
-    }
-
-    .board-post-row td:first-child {
-        padding-left: 0.75rem;
-    }
-
-    .board-post-row td:nth-child(2) {
-        padding-left: 0.75rem;
-    }
-
-    .board-post-number {
-        font-size: 0.75rem;
-    }
-
-    .board-post-notice-badge {
-        padding: 0.2rem 0.6rem;
-        font-size: 0.7rem;
-    }
-
-    .board-post-title-cell {
-        flex-direction: row;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .board-post-title-text {
-        font-size: 0.85rem;
-        line-height: 1.4;
-        word-break: keep-all;
-        overflow-wrap: break-word;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .board-post-image-indicator {
-        font-size: 0.7rem;
-    }
-
-    .board-post-author {
-        font-size: 0.75rem;
-        max-width: 60px;
-    }
-
-    .board-post-views {
-        font-size: 0.75rem;
-    }
-
-    .board-post-images {
-        font-size: 0.75rem;
-    }
-
-    .board-post-empty {
-        padding: 3rem 1rem;
-    }
-
-    .board-post-empty-icon {
-        font-size: 3rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .board-post-empty-title {
-        font-size: 1rem;
-    }
-
-    .board-post-loading-spinner {
-        width: 35px;
-        height: 35px;
-    }
-
-    .board-post-loading-text {
-        font-size: 0.85rem;
-    }
-
-    .board-post-pagination {
-        gap: 0.35rem;
-        padding: 0.875rem 0;
-        flex-wrap: wrap;
-    }
-
-    .pagination-button {
-        padding: 0.45rem 0.7rem;
-        font-size: 0.8rem;
-        border-radius: 5px;
-    }
-
-    .pagination-button:not(.pagination-button-active):not(:disabled):nth-child(n+7) {
-        display: none;
-    }
-
-    .board-post-row {
-        animation-delay: 0s !important;
-    }
+/* 게시글 검색창 */
+.board-post-search-wrapper {
+    flex: 1;
+    max-width: 300px;
 }
 
-
-@media (min-width: 501px) and (max-width: 600px) {
-   .board-post-table-header th:nth-child(2) {
-        width: 80px;
-   }
-
-   .board-post-table-header th:nth-child(4),
-   .board-post-row td:nth-child(4) {
-      width: 80px;
-   }
+.board-post-search-input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-
-@media (max-width: 500px) {
-    .board-post-container {
-        min-width: 85vw;
-    }
-
-    .board-post-header {
-        max-width: 82.35vw;
-    }
-    
-    .board-post-list-container {
-        max-width: 82.35vw;
-    }
+.board-post-search-input:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+.board-tooltip-bubble {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 10px);       /* 오른쪽으로 */
+    transform: translateY(-50%) translateX(4px);
+    background: #1b5e20;
+    color: white;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    min-width: 160px;
+    max-width: 240px;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+    pointer-events: none;
 }
 
-/* ========================================
-   초소형 모바일 (400px 이하)
-======================================== */
-@media (max-width: 400px) {
-    .board-post-container {
-        padding: 0.75rem 0;
-        gap: 0.75rem;
-        min-width: 82.75vw;
-    }
-
-    .board-post-header {
-        padding: 0.875rem 1rem;
-        border-radius: 10px;
-    }
-
-    .board-post-title {
-        font-size: 1.1rem;
-    }
-
-    .board-post-meta {
-        font-size: 0.75rem;
-    }
-
-    .btn-write-post {
-        font-size: 0.8rem;
-        padding: 0.55rem 0.875rem;
-        gap: 0.35rem;
-    }
-
-    .btn-write-post svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    .board-post-table-header th {
-        padding: 0.65rem 0.4rem;
-        font-size: 0.75rem;
-    }
-
-    .board-post-table-header th:first-child {
-        width: 45px;
-        padding-left: 0.5rem;
-    }
-
-    .board-post-table-header th:nth-child(2) {
-        min-width: 100px;
-    }
-
-    .board-post-table-header th:nth-child(3) {
-        width: 60px;
-    }
-
-    .board-post-table-header th:nth-child(5),
-    .board-post-table-header th:nth-child(6) {
-        width: 45px;
-    }
-
-    .board-post-row td {
-        padding: 0.75rem 0.4rem;
-        font-size: 0.75rem;
-    }
-
-    .board-post-row td:first-child {
-        padding-left: 0.5rem;
-    }
-
-    .board-post-title-text {
-        font-size: 0.8rem;
-        word-break: keep-all;
-        overflow-wrap: break-word;
-    }
-
-    .board-post-author {
-        font-size: 0.7rem;
-        max-width: 50px;
-    }
-
-    .board-post-notice-badge {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.5rem;
-    }
-
-    .pagination-button {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
-    }
-
-    .pagination-button:not(.pagination-button-active):not(:disabled):nth-child(n+5) {
-        display: none;
-    }
+.board-info-icon:hover .board-tooltip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
 }
 
-/* ========================================
-   가로모드 모바일 최적화
-======================================== */
-@media (max-width: 900px) and (orientation: landscape) {
-    .board-post-container {
-        min-height: 50vh;
-    }
-
-    .board-post-list-container {
-        max-height: calc(100vh - 250px);
-    }
+.board-tooltip-arrow {
+    position: absolute;
+    top: 50%;
+    left: -5px;                     /* 왼쪽 화살표 */
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid #1b5e20;
 }
 
 /* 수정됨 뱃지 */
@@ -1123,28 +591,429 @@
     font-size: 0.8rem;
 }
 
-/* 반응형 - 1300px 이하 */
-@media (max-width: 1300px) {
+/* ========================================
+   1000px 이하 — 태블릿
+======================================== */
+@media (max-width: 1100px) {
+    .board-post-container {
+        padding: 1.5rem 2rem;
+        gap: 1.5rem;
+        min-width: 60vw;
+    }
+
+    .board-post-header {
+        width: auto;
+        padding: 1.25rem 1.75rem;
+        gap: 1rem;
+    }
+
+    .board-post-title {
+        font-size: 1.5rem;
+    }
+
+    .board-post-meta {
+        font-size: 0.85rem;
+    }
+
+    .board-post-search-wrapper {
+        max-width: 220px;
+    }
+
+    .btn-write-post {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-write-post svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .board-post-table-header th {
+        padding: 0.875rem;
+        font-size: 0.85rem;
+    }
+
+    .board-post-table-header th:first-child { width: 70px; }
+    .board-post-table-header th:nth-child(2) { min-width: 150px; }
+    .board-post-table-header th:nth-child(3) { width: 120px; }
+    .board-post-table-header th:nth-child(4) { width: 140px; }
+    .board-post-table-header th:nth-child(5) { width: 65px; }
+
+    .board-post-row td {
+        padding: 1rem 0.875rem;
+        font-size: 0.85rem;
+    }
+
     .board-post-edited-badge {
         font-size: 0.6rem;
         padding: 0.12rem 0.4rem;
-        margin-left: 0.3rem;
     }
-    
+
     .date-label {
         font-size: 0.75rem;
     }
+
+    .board-post-notice-badge {
+        font-size: 0.65rem;
+    }
 }
 
-/* 모바일 - 600px 이하 */
+/* ========================================
+   900px 이하 — 소형 태블릿
+======================================== */
+@media (max-width: 900px) {
+    .board-post-container {
+        padding: 1.25rem 1.5rem;
+        gap: 1.25rem;
+        min-width: 55vw;
+    }
+
+    .board-post-header {
+        flex-wrap: wrap;
+        padding: 1.1rem 1.5rem;
+        gap: 0.75rem;
+    }
+
+    .board-post-header-left {
+        flex: 1 1 auto;
+        min-width: 140px;
+    }
+
+    /* 검색창: 헤더 두 번째 줄로 내림 */
+    .board-post-search-wrapper {
+        order: 3;
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+
+    .board-post-search-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .board-post-header-right {
+        flex-shrink: 0;
+    }
+
+    .board-post-title {
+        font-size: 1.35rem;
+    }
+
+    .board-post-table-header th:nth-child(2) { min-width: 120px; }
+    .board-post-table-header th:nth-child(3) { width: 100px; }
+    .board-post-table-header th:nth-child(4) { width: 120px; }
+
+    .board-post-row td {
+        font-size: 0.82rem;
+        padding: 0.9rem 0.75rem;
+    }
+
+    .board-post-author {
+        max-width: 90px;
+    }
+}
+
+/* ========================================
+   600px 이하 — 모바일
+======================================== */
 @media (max-width: 600px) {
+    .board-post-container {
+        padding: 0.75rem 0;
+        gap: 0.875rem;
+        min-width: 87.5vw;
+        max-width: 100%;
+        min-height: 60vh;
+    }
+
+    .board-post-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 1.25rem;
+        gap: 0.75rem;
+        border-radius: 12px;
+        max-width: 100%;
+    }
+
+    .board-post-header-left {
+        width: 100%;
+    }
+
+    /* 검색창: 전체 폭 */
+    .board-post-search-wrapper {
+        order: unset;
+        flex: unset;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .board-post-search-input {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 0.85rem;
+        padding: 0.5rem 0.875rem;
+    }
+
+    .board-post-header-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .board-post-title {
+        font-size: 1.2rem;
+    }
+
+    .board-post-meta {
+        font-size: 0.8rem;
+    }
+
+    /* 툴팁: 모바일에선 말풍선 아래로 */
+    .board-tooltip-bubble {
+        top: calc(100% + 8px);
+        left: 0;
+        transform: translateY(4px);
+        right: unset;
+        min-width: 160px;
+    }
+
+    .board-info-icon:hover .board-tooltip-bubble {
+        transform: translateY(0);
+    }
+
+    .board-tooltip-arrow {
+        top: -5px;
+        left: 10px;
+        transform: none;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid #1b5e20;
+        border-top: none;
+        border-right-color: transparent;
+    }
+
+    .btn-write-post {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+    }
+
+    .btn-write-post svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .board-post-list-container {
+        border-radius: 8px;
+        max-width: 100%;
+    }
+
+    .board-post-table-header th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.78rem;
+    }
+
+    .board-post-table-header th:first-child {
+        width: 50px;
+        padding-left: 0.75rem;
+    }
+
+    .board-post-table-header th:nth-child(2) {
+        min-width: 110px;
+        padding-left: 0.75rem;
+    }
+
+    .board-post-table-header th:nth-child(3) { width: 65px; }
+    .board-post-table-header th:nth-child(4) { width: 80px; }
+    .board-post-table-header th:nth-child(5) { width: 48px; }
+
+    .board-post-row td {
+        padding: 0.875rem 0.5rem;
+        font-size: 0.78rem;
+    }
+
+    .board-post-row td:first-child,
+    .board-post-row td:nth-child(2) {
+        padding-left: 0.75rem;
+    }
+
+    .board-post-title-text {
+        font-size: 0.82rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .board-post-author {
+        font-size: 0.73rem;
+        max-width: 60px;
+    }
+
+    .board-post-date {
+        font-size: 0.73rem;
+    }
+
+    .board-post-views {
+        font-size: 0.73rem;
+    }
+
+    .board-post-notice-badge {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.55rem;
+    }
+
     .board-post-edited-badge {
         font-size: 0.55rem;
         padding: 0.1rem 0.35rem;
-        margin-left: 0.25rem;
     }
-    
+
     .date-label {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
+    }
+
+    .board-post-empty {
+        padding: 3rem 1rem;
+    }
+
+    .board-post-empty-icon {
+        font-size: 3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .board-post-empty-title {
+        font-size: 0.95rem;
+    }
+
+    .board-post-pagination {
+        gap: 0.35rem;
+        padding: 0.875rem 0;
+        flex-wrap: wrap;
+    }
+
+    .pagination-button {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    /* 페이지 버튼 너무 많으면 숨김 */
+    .pagination-button:not(.pagination-button-active):not(:disabled):nth-child(n+7) {
+        display: none;
+    }
+
+    .board-post-row {
+        animation-delay: 0s !important;
+    }
+}
+
+/* ========================================
+   400px 이하 — 초소형 모바일
+======================================== */
+@media (max-width: 400px) {
+    .board-post-container {
+        padding: 0.5rem 0;
+        gap: 0.75rem;
+        min-width: 85vw;
+    }
+
+    .board-post-header {
+        padding: 0.875rem 1rem;
+        border-radius: 10px;
+        max-width: 83vw;
+    }
+
+    .board-post-title {
+        font-size: 1.05rem;
+    }
+
+    .board-post-meta {
+        font-size: 0.73rem;
+    }
+
+    .board-post-search-input {
+        font-size: 0.8rem;
+        padding: 0.45rem 0.75rem;
+    }
+
+    .btn-write-post {
+        font-size: 0.8rem;
+        padding: 0.55rem 0.875rem;
+    }
+
+    .btn-write-post svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .board-post-list-container {
+        max-width: 83vw;
+    }
+
+    .board-post-table-header th {
+        padding: 0.65rem 0.4rem;
+        font-size: 0.72rem;
+    }
+
+    .board-post-table-header th:first-child {
+        width: 42px;
+        padding-left: 0.5rem;
+    }
+
+    .board-post-table-header th:nth-child(2) { min-width: 90px; }
+    .board-post-table-header th:nth-child(3) { width: 55px; }
+    .board-post-table-header th:nth-child(4) { width: 70px; }
+    .board-post-table-header th:nth-child(5) { width: 42px; }
+
+    .board-post-row td {
+        padding: 0.75rem 0.4rem;
+        font-size: 0.72rem;
+    }
+
+    .board-post-row td:first-child {
+        padding-left: 0.5rem;
+    }
+
+    .board-post-title-text {
+        font-size: 0.78rem;
+    }
+
+    .board-post-author {
+        font-size: 0.68rem;
+        max-width: 48px;
+    }
+
+    .board-post-notice-badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.45rem;
+    }
+
+    .board-post-edited-badge {
+        font-size: 0.5rem;
+        padding: 0.08rem 0.3rem;
+        margin-left: 0.2rem;
+    }
+
+    .date-label {
+        font-size: 0.63rem;
+    }
+
+    .pagination-button {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .pagination-button:not(.pagination-button-active):not(:disabled):nth-child(n+5) {
+        display: none;
+    }
+}
+
+/* ========================================
+   가로모드
+======================================== */
+@media (max-width: 900px) and (orientation: landscape) {
+    .board-post-container {
+        min-height: 50vh;
+    }
+
+    .board-post-list-container {
+        max-height: calc(100vh - 260px);
     }
 }

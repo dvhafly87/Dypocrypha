@@ -172,7 +172,7 @@ function PasswordAuthSection({ onSuccess }) {
 // ----------------------------------------------------------------
 // 파일 상세 뷰
 // ----------------------------------------------------------------
-function FileDetailSection({ fileInfo }) {
+function FileDetailSection({ fileInfo, onDownload }) {
     const { addToast } = useToast();
     const { fileUuid } = useParams();
     const navigate = useNavigate();
@@ -183,13 +183,6 @@ function FileDetailSection({ fileInfo }) {
     const isVideo = ['.mp4', '.avi', '.mov'].includes(ext);
     const isAudio = ['.mp3', '.wav', '.flac'].includes(ext);
     const isPdf = ext === '.pdf';
-
-    const handleDownload = () => {
-        const a = document.createElement('a');
-        a.href = fileUrl;
-        a.download = fileInfo.fileMainName + fileInfo.fileExtension;
-        a.click();
-    };
 
     const handleDeleteFile = async () => {
         try {
@@ -337,7 +330,7 @@ function FileDetailSection({ fileInfo }) {
 
                 {/* 다운로드 버튼 */}
                 <div className="file-detail-action-area">
-                    <button className="file-detail-download-btn" onClick={handleDownload}>
+                    <button className="file-detail-download-btn" onClick={onDownload}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -402,6 +395,46 @@ export default function UploadFileContent() {
         getFileUploadInformation();
     }, [fileUuid]);
 
+    const handleDownload = async () => {
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/archive/file/download`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileUuid }),
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                if (response.status === 401) {
+                    localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: result.downloadMessage }));
+                    navigate('/login');
+                    return;
+                }
+                if (response.status === 404 || response.status === 400) {
+                    localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: result.downloadMessage }));
+                    navigate('/archive');
+                    return;
+                }
+                addToast(result.downloadMessage || '다운로드 실패', 'error');
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileInfo.fileMainName + fileInfo.fileExtension;
+            a.click();
+            URL.revokeObjectURL(url);
+            setFileInfo(prev => ({ ...prev, downloadCount: prev.downloadCount + 1 }));
+        } catch (error) {
+            localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: error.message }));
+            navigate('/');
+            return;
+        }
+    };
+
     const handlePasswordSuccess = (info) => {
         setFileInfo(info);
         setShowPassAuth(false);
@@ -423,7 +456,7 @@ export default function UploadFileContent() {
                 <PasswordAuthSection onSuccess={handlePasswordSuccess} />
             )}
             {fileInfo && (
-                <FileDetailSection fileInfo={fileInfo} />
+                <FileDetailSection fileInfo={fileInfo} onDownload={handleDownload} />
             )}
         </div>
     );

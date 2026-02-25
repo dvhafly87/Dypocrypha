@@ -30,6 +30,8 @@ import Archive from './components/Archive.jsx';
 import ArchiveUpload from './components/ArchiveUpload.jsx';
 import ArchiveContent from './components/UploadFileContent.jsx';
 
+import SearchAllFunction from './components/SearchAllKeyword.jsx';
+
 import './css/App.css'
 
 export default function App() {
@@ -62,8 +64,10 @@ export default function App() {
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
 
               <Route path="/archive" element={<Archive />}/>
-              <Route path="/archive/fileSelect/:fileUuid" element={<ArchiveContent/>} />ㄴ
+              <Route path="/archive/fileSelect/:fileUuid" element={<ArchiveContent/>} />
               <Route path="/archive/upload" element={<ArchiveUpload />} />
+
+              <Route path="/all/search/:searchAllKey" element={<SearchAllFunction/>}/>
 
             </Routes>
           </AuthProvider>
