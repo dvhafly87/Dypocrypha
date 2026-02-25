@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import ProfileContainer from '../components/ProfileContainer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
-import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
 
 import '../css/Header.css';
 
@@ -30,13 +28,13 @@ export default function Header() {
 
     const fetchVisitorStats = async () => {
       try {
-        const response = await fetch('/main/visitor/record', {
+        const response = await fetch(`${API.API_BASE_URL}/main/visitor/record`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         });
         if (response.ok) {
           const data = await response.json();
-          setTodayVisitors(data.todayCount);
+          setTotalVisitors(data.todayCount);
           isRecorded.current = true; 
         }
       } catch (error) {
@@ -46,6 +44,7 @@ export default function Header() {
 
     fetchVisitorStats();
   }, []);
+
   const handleSearchKey = (e) => {
     e.preventDefault();
 
@@ -136,8 +135,8 @@ export default function Header() {
           <img src={DOGE} alt="로고" />
           <Link to="/">Dypocrypha</Link>
           <div className="visitor-badge">
-            <span className="visitor-total">{totalVisitors}</span> {/* 방문자수 카운트 빨간색 */}
-            <span className="visitor-online">•{onlineUsers}</span> {/* 접속자수 카운트 초록색 */}
+            <span className="visitor-total">{totalVisitors}</span> 
+            <span className="visitor-online">•{onlineUsers}</span>
           </div>
         </div>
 

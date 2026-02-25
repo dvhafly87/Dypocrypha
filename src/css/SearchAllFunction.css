@@ -9,14 +9,6 @@
     min-height: 80vh;
 }
 
-.visitor-badge {
-  margin-left: 8px;
-  font-size: 12px;
-  color: #888;
-  opacity: 0.7;
-  font-weight: 500;
-}
-
 /* ── 로딩 ── */
 .search-loading {
     display: flex;
