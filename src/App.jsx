@@ -32,6 +32,13 @@ import ArchiveContent from './components/UploadFileContent.jsx';
 
 import SearchAllFunction from './components/SearchAllKeyword.jsx';
 
+import MyPage from './components/MyPage.jsx';
+
+import MyContent from './components/MyPage/MyContent.jsx';
+import MyPassword from './components/MyPage/MyPasswordChange.jsx';
+import MyProfile from './components/MyPage/MyProfile.jsx';
+import MyWithdraw from './components/MyPage/MyWithDraw.jsx';
+
 import './css/App.css'
 
 export default function App() {
@@ -63,11 +70,18 @@ export default function App() {
               <Route path="/project/report/update/:reportId/:projectId" element={<ReportEditor />} />
               <Route path="/project/complete/report/:projectId" element={<ProjectReport />} />
 
-              <Route path="/archive" element={<Archive />}/>
-              <Route path="/archive/fileSelect/:fileUuid" element={<ArchiveContent/>} />
+              <Route path="/archive" element={<Archive />} />
+              <Route path="/archive/fileSelect/:fileUuid" element={<ArchiveContent />} />
               <Route path="/archive/upload" element={<ArchiveUpload />} />
 
-              <Route path="/all/search/:searchAllKey" element={<SearchAllFunction/>}/>
+              <Route path="/all/search/:searchAllKey" element={<SearchAllFunction />} />
+
+              <Route path="/mypage" element={<MyPage />}>
+                <Route path="profile" element={<MyProfile />} />
+                <Route path="password" element={<MyPassword />} />
+                <Route path="content" element={<MyContent />} />
+                <Route path="withdraw" element={<MyWithdraw />} />
+              </Route>
 
             </Routes>
           </AuthProvider>

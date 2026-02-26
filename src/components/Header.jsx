@@ -64,18 +64,18 @@ export default function Header() {
     });
 
     client.onConnect = () => {
-      console.log('STOMP CONNECTED'); // 이게 찍히는지 먼저 확인
+      // console.log('STOMP CONNECTED'); // 이게 찍히는지 먼저 확인
       const subscription = client.subscribe('/topic/online-users', (message) => {
-        console.log("메시지 도착:", message.body);
+        // console.log("메시지 도착:", message.body);
         const data = JSON.parse(message.body);
         setOnlineUsers(data.count);
       });
-      
+
       client.publish({
         destination: '/app/request-count'
       });
 
-      console.log("구독 시작됨:", subscription.id);
+      // console.log("구독 시작됨:", subscription.id);
     };
 
     client.activate();
