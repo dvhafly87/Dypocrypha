@@ -10,7 +10,7 @@ import { Client } from '@stomp/stompjs';
 
 import '../css/Header.css';
 
-import DOGE from '../../public/A3.svg';
+import DOGE from '../../public/icon.png';
 import SIC from '../img/sic.jpg';
 
 export default function Header() {

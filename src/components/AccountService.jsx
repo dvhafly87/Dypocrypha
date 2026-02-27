@@ -71,8 +71,6 @@ export default function AccountService() {
             
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             
-            // 💡 리디렉션: isLogined가 이미 true로 업데이트 되었으므로
-            // 다음 화면에서 프로필 등의 UI가 정상적으로 표시됩니다.
             navigate('/');
         }
     };
@@ -195,13 +193,6 @@ export default function AccountService() {
                                 </svg>
                                 <span>비밀번호 재설정</span>
                             </a>
-                            {/* <a href="/findId" className="service-link">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                                <span>아이디 찾기</span>
-                            </a> */}
                         </div>
                     </div>
                 </div>

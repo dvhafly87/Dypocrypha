@@ -574,19 +574,16 @@ export default function ProjectManage() {
     const updateProjectLog = async () => {
         const selectedLog = getSelectedLog();
 
-        // 1. 로그 선택 확인 ✅
         if (!selectedLog) {
             addToast("수정할 로그를 선택해주세요", "warning");
             return;
         }
 
-        // 2. ⭐ 시스템 로그 수정 방지 추가
         if (selectedLogId === 'created' || selectedLogId === 'ended') {
             addToast("시스템 로그는 수정할 수 없습니다", "warning");
             return;
         }
 
-        // 3. ⭐ 제목 검증 개선 (순서 변경)
         if (!logTitle || logTitle.trim().length === 0) {
             addToast("로그 제목을 입력해 주십시오", "warning");
             return;
@@ -597,7 +594,6 @@ export default function ProjectManage() {
             return;
         }
 
-        // 4. 로그인 확인 ✅
         if (!loginSuccess || !isLogined) {
             const toastData = {
                 status: 'error',
@@ -608,7 +604,6 @@ export default function ProjectManage() {
             return;
         }
 
-        // 5. 내용 검증 ✅
         const editorInstance = editorRef.current?.getInstance();
         const content = editorInstance?.getMarkdown()?.trim();
 
@@ -693,10 +688,8 @@ export default function ProjectManage() {
             return;
         }
 
-        // 선택된 로그의 정보를 state에 설정
         setLogTitle(selectedLog.logTitle);
 
-        // 에디터에 기존 내용 설정 (다음 렌더링에서)
         if (editorRef.current) {
             editorRef.current.getInstance()?.setMarkdown(selectedLog.logContent || '');
         }

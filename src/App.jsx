@@ -36,6 +36,7 @@ import MyPage from './components/MyPage.jsx';
 
 import MyContent from './components/MyPage/MyContent.jsx';
 import MyPassword from './components/MyPage/MyPasswordChange.jsx';
+import MyPasswordCheck from './components/MyPage/MyPasswordCheck.jsx';
 import MyProfile from './components/MyPage/MyProfile.jsx';
 import MyWithdraw from './components/MyPage/MyWithDraw.jsx';
 
@@ -78,7 +79,8 @@ export default function App() {
 
               <Route path="/mypage" element={<MyPage />}>
                 <Route path="profile" element={<MyProfile />} />
-                <Route path="password" element={<MyPassword />} />
+                <Route path="password" element={<MyPasswordCheck />} />
+                <Route path="password/change" element={<MyPassword />} />
                 <Route path="content" element={<MyContent />} />
                 <Route path="withdraw" element={<MyWithdraw />} />
               </Route>

@@ -98,7 +98,7 @@ export default function Mypage() {
                                 className={({ isActive }) => `mypage-nav-item ${isActive ? 'active' : ''}`}
                             >
                                 <IconFolder />
-                                작업물 관리
+                                내 작업물 관리
                             </NavLink>
                         </li>
 
