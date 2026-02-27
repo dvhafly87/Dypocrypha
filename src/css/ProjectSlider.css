@@ -1,4 +1,8 @@
 /* ProjectSlider.css */
+.slider-link {
+    text-decoration: none;
+    color: inherit; /* 기존 색상 유지 */
+}
 
 .slider-container {
     width: 100%;
@@ -194,6 +198,18 @@
 .stack-tag:hover {
     background: #e8f5e9;
     transform: translateY(-2px);
+}
+
+/* NavLink 포함 stack-tag 밑줄 제거 */
+.stack-tags a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: #2e7d32;       /* 기본 색상 */
+}
+
+.stack-tags a:hover {
+    background: #e8f5e9;
+    transform: translateY(-2px);
+    color: #2e7d32;       /* hover 시 색상 유지 */
 }
 
 /* 인디케이터 점 */

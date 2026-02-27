@@ -89,7 +89,6 @@ export default function PasswordChange() {
                 throw new Error(result.passwordChkMessage || "서버 통신 불가");
             } else {
                 localStorage.setItem('redirectToast', JSON.stringify({ status: 'success', message: result.passwordChkMessage || "비밀번호 확인됨" }));
-                sessionStorage.setItem('passwordVerified', 'true');
                 navigate(`/mypage/password/change?token=${result.tempToken}`);
             }
         } catch (error) {

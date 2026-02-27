@@ -3,6 +3,7 @@ import { useToast } from '../components/ToastContext.jsx';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import API from '../config/apiConfig.js';
 import '../css/ProjectSlider.css';
+import { NavLink } from 'react-router-dom';
 
 export default function ProjectSlider() {
     const { addToast } = useToast();
@@ -140,46 +141,50 @@ export default function ProjectSlider() {
                 </div>
             </div>
 
-            <div className={`slider-content ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
-                <div
-                    className="project-image"
-                    style={{ backgroundImage: `url(${currentProject.banner})` }}
-                />
-                <div className="project-info">
-                    <div className="info-row">
-                        <span className="info-label">프로젝트명</span>
-                        <span className="info-value">{currentProject.title}</span>
-                    </div>
-
-                    <div className="info-row">
-                        <span className="info-label">프로젝트 기간</span>
-                        <span className="info-value">{currentProject.period}</span>
-                    </div>
-
-                    <div className="info-row">
-                        <span className="info-label">프로젝트 규모</span>
-                        <span className="info-value">{currentProject.scale}</span>
-                    </div>
-
-                    <div className="info-row">
-                        <span className="info-label">프로젝트 설명</span>
-                        <span className="project-description">
-                            {currentProject.description}
-                        </span>
-                    </div>
-
-                    {currentProject.stacks && currentProject.stacks.length > 0 && (
+            <NavLink className="slider-link" to={`/project/manage/${currentProject.id}`} >
+                <div className={`slider-content ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
+                    <div
+                        className="project-image"
+                        style={{ backgroundImage: `url(${currentProject.banner})` }}
+                    />
+                    <div className="project-info">
                         <div className="info-row">
-                            <span className="info-label">프로젝트 스택</span>
-                            <div className="stack-tags">
-                                {currentProject.stacks.map((stack, idx) => (
-                                    <span key={idx} className="stack-tag">{stack}</span>
-                                ))}
-                            </div>
+                            <span className="info-label">프로젝트명</span>
+                            <span className="info-value">{currentProject.title}</span>
                         </div>
-                    )}
+
+                        <div className="info-row">
+                            <span className="info-label">프로젝트 기간</span>
+                            <span className="info-value">{currentProject.period}</span>
+                        </div>
+
+                        <div className="info-row">
+                            <span className="info-label">프로젝트 규모</span>
+                            <span className="info-value">{currentProject.scale}</span>
+                        </div>
+
+                        <div className="info-row">
+                            <span className="info-label">프로젝트 설명</span>
+                            <span className="project-description">
+                                {currentProject.description}
+                            </span>
+                        </div>
+
+                        {currentProject.stacks && currentProject.stacks.length > 0 && (
+                            <div className="info-row">
+                                <span className="info-label">프로젝트 스택</span>
+                                <div className="stack-tags">
+                                    {currentProject.stacks.map((stack, idx) => (
+                                        <NavLink to={`/all/search/${encodeURIComponent(stack)}`}>
+                                            <span key={idx} className="stack-tag">{stack}</span>
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            </NavLink>
 
             <div className="dots-container">
                 {projects.map((_, idx) => (

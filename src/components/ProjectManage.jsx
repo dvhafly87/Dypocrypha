@@ -1937,18 +1937,7 @@ export default function ProjectManage() {
                                 {projectMember.length > 0 && (
                                     <div className={permissionGrade === 'L' ? "team-member-information" : "team-member-information-non-leader"}>
                                         {projectMember.map(member => (
-                                            <div key={member.id} className="member-card"
-                                                style={projectBasic.teamValue
-                                                    && member.pjMemberName === projectBasic.starter ?
-                                                    {
-                                                        display: 'none',
-                                                        visibility: 'hidden'
-                                                    }
-                                                    :
-                                                    {
-
-                                                    }
-                                                }>
+                                            <div key={member.id} className="member-card">
                                                 <div className="member-name">{member.pjMemberName}</div>
                                                 <div className="member-detail-wrapper">
                                                     <div className="member-detail">
@@ -2042,7 +2031,7 @@ export default function ProjectManage() {
                                             <input
                                                 type="text"
                                                 className="project-modal-input"
-                                                placeholder="팀원 이름을 입력하세요"
+                                                placeholder="팀원의 닉네임 또는 이름을 입력해주세요"
                                                 value={newMemberName}
                                                 onChange={(e) => setNewMemberName(e.target.value)}
                                             />

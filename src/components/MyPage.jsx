@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, NavLink, Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import API from '../config/apiConfig.js';
 
 import '../css/MyPage.css';
 
