@@ -191,6 +191,48 @@ export default function MyContent() {
         fetchData();
     }, []);
 
+    //게시판 이동용 로컬스토리지 저장을 위한 핸들러
+    const storageWithExpiry = (key, value) => {
+        const item = {
+            value: value,
+            expiry: new Date().getTime() + (2 * 60 * 60 * 1000)
+        };
+        localStorage.setItem(key, JSON.stringify(item));
+    };
+
+    //게시판 이동용 핸들러
+    const handleNavigateToBoard = (item) => {
+        storageWithExpiry('selectedBoardId', item.boardPriId.toString());
+        storageWithExpiry('selectedBoardName', item.boardName);
+        storageWithExpiry('selectedBoardPtd', item.boardProtected.toString());
+        storageWithExpiry('selectedBoardDec', item.boardDec || '');
+        navigate('/board');
+    };
+
+    //댓글 엔티티에 게시판 네임이 없는 관계로 보드 아이디만 전송해서 보드 네임 리턴하는 API가 있다?!?!?
+    //그냥 설계 미스임
+    const handleNavigateToComment = async (item) => {
+        try {
+            const response = await fetch(`${API.API_BASE_URL}/board/info/id`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ boardId: item.board })
+            });
+            const result = await response.json();
+
+            if (result.boardInfoStatus) {
+                navigate(`/boardPost/${result.boardName}/${item.board}/${item.post}`);
+            } else {
+                throw new Error(result.boardInfoMessage || "서버 통신 불가");
+            }
+        } catch (error) {
+            localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: error.message }));
+            navigate(error.message === '로그인이 필요합니다' ? '/login' : '/');
+            return;
+        }
+    };
+
     /* ── 삭제 핸들러 ── */
 
     // 아카이브 삭제
@@ -333,7 +375,10 @@ export default function MyContent() {
             addToast('대기중인 프로젝트는 삭제 불가능합니다', 'error');
             return;
         }
+
         if (!window.confirm('정말 이 프로젝트를 삭제하시겠습니까?')) return;
+
+
         try {
             const response = await fetch(`${API.API_BASE_URL}/project/delete`, {
                 method: 'POST',
@@ -350,7 +395,36 @@ export default function MyContent() {
                 addToast('삭제되었습니다', 'success');
                 setProjectList(prev => prev.filter(p => p.id !== project.id));
             } else {
-                addToast(result.deleteMessage, 'error');
+                if (result.deleteForMember) {
+                    try {
+                        const mResponse = await fetch(`${API.API_BASE_URL}/project/draw/member`, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ projectId: project.id }),
+                        });
+
+                        const mResult = await mResponse.json();
+
+                        if (!mResponse.ok) {
+                            if (mResponse.status === 401) {
+                                localStorage.setItem('redirectToast', JSON.stringify({ status: 'error', message: mResult.exitMessage || "로그인이 필요한 서비스입니다" }));
+                                navigate('/');
+                            }
+                            throw new Error(mResult.exitMessage || "서버 통신 불가");
+                        } else {
+                            if (mResult.exitMessage) {
+                                addToast(mResult.exitMessage, 'success');
+                            }
+                            setProjectList(prev => prev.filter(p => p.id !== project.id));
+                        }
+                    } catch (error) {
+                        localStorage.setItem('redirectToast', JSON.stringify({ status: 'error', message: error.message }));
+                        navigate('/');
+                    }
+                } else {
+                    addToast(result.deleteMessage, 'error');
+                }
             }
         } catch {
             localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: '서버 오류로 삭제가 불가능합니다' }));
@@ -387,10 +461,7 @@ export default function MyContent() {
             {/* 컨텐츠 바디 */}
             <div className="mycontent-body">
                 {isDataLoading ? (
-                    <div className="mycontent-loading">
-                        <div className="loading-spinner" />
-                        <p>불러오는 중...</p>
-                    </div>
+                    <p>불러오는 중...</p>
                 ) : (
                     <>
                         {activeTab === 'project' && (
@@ -423,6 +494,7 @@ export default function MyContent() {
                                     <BoardCard
                                         key={item.boardPriId}
                                         item={item}
+                                        onNavigate={() => handleNavigateToBoard(item)}
                                         onDelete={() => openBoardDeleteModal(item)}
                                     />
                                 ))}
@@ -434,7 +506,7 @@ export default function MyContent() {
                                     <PostCard
                                         key={item.boardPostPr}
                                         item={item}
-                                        onNavigate={() => navigate(`/board`)}
+                                        onNavigate={() => navigate(`/boardPost/${item.boardName}/${item.boardId}/${item.boardPostId}`)}
                                         onDelete={() => handleDeletePost(item)}
                                     />
                                 ))}
@@ -446,6 +518,7 @@ export default function MyContent() {
                                     <CommentCard
                                         key={item.boardPostCmId}
                                         item={item}
+                                        onNavigate={() => handleNavigateToComment(item)}
                                         onDelete={() => handleDeleteComment(item)}
                                     />
                                 ))}
@@ -571,10 +644,10 @@ function ArchiveCard({ item, onNavigate, onDelete }) {
     );
 }
 
-function BoardCard({ item, onDelete }) {
+function BoardCard({ item, onNavigate, onDelete }) {
     return (
         <div className="mc-card">
-            <div className="mc-card-left">
+            <div className="mc-card-left" onClick={onNavigate}>
                 <div className="mc-card-title-row">
                     <span className="mc-card-title">{item.boardName}</span>
                     {item.boardProtected && <span className="mc-lock-icon" title="비밀번호 보호"><IconLock /></span>}
@@ -585,6 +658,7 @@ function BoardCard({ item, onDelete }) {
                 </div>
             </div>
             <div className="mc-card-actions">
+                <button className="mc-card-goto" onClick={onNavigate} title="이동"><IconGo /></button>
                 <button className="mc-card-delete" onClick={onDelete} title="삭제"><IconTrash /></button>
             </div>
         </div>
@@ -613,10 +687,10 @@ function PostCard({ item, onNavigate, onDelete }) {
     );
 }
 
-function CommentCard({ item, onDelete }) {
+function CommentCard({ item, onNavigate, onDelete }) {
     return (
         <div className="mc-card">
-            <div className="mc-card-left">
+            <div className="mc-card-left" onClick={onNavigate}>
                 <div className="mc-card-title-row">
                     <span className="mc-card-title mc-card-title--comment">{item.boardCommentContext}</span>
                 </div>
@@ -625,6 +699,7 @@ function CommentCard({ item, onDelete }) {
                 </div>
             </div>
             <div className="mc-card-actions">
+                <button className="mc-card-goto" onClick={onNavigate} title="이동"><IconGo /></button>
                 <button className="mc-card-delete" onClick={onDelete} title="삭제"><IconTrash /></button>
             </div>
         </div>
