@@ -1,47 +1,43 @@
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="background-color:#000; width:500px; height:500px;">
   <defs>
-    <clipPath id="rhombusClip">
-      <path d="M50 2 L98 50 L50 98 L2 50 Z" />
+    <clipPath id="rhombus">
+      <path d="M50 5 L95 50 L50 95 L5 50 Z" />
     </clipPath>
 
     <style>
       .line { fill: none; stroke: #39d353; stroke-width: 2.2; stroke-linecap: round; }
-      @keyframes swell {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(1px, -1px) scale(1.02); }
+      @keyframes waveFlow {
+        0%, 100% { stroke-dashoffset: 0; transform: translate(0, 0); }
+        50% { stroke-dashoffset: 5; transform: translate(1px, 1px); }
       }
-      .sec-l { animation: swell 3s ease-in-out infinite; transform-origin: 30% 50%; }
-      .sec-r { animation: swell 4s ease-in-out infinite; animation-delay: -1s; transform-origin: 70% 30%; }
-      .sec-b { animation: swell 3.5s ease-in-out infinite; animation-delay: -2s; transform-origin: 50% 80%; }
+      .anim { animation: waveFlow 4s ease-in-out infinite; }
     </style>
   </defs>
 
-  <g clip-path="url(#rhombusClip)">
-    <g class="sec-l">
-      <path class="line" d="M15 40 Q25 50 15 65 T20 90" />
-      <path class="line" d="M22 32 Q32 45 22 60 T27 88" />
-      <path class="line" d="M30 25 Q40 40 30 55 T35 85" />
-      <path class="line" d="M38 18 Q48 35 38 50 T43 82" />
-      <path class="line" d="M46 12 Q56 30 46 45 T50 75" />
+  <g clip-path="url(#rhombus)">
+    <g class="anim">
+      <path class="line" d="M20 30 Q35 45 25 60" />
+      <path class="line" d="M28 22 Q43 37 33 52" />
+      <path class="line" d="M36 14 Q51 29 41 44" />
+      <path class="line" d="M44 6  Q59 21 49 36" />
     </g>
 
-    <g class="sec-r">
-      <path class="line" d="M52 5 L90 45" />
-      <path class="line" d="M60 8 L95 48" />
-      <path class="line" d="M68 12 L98 52" />
-      <path class="line" d="M76 17 L99 60" />
-      <path class="line" d="M84 25 L99 70" />
-      <path class="line" d="M50 15 L80 50" />
-      <path class="line" d="M50 28 L70 52" />
+    <g class="anim" style="animation-delay: -1.3s;">
+      <path class="line" d="M55 10 L85 40" />
+      <path class="line" d="M63 15 L90 42" />
+      <path class="line" d="M71 20 L94 43" />
+      <path class="line" d="M79 25 L97 43" />
+      <path class="line" d="M50 25 L75 50" />
     </g>
 
-    <g class="sec-b">
-      <path class="line" d="M10 55 Q40 45 60 65 T95 55" stroke-width="2.5" />
-      <path class="line" d="M15 65 Q45 55 65 75 T98 65" stroke-width="2.5" />
-      <path class="line" d="M22 75 Q52 65 72 85 T95 78" stroke-width="2.5" />
-      <path class="line" d="M30 85 Q60 75 80 95" stroke-width="2.5" />
-      <path class="line" d="M40 92 Q60 85 75 98" stroke-width="2.5" />
-      <path class="line" d="M5 48 Q35 38 55 58 T90 48" opacity="0.7" />
+    <g class="anim" style="animation-delay: -2.6s;">
+      <path class="line" d="M15 65 Q45 50 85 65" />
+      <path class="line" d="M25 73 Q50 58 90 73" />
+      <path class="line" d="M35 81 Q55 66 95 81" />
+      <path class="line" d="M45 89 Q60 74 85 89" />
+      <path class="line" d="M55 95 Q65 85 75 95" />
     </g>
+
+    <path d="M50 50 L50 10 M50 50 L10 50 M50 50 L90 90" stroke="black" stroke-width="1.5" fill="none" opacity="0.5"/>
   </g>
 </svg>
