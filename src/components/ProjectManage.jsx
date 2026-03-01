@@ -1675,7 +1675,7 @@ export default function ProjectManage() {
         if ((projectBasic.status === 'C' || projectBasic.status === 'D') && projectBasic.endDay) {
             events.push({
                 title: projectBasic.status === 'C' ? '✅ 프로젝트 완료' : '⏸️ 프로젝트 중단',
-                date: projectBasic.endDay,
+                date: projectBasic.endDay.split('T')[0],
                 backgroundColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
                 borderColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
                 type: 'project-end'
@@ -2756,7 +2756,7 @@ export default function ProjectManage() {
                                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                     </svg>
                                     <span className="sub-info-cm">
-                                        {projectMember.length - 1}명 참여
+                                        {projectMember.length}명 참여
                                     </span>
                                 </span>
                             </div>
@@ -3129,7 +3129,7 @@ export default function ProjectManage() {
                             <div className="overview-section-container">
                                 <div className="overview-card-wrapper">
                                     <div className="overview-card">
-                                        <h3>실제 작업 일수</h3>
+                                        <h3>로그 기록 일수</h3>
                                         <p className="card-value">{getActualWorkingDays()}일</p>
                                         <p className="card-description">
                                             전체 {getProjectDays(projectBasic)}일 중 기록

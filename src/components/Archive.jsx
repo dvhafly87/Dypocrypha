@@ -21,7 +21,9 @@ export default function Archive() {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [availableExtensions, setAvailableExtensions] = useState(['all']);
-    const [searchFileKey, setSearchFileKey] = useState('');
+    const [searchFileKey, setSearchFileKey] = useState(
+        () => localStorage.getItem('nickname') || ''
+    );
 
     const fileInputRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -375,7 +377,7 @@ export default function Archive() {
                                             ) : !file.isEncrypted && ['.mp4', '.avi', '.mov'].includes(file.fileExtension) ? (
                                                 <video src={`${API.API_BASE_URL}/archive/file/${file.fileUuidName}`} className="archive-card-preview-video" muted />
                                             ) : !file.isEncrypted && ['.mp3'].includes(file.fileExtension) && file.mp3FileThumb !== null ? (
-                                                 <img src={`${API.API_BASE_URL}/archive/file/mp3/${file.mp3FileThumb}`} className="archive-card-preview-img" alt={file.mp3FileThumb} />
+                                                <img src={`${API.API_BASE_URL}/archive/file/mp3/${file.mp3FileThumb}`} className="archive-card-preview-img" alt={file.mp3FileThumb} />
                                             ) : (
                                                 getFileIcon(file.fileExtension)
                                             )}

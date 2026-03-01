@@ -98,7 +98,11 @@ export default function MyWithdraw() {
                 </div>
                 <div className="withdraw-notice-item">
                     <span className="withdraw-notice-dot" />
-                    작성한 게시글, 프로젝트, 아카이브 파일은 삭제되지 않고 유지됩니다.
+                    작성한 게시글 및 프로젝트는 삭제되지 않으며 익명으로 전환됩니다.
+                </div>
+                <div className="withdraw-notice-item">
+                    <span className="withdraw-notice-dot" />
+                    아카이브에 업로드한 파일은 탈퇴 시 모두 영구 삭제됩니다.
                 </div>
                 <div className="withdraw-notice-item">
                     <span className="withdraw-notice-dot" />

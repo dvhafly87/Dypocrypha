@@ -276,6 +276,13 @@ export default function ArchiveUpload() {
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 navigate('/login');
+            } else if (response.status === 403) {
+                const toastData = {
+                    status: 'warning',
+                    message: result.uploadMessage
+                };
+                localStorage.setItem('redirectToast', JSON.stringify(toastData));
+                navigate('/archive');
             } else if (response.ok) { //업로드 성공
                 if (result.uploadStatus) {
                     const toastData = {

@@ -235,6 +235,7 @@
     .mypage-inner {
         flex-direction: column;
         gap: 0;
+        align-items: stretch;
     }
 
     .mypage-nav {

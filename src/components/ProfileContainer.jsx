@@ -7,7 +7,7 @@ import API from '../config/apiConfig';
 import Doge from '../img/doge.jpeg';
 
 export default function ProfileContainer() {
-    const [userNickname, setUserNickname] = useState('');
+    const [profileInfo, setProfileDto] = useState({});
     const { logout, isLogined } = useAuth();
 
     useEffect(() => {
@@ -18,18 +18,20 @@ export default function ProfileContainer() {
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                 });
-                
+
                 if (!response.ok) {
                     logout();
                     return;
                 }
 
                 const result = await response.json();
-                
+
                 if (!result.getProfileInfo) {
                     logout();
                 } else {
-                    setUserNickname(result.nickname);
+                    if (result.getProfileDto) {
+                        setProfileDto(result.getProfileDto);
+                    }
                 }
             } catch (error) {
                 console.error("프로필 정보 로드 실패:", error);
@@ -49,14 +51,16 @@ export default function ProfileContainer() {
     return (
         <div className="profile-container">
             <div className="profile-image-wrapper">
-                <img 
-                    src={Doge} 
-                    alt={`${userNickname}의 프로필`} 
+                <img
+                    src={profileInfo.profileImage
+                        ? `${API.API_BASE_URL}/member/prof/${profileInfo.profileImage}`
+                        : Doge}
+                    alt={`${profileInfo.nickname}의 프로필`}
                     className="profile-image"
                 />
             </div>
             <div className="profile-info">
-                <span className="profile-nickname">{userNickname || '사용자'} 님</span>
+                <span className="profile-nickname">{profileInfo.nickname || '사용자'} 님</span>
                 <div className="profile-actions">
                     <Link to="/mypage" className="profile-mypage-link">
                         마이페이지
