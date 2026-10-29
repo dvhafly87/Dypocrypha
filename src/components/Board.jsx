@@ -56,7 +56,12 @@ export default function BoardMain() {
   const [boardChoiceDescription, setBoardChoiceDescription] = useState();
   const [boardList, setBoardList] = useState([]);
   const [filteredBoardList, setFilteredBoardList] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    try { return sessionStorage.getItem('board-picker-query') || ''; } catch { return ''; }
+  });
+  useEffect(() => {
+    try { sessionStorage.setItem('board-picker-query', searchQuery); } catch { /* Optional persistence. */ }
+  }, [searchQuery]);
   const { addToast } = useToast();
   const { isLogined } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,7 +70,7 @@ export default function BoardMain() {
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [boardPassword, setBoardPassword] = useState('');
 
-  const [isNarrowScreen, setIsNarrowScreen] = useState(window.innerWidth <= 1300);
+
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
@@ -85,14 +90,6 @@ export default function BoardMain() {
     }
   }, [addToast]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsNarrowScreen(window.innerWidth <= 1300);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const boardListCalling = async () => {
@@ -390,12 +387,6 @@ export default function BoardMain() {
     }
   };
 
-  const getBoardDisplayName = (name) => {
-    if (isNarrowScreen && name.length > 5) {
-      return name.substring(0, 4) + "...";
-    }
-    return name;
-  };
 
   return (
     <div className="board-wrapper">
@@ -468,7 +459,7 @@ export default function BoardMain() {
                         </span>
                       )}
                       <span className="board-name" title={board.boardName}>
-                        {getBoardDisplayName(board.boardName)}
+                        {board.boardName}
                       </span>
                     </div>
                     {isLogined && board.boardPriId !== 1 && board.boardName !== '자유게시판' && (
@@ -537,6 +528,7 @@ export default function BoardMain() {
             <>
               <div>
                 <BoardAccessWrapper
+                  key={boardChoice}
                   boardId={boardChoice}
                   boardName={boardChoiceName}
                   boardDescription={boardChoiceDescription}
@@ -547,6 +539,7 @@ export default function BoardMain() {
             <>
               <div>
                 <BoardPost
+                  key={boardChoice}
                   boardId={boardChoice}
                   boardName={boardChoiceName}
                   boardDescription={boardChoiceDescription}

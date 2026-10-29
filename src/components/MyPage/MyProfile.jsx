@@ -77,7 +77,6 @@ export default function MyProfile() {
                     credentials: 'include',
                 });
                 const result = await response.json();
-                console.log("응답", result);
 
                 if (!response.ok) {
                     if (response.status === 401) {
@@ -133,6 +132,7 @@ export default function MyProfile() {
             });
 
             const result = await response.json();
+
             if (!response.ok) {
                 if (response.status === 401) {
                     localStorage.setItem('redirectToast', JSON.stringify({ status: 'error', message: result.changedNickName || '로그인이 필요한 서비스 입니다' }));
@@ -147,6 +147,7 @@ export default function MyProfile() {
                 localStorage.setItem('nickname', trimmed);
                 addToast("닉네임이 변경되었습니다", "success");
                 setGetInfo(prev => ({ ...prev, nickname: trimmed }));
+                setIsSubmitting(false);
                 setNickValue(trimmed);
                 setEditNick(false);
             }

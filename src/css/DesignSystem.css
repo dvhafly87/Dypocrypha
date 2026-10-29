@@ -1,0 +1,315 @@
+/* Presentation-only refresh. Imported after page CSS and Theme.css.
+   Existing selectors, routes, authored content and theme behavior stay intact. */
+:root {
+  --page-pad: 32px;
+  --content-max: 1280px;
+  --reading-max: 760px;
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --brand-fill: #257443;
+  --brand-fill-hover: #1d6037;
+  --on-brand: #ffffff;
+  --page-bg: #f7f9f8;
+  --primary-color: var(--brand-fill);
+  --primary-hover: var(--brand-fill-hover);
+  --bg-color: var(--page-bg);
+  --border-color: var(--border);
+  --text-main: var(--text);
+  --text-sub: var(--text-secondary);
+  --white: var(--surface);
+}
+:root[data-theme="dark"] {
+  --page-bg: #101814;
+  --brand-fill: #2a7a48;
+  --brand-fill-hover: #318650;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.6; }
+button, input, textarea, select { font-family: inherit; }
+html :is(.main-home-container, .board-wrapper, .board-content-container, .board-write-container,
+  .project-main-container, .project-manage-container, .archive-main-container, .search-main-container,
+  .mypage-container, .file-content-main-container, .upload-confirmation-container, .report-insert-container) {
+  width: 100%; max-width: var(--content-max); margin-inline: auto;
+  padding: 32px var(--page-pad); gap: 24px; min-width: 0; box-sizing: border-box;
+}
+html :is(.archive-main-container, .project-content-container, .project-list-container, .archive-uploaded-viewer-container) {
+  height: auto; overflow-y: visible;
+}
+html :is(.project-main-content-container, .board-main-container, .board-main-container-choice) { min-width: 0; }
+/* Neutral surfaces, one boundary per group; floating dialogs retain their shadow. */
+html :is(.personal-project-slider, .slider-container, .recently-posted-section, .recently-archive-section,
+  .board-side-container, .board-post-container, .post-content-main, .board-writemain-container,
+  .project-content-container, .project-card, .project-list-item, .project-manage-header,
+  .project-manage-summary-area, .project-manage-teamValue-area, .project-calendar-section,
+  .project-log-container, .project-complete-report-container, .report-card, .overview-card, .chart-container,
+  .activity-heatmap-section, .search-section, .search-project-card, .search-archive-card,
+  .archive-card, .account-wrapper, .private-access-card, .file-password-auth-card,
+  .select-file-viewer-container, .report-editor-section, .mc-card) {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-card); box-shadow: none;
+}
+html :is(.personal-project-slider, .slider-container, .recently-posted-section, .recently-archive-section,
+  .project-card, .project-list-item, .search-project-card, .search-archive-card, .archive-card,
+  .member-card, .report-card, .mc-card, .board-list-item):hover {
+  transform: none; box-shadow: none; border-color: var(--border);
+}
+/* Page headings: hierarchy comes from type and spacing rather than colored banners. */
+html :is(.project-header, .archive-header, .board-content-header, .board-write-header,
+  .file-content-header, .upload-confirmation-header, .report-header, .private-access-header,
+  .search-header, .board-post-header) {
+  background: transparent; color: var(--text); border-radius: 0; box-shadow: none;
+  padding: 0 0 20px; border-bottom: 1px solid var(--border); gap: 16px; transform: none;
+}
+html :is(.project-header-left, .project-header-right, .archive-header-title, .archive-header-actives-wrapper) { padding: 0; }
+html :is(.project-main-container .project-title, .archive-main-title, .board-content-header h2,
+  .board-write-header h2, .file-content-main-title, .upload-confirmation-header-title,
+  .report-header h2, .private-access-title, .search-keyword-label, .board-post-title) {
+  color: var(--text); font-size: clamp(24px, 2vw, 28px); line-height: 1.3; font-weight: 700;
+  margin: 0; text-shadow: none; letter-spacing: -.5px; overflow-wrap: anywhere;
+}
+html :is(.project-sub-title, .archive-sub-title, .file-content-sub-title, .private-access-meta,
+  .search-keyword-sub, .board-post-meta) { color: var(--text-secondary); font-size: 14px; opacity: 1; }
+html :is(.slider-header, .board-side-container > .sidebar-header, .project-home-modal-header,
+  .callendar-log-input-header, .project-modal-log-header, .project-log-list-header,
+  .project-complete-report-header, .search-section-header) {
+  background: var(--surface); color: var(--text); padding: 16px 24px; border-bottom: 1px solid var(--border); box-shadow: none;
+}
+html :is(.slider-header h2, .board-side-container > .sidebar-header h2,
+  .project-home-modal-header h3, .callendar-log-input-header h4, .project-modal-log-header h3,
+  .project-complete-report-header h2, .search-section-title) { color: var(--text); font-size: 20px; line-height: 1.4; text-shadow: none; }
+html :is(.recently-posted-section, .recently-archive-section, .board-writemain-container,
+  .post-content-main, .project-manage-summary-area, .project-calendar-section, .report-editor-section) { padding: 24px; }
+html :is(.recently-post-header, .recently-archive-header) { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px; }
+html :is(.recently-post-header h2, .recently-archive-header h2) { color: var(--text); font-size: 20px; border-left: 0; padding-left: 0; }
+/* Controls use one height/radius; icon-only and library controls retain their sizing. */
+html :is(.input-group input, .input-group select, .form-group input, .form-group textarea, .form-group select,
+  .profile-field-input, .password-input, .passwordchk-input, .pwchange-input, .private-password-input, .private-access-input,
+  .file-password-input, .report-title-input, .project-modal-input, .withdraw-input,
+  .board-post-search-input, .project-search-container input, .file-search-form input,
+  .file-name-input, .comment-input) {
+  min-height: 44px; font-size: 16px; border: 1px solid var(--border); border-radius: var(--radius-control);
+  background: var(--surface); color: var(--text); box-sizing: border-box;
+}
+html :is(.input-group label, .form-group label, .input-label, .profile-field-label) { color: var(--text); font-size: 14px; line-height: 1.5; }
+html :is(.input-group input, .input-group select, .form-group input, .form-group textarea, .form-group select,
+  .profile-field-input, .password-input, .passwordchk-input, .pwchange-input, .private-password-input, .private-access-input, .file-password-input,
+  .report-title-input, .project-modal-input, .withdraw-input, .board-post-search-input):focus {
+  border-color: var(--focus); box-shadow: 0 0 0 2px var(--accent-tint); outline: none;
+}
+html :is(.input-group input.error, .emailValid, .password-input.error) { border-color: var(--theme-border-ef5350, #ef5350); }
+html :is(.passwordchk-btn, .pwchange-btn, .login-btn, .register-btn, .submit-btn, .btn-submit, .btn-write-post, .sidebar-actions-button,
+  .upload-btn, .upload-button, .btn-private-submit, .file-password-submit-btn,
+  .file-detail-download-btn, .comment-submit-btn, .add-new-project-container .add-new-project) {
+  background: var(--brand-fill); color: var(--on-brand); border: 1px solid var(--brand-fill);
+  border-radius: var(--radius-control); min-height: 44px; padding: 10px 16px; font-size: 15px;
+  font-weight: 600; line-height: 1.4; box-shadow: none; text-shadow: none;
+}
+html :is(.passwordchk-btn, .pwchange-btn, .login-btn, .register-btn, .submit-btn, .btn-submit, .btn-write-post, .sidebar-actions-button,
+  .upload-btn, .upload-button, .btn-private-submit, .file-password-submit-btn,
+  .file-detail-download-btn, .comment-submit-btn, .add-new-project-container .add-new-project):hover:not(:disabled) {
+  background: var(--brand-fill-hover); color: var(--on-brand); box-shadow: none; transform: none;
+}
+html :is(.btn-cancel, .cancel-button, .btn-list, .btn-edit, .btn-private-back, .file-content-back-btn,
+  .filter-dropdown-btn, .service-link, .verify-btn, .reselect-file-button, .profile-btn,
+  .add-new-project-container .sort-card, .add-new-project-container .sort-list) {
+  background: var(--surface); color: var(--text); border: 1px solid var(--border);
+  border-radius: var(--radius-control); min-height: 44px; box-shadow: none; font-size: 15px; transform: none;
+}
+html :is(.btn-cancel, .cancel-button, .btn-list, .btn-edit, .btn-private-back, .file-content-back-btn,
+  .filter-dropdown-btn, .service-link, .verify-btn, .reselect-file-button, .profile-btn):hover:not(:disabled) {
+  background: var(--surface-raised); color: var(--text); border-color: var(--border); box-shadow: none; transform: none;
+}
+html .add-new-project-container :is(.sort-card, .sort-list).active { background: var(--accent-tint); color: var(--accent); border-color: var(--accent); }
+html :is(.btn-delete-post, .project-delete-btn) { background: var(--surface); color: var(--theme-text-dc2626, #dc2626); border: 1px solid var(--border); box-shadow: none; }
+html button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+html :is(button, a, input, textarea, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+/* Navigation remains sticky at its exact height in each breakpoint. */
+html .main-header { height: 76px; min-height: 76px; padding: 12px var(--page-pad); background: var(--surface); border-color: var(--border); }
+html .main-header .profile-container { padding: 0; gap: 12px; background: transparent; border: 0; box-shadow: none; }
+html .main-header .profile-image-wrapper { width: 40px; height: 40px; }
+html .main-header .profile-info { gap: 2px; }
+html .main-header .profile-nickname { font-size: 13px; line-height: 1.4; }
+html .main-header :is(.profile-mypage-link, .profile-logout-btn) { padding: 2px 8px; background: var(--surface-raised); color: var(--accent); border: 1px solid var(--border); line-height: 1.4; }
+html .brand-box img { width: 48px; height: 48px; }
+html .brand-box a { color: var(--accent); font-size: 22px; }
+html .sub-nav { top: 76px; padding: 10px var(--page-pad); gap: 8px; background: var(--surface); border-color: var(--border); }
+html .sub-nav a { color: var(--text-secondary); padding: 6px 14px; border-radius: 8px; font-size: 15px; }
+html .sub-nav a.active { color: var(--accent); background: var(--accent-tint); font-weight: 600; }
+html .move-agreeAndlogin { background: var(--brand-fill); color: var(--on-brand); padding: 10px 18px; border-radius: 8px; box-shadow: none; }
+html .move-agreeAndlogin:hover { background: var(--brand-fill-hover); color: var(--on-brand); box-shadow: none; }
+html .search-box { background: var(--surface-raised); border-color: var(--border); border-radius: 8px; min-height: 44px; }
+html :is(.search-btn, .board-search-button) { background: var(--brand-fill); }
+html .mobile-sidebar > .sidebar-header { background: transparent; padding: 0; color: var(--text); }
+html .mobile-sidebar > .sidebar-header h2 { color: var(--accent); }
+/* Home. Keep the original project image, with a compact, bounded preview. */
+html .slider-container { border: 0; }
+html .slider-header { padding: 16px 24px; }
+html .slider-header h2 { padding: 0; background: none; }
+html .slider-btn { background: var(--surface-raised); color: var(--text); border: 1px solid var(--border); }
+html .slider-indicator { color: var(--text-secondary); }
+html .slider-content { min-height: 0; }
+html .project-image { min-height: 0; max-height: none; align-self: stretch; }
+html .project-info { padding: 24px; gap: 12px; max-height: none; overflow-y: visible; background: var(--surface); }
+html .info-row { padding-bottom: 12px; margin-bottom: 0; border-color: var(--border); }
+html .info-row:last-child { padding-bottom: 0; }
+html .info-value { color: var(--text); }
+html :is(.stack-tag, .skill-tag, .skill-tag-small, .search-skill-tag) { background: var(--surface-raised); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 6px; box-shadow: none; }
+html .stack-tag:hover { background: var(--accent-tint); color: var(--accent); transform: none; }
+html .recently-posted-section :is(th, td) { border-bottom: 1px solid var(--border); }
+html .recently-posted-section th { background: var(--surface-raised); color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+html .recently-posted-section tbody tr:hover { transform: none; box-shadow: none; background: var(--surface-raised); }
+/* Board navigation and detail. Preserve narrow-screen columns and lock/delete icons. */
+html .board-side-container { min-width: 240px; max-width: 288px; }
+html :is(.sidebar-actions, .sidebar-boardList) { padding: 16px; }
+html .board-list-item { border: 1px solid transparent; border-radius: 8px; background: transparent; box-shadow: none; }
+html .board-list-item.item-activate { background: var(--accent-tint); border-color: var(--accent); }
+html .board-list-item .board-name { color: var(--text); }
+html .board-list-item.item-activate .board-name { color: var(--accent); }
+html .board-post-container { padding: 24px; min-height: 0; align-self: flex-start; }
+html :is(.board-main-container, .board-main-container-choice) { border-radius: 12px; box-shadow: none; }
+html .board-main-container-choice { border: 0; background: transparent; }
+html .board-post-list-container { flex: 0 1 auto; max-height: none; overflow-y: visible; }
+html .board-post-table-header th { background: var(--surface-raised); color: var(--text-secondary); border-color: var(--border); }
+html .board-post-row:hover { transform: none; box-shadow: none; }
+html .private-board-access-container { min-width: 0; width: 100%; padding: 24px; gap: 24px; min-height: 0; }
+html .private-access-header { width: 100%; }
+html .private-access-form-container { flex: 0 1 auto; }
+html .private-access-title .lock-icon { color: var(--accent); stroke: currentColor; }
+html .private-access-card { max-width: 440px; padding: 24px; box-sizing: border-box; }
+html .private-access-icon-wrapper { width: 56px; height: 56px; background: var(--accent-tint); margin-bottom: 16px; }
+html .private-access-icon-wrapper svg { width: 28px; height: 28px; }
+html .post-title { color: var(--text); font-size: clamp(24px, 2.4vw, 32px); line-height: 1.4; overflow-wrap: anywhere; }
+html .post-meta { color: var(--text-secondary); font-size: 14px; }
+html .post-body { max-width: var(--reading-max); margin: 24px auto; font-size: 17px; line-height: 1.85; overflow-wrap: anywhere; }
+html .post-body img { max-width: 100%; height: auto; }
+html .post-body :is(pre, .table) { overflow-x: auto; max-width: 100%; }
+html .comments-section { border-top: 1px solid var(--border); box-shadow: none; background: transparent; }
+html .board-writemain-container input[type="text"] { min-height: 44px; font-size: 16px; border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 12px 60px 12px 16px; }
+html .board-writemain-container .char-count { top: 36px; }
+html .option-item { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; box-shadow: none; }
+/* Projects, calendar and reports. No height clipping in the main page. */
+html .project-content-container { min-height: 0; }
+html .project-main-content-header { padding: 24px; border-color: var(--border); }
+html .project-list-container { padding: 24px; }
+html .project-card-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+html .project-card-content { padding: 20px; }
+html .project-card-title { color: var(--text); font-size: 18px; }
+html .project-card:hover .project-card-thumb img { transform: none; }
+html .project-card-skills { flex-wrap: wrap; overflow: visible; }
+html .project-status-box { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); box-shadow: none; min-width: 64px; padding: 8px 12px; backdrop-filter: none; }
+html .project-status-box.status-active { background: var(--accent-tint); color: var(--accent); border-color: var(--accent); }
+html .project-status-box .count { color: var(--text); }
+html .project-status-box :is(.count, .label) { opacity: 1; }
+html .project-manage-thumb-wrapper { height: 280px; border-radius: 12px 12px 0 0; }
+html .project-manage-thumbnail { border-radius: 12px 12px 0 0; }
+html .project-manage-overlay { padding: 24px; }
+html .project-manage-info .project-title { font-size: 28px; color: #fff; }
+html .project-manage-info .project-title { overflow-wrap: anywhere; }
+html .project-manage-content-area { gap: 24px; }
+html .project-manage-thumb-wrapper { background: var(--brand-fill); }
+html :is(.project-thumb-edit-btn, .summary-text button, .skill-inline button, .category-update-select-button,
+  .add-member-btn, .rpbtn, .log-input-button-wrapper button) { background: var(--brand-fill); color: var(--on-brand); border: 1px solid var(--brand-fill); border-radius: 8px; box-shadow: none; min-height: 44px; }
+html :is(.project-thumb-edit-btn, .summary-text button, .skill-inline button, .category-update-select-button,
+  .add-member-btn, .rpbtn, .log-input-button-wrapper button):hover { background: var(--brand-fill-hover); box-shadow: none; transform: none; }
+html .skill-badge { background: var(--surface-raised); color: var(--text-secondary); border: 1px solid var(--border); box-shadow: none; }
+html :is(.project-log-list-header, .log-detail-header) { color: var(--text); background: var(--surface-raised); box-shadow: none; border-color: var(--border); }
+html .log-detail-content { font-size: 16px; line-height: 1.75; }
+html :is(.project-complete-report-header, .report-card-header) { color: var(--text); background: var(--surface); }
+html :is(.report-card-title, .project-complete-report-header h3) { color: var(--text); }
+html .fc .fc-toolbar-title { color: var(--text); font-size: 20px; }
+html .fc .fc-button-primary { background: var(--brand-fill); border-color: var(--brand-fill); color: var(--on-brand); box-shadow: none; }
+/* Archives and upload forms. */
+html .archive-uploaded-viewer-container { min-height: 0; padding: 0; }
+html .file-search-form input { background: var(--surface); color: var(--text); }
+html .archive-card { overflow: hidden; }
+html .archive-card-name { color: var(--text); font-weight: 600; }
+html .archive-card { height: auto; min-height: 200px; box-sizing: border-box; }
+html :is(.file-detail-info-section, .upload-info-section) { background: var(--surface); }
+html .encryption-section { background: var(--surface-raised); border: 1px solid var(--border); box-shadow: none; }
+html .file-name-wrapper .file-name-input { border: 0; background: transparent; }
+/* Account screens share the same calm two-column shell, compact on mobile. */
+html .account-service-main-container { background: var(--page-bg); padding: 32px var(--page-pad); min-height: 70vh; align-items: flex-start; }
+html .account-wrapper { max-width: 880px; }
+html .welcome-section { background: var(--surface-raised); color: var(--text); padding: 32px; border-right: 1px solid var(--border); }
+html .welcome-content h1 { font-size: 24px; color: var(--text); }
+html .welcome-content > p { color: var(--text-secondary); margin-bottom: 24px; }
+html :is(.logo-circle, .feature-icon) { background: var(--accent-tint); color: var(--accent); backdrop-filter: none; }
+html .form-section { padding: 32px; min-width: 0; }
+html :is(.login-container h2, .register-container h2, .reset-container h2) { color: var(--text); font-size: 24px; line-height: 1.4; }
+html .divider { margin: 24px 0; }
+html .mypage-inner { gap: 24px; }
+html .mypage-nav { top: 152px; }
+html .mypage-viewer { border-color: var(--border); padding-left: 24px; }
+html .profile-root { padding-top: 0; }
+html :is(.modal-content, .add-new-project-modal, .project-modal-content, .project-thumb-edit-modal-content,
+  .callendar-input-log-modal, .mc-modal) { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--menu-shadow); }
+html :is(.pagination-button, .pagination-btn, .pagination-number) { border-radius: 8px; box-shadow: none; }
+@media (max-width: 1199px) {
+  :root { --page-pad: 24px; }
+  html .project-image { flex: 0 0 250px; height: 250px; }
+  html .project-header { flex-wrap: wrap; }
+  html .project-header-right { flex-wrap: wrap; }
+}
+@media (max-width: 773px) {
+  html .board-side-container { max-width: none; min-width: 0; width: 100%; }
+}
+@media (max-width: 600px) {
+  :root { --page-pad: 16px; }
+  html :is(.main-home-container, .board-wrapper, .board-content-container, .board-write-container,
+    .project-main-container, .project-manage-container, .archive-main-container, .search-main-container,
+    .mypage-container, .file-content-main-container, .upload-confirmation-container, .report-insert-container) { padding-block: 24px; gap: 20px; }
+  html .main-header { min-height: 64px; height: 64px; padding-block: 8px; gap: 8px; }
+  html .brand-box img { width: 36px; height: 36px; }
+  html .brand-box a { font-size: 18px; }
+  html .brand-box { gap: 6px; }
+  html .visitor-badge { font-size: 11px; margin-left: 0; }
+  html .sub-nav { display: none; }
+  html :is(.project-header, .archive-header, .board-content-header, .board-write-header,
+    .file-content-header, .upload-confirmation-header, .report-header, .private-access-header) { padding-bottom: 16px; }
+  html :is(.project-header-left, .project-header-right, .archive-header-title, .archive-header-actives-wrapper) { padding: 0; }
+  html .project-header-right { width: 100%; gap: 8px; }
+  html .project-status-box { flex: 1; min-width: 0; padding: 8px; }
+  html :is(.recently-posted-section, .recently-archive-section, .board-writemain-container, .post-content-main,
+    .project-manage-summary-area, .project-calendar-section, .report-editor-section,
+    .project-main-content-header, .project-list-container, .board-post-container, .private-board-access-container) { padding: 16px; }
+  html .private-board-access-container { gap: 20px; }
+  html .board-post-container { border: 0; }
+  html :is(.slider-header, .board-side-container > .sidebar-header) { padding: 16px; }
+  html .slider-header h2 { padding: 0; }
+  html .project-image { flex-basis: 180px; height: 180px; max-height: 180px; }
+  html .project-info { padding: 16px; }
+  html .project-card-grid { grid-template-columns: 1fr; gap: 16px; }
+  html .project-manage-thumb-wrapper { height: 220px; }
+  html .project-manage-overlay { padding: 16px; }
+  html .project-manage-info .project-title { font-size: 24px; }
+  html .post-body { font-size: 16px; line-height: 1.8; margin-block: 20px; }
+  html .account-service-main-container { padding-block: 24px; }
+  html .account-wrapper { flex-direction: column; }
+  html .welcome-section { padding: 24px; border-right: 0; border-bottom: 1px solid var(--border); }
+  html .logo-circle { width: 48px; height: 48px; margin-bottom: 12px; }
+  html .welcome-content > p { margin-bottom: 0; }
+  html .form-section { padding: 24px; }
+  html .mypage-viewer { padding-left: 0; padding-top: 24px; border-left: 0; }
+  html .mypage-nav { position: static; }
+  html .toastui-editor-md-tab-container .tab-item { min-height: 44px; height: auto; line-height: 44px; box-sizing: border-box; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html :is(.project-card, .project-list-item, .archive-card, .board-post-row, .pj-comment) { animation: none; transition: none; opacity: 1; }
+}
+
+/* Mobile header: equal side slots keep the home link at the viewport center. */
+@media (max-width: 600px) {
+  html .main-header {
+    display:grid; grid-template-columns:minmax(44px,1fr) auto minmax(44px,1fr);
+    column-gap:8px; align-items:center;
+    padding-inline:max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  }
+  html .main-header .hamburger-btn { grid-column:1; grid-row:1; justify-self:start; }
+  html .main-header .brand-box { grid-column:2; grid-row:1; justify-self:center; margin:0; min-width:0; }
+  html .main-header .brand-home { min-height:44px; gap:6px; }
+  html .main-header > .visitor-badge {
+    grid-column:3; grid-row:1; justify-self:end; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:flex-end; gap:0 4px; min-width:0; max-width:100%;
+    margin:0; line-height:1.5; font-variant-numeric:tabular-nums;
+  }
+  html .main-header > .visitor-badge span { white-space:nowrap; }
+}

@@ -94,7 +94,8 @@ export default function Archive() {
                     loadMore();
                 }
             },
-            { root: containerRef.current, threshold: 0.1, rootMargin: '100px' }
+            // The archive now scrolls with the document, not a nested grid.
+            { root: null, threshold: 0.1, rootMargin: '100px' }
         );
 
         if (observerRef.current) observer.observe(observerRef.current);
@@ -149,7 +150,7 @@ export default function Archive() {
             return;
         }
 
-        navigate('/archive/upload', { state: { file } });
+        navigate('/archives/upload', { state: { file } });
     };
 
     // ----------------------------------------------------------------
@@ -290,8 +291,8 @@ export default function Archive() {
             {/* 헤더 */}
             <div className="archive-header">
                 <span className="archive-header-title">
-                    <p className="archive-main-title">Dypocrypha</p>
-                    <p className="archive-sub-title">아카이브</p>
+                    <h1 className="archive-main-title">아카이브</h1>
+                    <p className="archive-sub-title">파일과 자료를 한곳에서 관리합니다.</p>
                 </span>
                 <div className="file-search-form">
                     <input
@@ -357,7 +358,7 @@ export default function Archive() {
                 ) : (
                     <>
                         {filteredFiles.map((file, index) => (
-                            <div className="archive-card" key={index} onClick={() => navigate(`/archive/fileSelect/${file.fileUuidName}`)}>
+                            <div className="archive-card" key={index} onClick={() => navigate(`/archives/fileSelect/${file.fileUuidName}`)}>
                                 <div className="archive-card-top">
                                     {/* 좌: 파일명 */}
                                     <div className="archive-card-name" title={file.fileName}>

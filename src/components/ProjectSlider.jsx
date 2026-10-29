@@ -141,7 +141,7 @@ export default function ProjectSlider() {
                 </div>
             </div>
 
-            <NavLink className="slider-link" to={`/project/manage/${currentProject.id}`} >
+            <NavLink className="slider-link" to={`/projects/manage/${currentProject.id}`} >
                 <div className={`slider-content ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
                     <div
                         className="project-image"

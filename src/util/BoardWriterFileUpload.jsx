@@ -5,6 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import '../css/BoardWriter.css';
 
+import { useEditorDraft } from '../util/useEditorDraft.js';
+import EditorDraftNotice from '../components/EditorDraftNotice.jsx';
 import API from '../config/apiConfig.js';
 
 const extractUploadedImages = (html) => {
@@ -82,8 +84,18 @@ export default function BoardWrite() {
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   const editorRef = useRef(null);
+  const draft = useEditorDraft({
+    boardId, postId: undefined, privateBoard: false,
+    values: { title, isPinned, isAnonymous }, editorRef,
+    
+    applyValues: data => { setTitle(data.title); setIsPinned(!!data.isPinned); setIsAnonymous(!!data.isAnonymous); }
+  });
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    if (draft.pending()) { addToast('이미지 업로드가 끝난 후 저장해주세요.', 'warning'); return; }
+    if (draft.candidate) { addToast('이전 임시 글을 복구하거나 현재 내용으로 계속할지 선택해주세요.', 'warning'); return; }
+    draft.flush();
     const editorContent = editorRef.current ? editorRef.current.getData() : '';
 
     if (!title.trim()) {
@@ -126,68 +138,30 @@ export default function BoardWrite() {
       });
 
       if (!response.ok) {
-        const toastData = {
-          status: 'warning',
-          message: "서버 통신 불가"
-        };
-        localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/');
+        draft.failed('서버에 등록하지 못했습니다. 입력 내용은 유지됩니다. 다시 등록해주세요.');
+        addToast('서버 통신 오류: 입력 내용은 유지됩니다.', 'error');
         return;
       }
 
       const result = await response.json();
 
       if (result.boardPostWriteStatus) {
+        draft.markSaved();
         addToast(result.boardPostWriteMessage, "success")
         navigate(-1);
       } else {
-        const toastData = {
-          status: 'warning',
-          message: result.boardPostWriteMessage
-        };
-        localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/board');
-        return;
+        draft.failed(result.boardPostWriteMessage || '게시글 등록에 실패했습니다. 입력 내용은 유지됩니다.');
+        addToast(result.boardPostWriteMessage || '등록 실패', 'error');
       }
     } catch (error) {
-      const toastData = {
-        status: 'warning',
-        message: "서버 통신 불가"
-      };
-      localStorage.setItem('redirectToast', JSON.stringify(toastData));
-      setIsSubmitting(false);
-      navigate('/');
-      return;
+      draft.failed('서버에 등록하지 못했습니다. 입력 내용은 유지됩니다. 다시 등록해주세요.');
+      addToast('서버 통신 오류: 입력 내용은 유지됩니다.', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancel = async () => {
-    const editorContent = editorRef.current ? editorRef.current.getData() : '';
-
-    if (title.trim() || (editorContent.trim() && editorContent !== '<p>&nbsp;</p>')) {
-      if (!window.confirm("작성 내용이 있습니다. 정말 취소하시겠습니까?"))
-        return;
-
-      const filenames = extractUploadedImages(editorContent);
-
-      if (filenames.length > 0) {
-        await fetch(`${API.API_BASE_URL}/api/upload/deleteAll`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ filenames })
-        });
-      }
-
-      navigate(-1);
-    } else {
-      navigate(-1);
-    }
-  };
+  const handleCancel = () => draft.leave(() => navigate(-1));
 
   useEffect(() => {
     const LoginChecker = async () => {
@@ -239,6 +213,7 @@ export default function BoardWrite() {
       </div>
 
       <div className="board-writemain-container">
+        <EditorDraftNotice draft={draft} />
         <div className="input-group">
           <label htmlFor="post-title" className="input-label">제목</label>
           <input
@@ -295,9 +270,11 @@ export default function BoardWrite() {
         <div className="editor-group">
           <label className="input-label">내용</label>
           <CKEditor
+            onChange={() => draft.changed()}
             editor={ClassicEditor}
             onReady={(editor) => {
               editorRef.current = editor;
+              draft.onReady();
             }}
             disabled={isSubmitting}
             config={{

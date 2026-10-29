@@ -1,19 +1,21 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
-import { useNavigate } from 'react-router-dom';
 
 import '../css/MainHome.css';
 
 import ProjectSlider from '../components/ProjectSlider.jsx'
 import API from '../config/apiConfig.js';
+import { formatDate } from '../util/dateFormat.js';
 
 export default function MainHome() {
     const { addToast } = useToast();
-    const navigate = useNavigate();
     const [boardList, setBoardList] = useState([]);
     const [hasError, setHasError] = useState(false);
     const [fileList, setFileList] = useState([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [filesLoading, setFilesLoading] = useState(true);
+    const [fileError, setFileError] = useState(false);
 
     useEffect(() => {
         const storedToastData = localStorage.getItem('redirectToast');
@@ -45,7 +47,9 @@ export default function MainHome() {
                     setFileList(result.recentFileReturnInfo);
                 }
             } catch (error) {
-                addToast(error.message, "error");
+                setFileError(true);
+            } finally {
+                setFilesLoading(false);
             }
         };
         getRecentlyArchiveInfomation();
@@ -71,6 +75,8 @@ export default function MainHome() {
             } catch (error) {
                 setHasError(true);
                 setBoardList([]);
+            } finally {
+                setPostsLoading(false);
             }
         };
         getCallRecentlyBoardInformation();
@@ -79,15 +85,7 @@ export default function MainHome() {
     // ----------------------------------------------------------------
     // 날짜 포맷
     // ----------------------------------------------------------------
-    const formatDate = (dateString) => {
-        if (!dateString) return '-';
-        try {
-            const date = new Date(dateString);
-            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        } catch { return '-'; }
-    };
 
-    const getAuthorDisplay = (post) => post.postAnonymous || post.postAuthor || '알 수 없음';
 
     // ----------------------------------------------------------------
     // 아카이브 아이콘 (Archive.jsx에서 가져옴)
@@ -176,7 +174,8 @@ export default function MainHome() {
                 <img
                     src={`${API.API_BASE_URL}/archive/file/${file.fileUuidName}`}
                     className="main-archive-preview-img"
-                    alt={file.fileMainName}
+                    loading="lazy"
+                    alt=""
                 />
             );
         }
@@ -186,6 +185,7 @@ export default function MainHome() {
                     src={`${API.API_BASE_URL}/archive/file/${file.fileUuidName}`}
                     className="main-archive-preview-img"
                     muted
+                    preload="none"
                 />
             );
         }
@@ -194,7 +194,8 @@ export default function MainHome() {
                 <img
                     src={`${API.API_BASE_URL}/archive/file/mp3/${file.mp3FileThumb}`}
                     className="main-archive-preview-img"
-                    alt={file.mp3FileThumb}
+                    loading="lazy"
+                    alt=""
                 />
             );
         }
@@ -206,114 +207,59 @@ export default function MainHome() {
     };
 
     return (
-        <>
-            <div className="main-home-container">
-                <div className="main-upper-section-wrapper">
-                    <ProjectSlider />
-                </div>
-                <div className="main-middle-section-wrapper">
-                    {/* ---- 최근 게시글 ---- */}
-                    <div className="recently-posted-section">
-                        <span className="recently-post-header">
-                            <h2>최근 게시글</h2>
-                        </span>
-                        <hr />
-                        {hasError ? (
-                            <div className="server-error-container">
-                                <p className="server-error-icon">🔧</p>
-                                <p className="server-error-message">현재 서버가 가동 중이 아닙니다</p>
-                                <p className="server-error-submessage">나중에 다시 방문해 주십시오</p>
-                            </div>
-                        ) : boardList.length === 0 ? (
-                            <div className="no-posts-container">
-                                <p className="no-posts-message">📝 아직 게시글이 없습니다</p>
-                                <p className="no-posts-submessage">첫 번째 게시글을 작성해보세요!</p>
-                            </div>
-                        ) : (
-                            <table className="recent-posts-table">
-                                <thead>
-                                    <tr>
-                                        <th>게시판</th>
-                                        <th>제목</th>
-                                        <th>작성자</th>
-                                        <th>작성일</th>
-                                        <th>조회수</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {boardList.map((post, index) => (
-                                        <tr key={post.boardPostPr || index}>
-                                            <td className="board-name-cell">{post.boardName || '미분류'}</td>
-                                            <td className="post-title-cell">
-                                                <Link to={`/boardPost/${post.boardName}/${post.boardId}/${post.boardPostId}`} className="post-title-link">
-                                                    {post.postIsPinned && (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="pinned-badge" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                            <path d="M12 2C11.4477 2 11 2.44772 11 3V14.5858L6.70711 10.2929C6.31658 9.90237 5.68342 9.90237 5.29289 10.2929C4.90237 10.6834 4.90237 11.3166 5.29289 11.7071L10.2929 16.7071C10.6834 17.0976 11.3166 17.0976 11.7071 16.7071L16.7071 11.7071C17.0976 11.3166 17.0976 10.6834 16.7071 10.2929C16.3166 9.90237 15.6834 9.90237 15.2929 10.2929L11 14.5858V3C11 2.44772 10.5523 2 10 2H12Z" />
-                                                        </svg>
-                                                    )}
-                                                    {post.postTitle}
-                                                </Link>
-                                            </td>
-                                            <td className="author-cell">{getAuthorDisplay(post)}</td>
-                                            <td className="date-cell">{formatDate(post.createdAt)}</td>
-                                            <td className="view-count-cell">{post.postViewCount || 0}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
-                    </div>
-
-                    {/* ---- 최근 아카이브 업로드 ---- */}
-                    <div className="archive-container">
-                        <h2>최근 아카이브 업로드</h2>
-
-                        {fileList.length === 0 ? (
-                            <div className="no-posts-container">
-                                <p className="no-posts-message">📂 업로드된 파일이 없습니다</p>
-                            </div>
-                        ) : (
-                            <div className="main-archive-card-list">
-                                {fileList.map((file, index) => (
-                                    <div
-                                        className="main-archive-card"
-                                        key={file.archId || index}
-                                        onClick={() => navigate(`/archive/fileSelect/${file.fileUuidName}`)}
-                                    >
-                                        {/* 미리보기 영역 */}
-                                        <div className="main-archive-card-preview">
-                                            {renderArchivePreview(file)}
-                                        </div>
-
-                                        {/* 정보 영역 */}
-                                        <div className="main-archive-card-info">
-                                            <div className="main-archive-card-header">
-                                                <span className="main-archive-ext-badge">
-                                                    {file.fileExtension?.replace('.', '').toUpperCase()}
-                                                </span>
-                                                {file.isEncrypted && (
-                                                    <span className="main-archive-lock-badge">
-                                                        <LockIcon /> 암호화
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="main-archive-filename" title={file.fileMainName}>
-                                                {file.fileMainName?.length > 20
-                                                    ? file.fileMainName.substring(0, 20) + '...'
-                                                    : file.fileMainName}
-                                            </p>
-                                            <div className="main-archive-meta">
-                                                <span>{file.uploader}</span>
-                                                <span>{formatDate(file.uploadDate)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
+        <main className="main-home-container">
+            <ProjectSlider />
+            <div className="home-recent-grid">
+                <section className="home-section" aria-labelledby="home-posts-title">
+                    <header className="home-section-header">
+                        <h2 id="home-posts-title">최근 게시글</h2>
+                        <Link className="home-more" to="/boards" aria-label="게시글 전체 보기">전체 보기 <span aria-hidden="true">→</span></Link>
+                    </header>
+                    {postsLoading ? <p className="home-state" role="status">게시글을 불러오는 중입니다.</p>
+                    : hasError ? <p className="home-state" role="status">게시글을 불러오지 못했습니다. 잠시 후 다시 확인해주세요.</p>
+                    : boardList.length === 0 ? <p className="home-state">아직 게시글이 없습니다.</p>
+                    : <ul className="home-post-list">
+                        {boardList.map((post, index) => (
+                            <li key={`${post.boardId}-${post.boardPostId || index}`}>
+                                <Link className="home-post-link" to={`/boardsPost/${encodeURIComponent(post.boardName || '게시판')}/${post.boardId}/${post.boardPostId}`}>
+                                    <span className="home-post-title">{post.postIsPinned && <span className="home-pinned">고정</span>}{post.postTitle}</span>
+                                    <span className="home-item-meta">
+                                        <span className="home-board-name" title={post.boardName}>{post.boardName || '미분류'}</span>
+                                        <span aria-hidden="true">·</span>
+                                        <span className="home-item-date">{formatDate(post.createdAt)}</span>
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>}
+                </section>
+                <section className="home-section" aria-labelledby="home-archive-title">
+                    <header className="home-section-header">
+                        <h2 id="home-archive-title">최근 아카이브</h2>
+                        <Link className="home-more" to="/archives" aria-label="아카이브 전체 보기">전체 보기 <span aria-hidden="true">→</span></Link>
+                    </header>
+                    {filesLoading ? <p className="home-state" role="status">파일을 불러오는 중입니다.</p>
+                    : fileError ? <p className="home-state" role="status">파일을 불러오지 못했습니다. 잠시 후 다시 확인해주세요.</p>
+                    : fileList.length === 0 ? <p className="home-state">아직 업로드된 파일이 없습니다.</p>
+                    : <ul className="home-file-list">
+                        {fileList.map((file, index) => (
+                            <li key={file.archId || file.fileUuidName || index}>
+                                <Link className="home-file-link" to={`/archives/fileSelect/${file.fileUuidName}`}>
+                                    <span className="home-file-preview" aria-hidden="true">{renderArchivePreview(file)}</span>
+                                    <span className="home-file-info">
+                                        <span className="home-file-badges">
+                                            <span className="home-file-ext">{file.fileExtension?.replace('.', '').toUpperCase()}</span>
+                                            {file.isEncrypted && <span className="home-file-lock"><LockIcon /> 암호화</span>}
+                                        </span>
+                                        <span className="home-file-name" title={file.fileMainName}>{file.fileMainName}</span>
+                                        <span className="home-item-meta"><span className="home-item-date">{formatDate(file.uploadDate)}</span></span>
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>}
+                </section>
             </div>
-        </>
+        </main>
     );
 }

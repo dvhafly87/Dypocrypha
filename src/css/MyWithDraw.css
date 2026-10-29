@@ -16,7 +16,7 @@
     flex-direction: column;
     gap: 0.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #fee2e2;
+    border-bottom: 1px solid var(--theme-border-fee2e2, #fee2e2);
 }
 
 .withdraw-header-title {
@@ -25,7 +25,7 @@
     gap: 0.5rem;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #dc2626;
+    color: var(--theme-text-dc2626, #dc2626);
     margin: 0;
 }
 
@@ -37,7 +37,7 @@
 
 .withdraw-header-desc {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--theme-text-6b7280, #6b7280);
     margin: 0;
     line-height: 1.6;
 }
@@ -50,8 +50,8 @@
     flex-direction: column;
     gap: 0.6rem;
     padding: 1.25rem;
-    background: #fef9f9;
-    border: 1px solid #fee2e2;
+    background: var(--theme-surface-fef9f9, #fef9f9);
+    border: 1px solid var(--theme-border-fee2e2, #fee2e2);
     border-radius: 10px;
 }
 
@@ -60,7 +60,7 @@
     align-items: flex-start;
     gap: 0.5rem;
     font-size: 0.855rem;
-    color: #374151;
+    color: var(--theme-text-374151, #374151);
     line-height: 1.5;
 }
 
@@ -68,7 +68,7 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #dc2626;
+    background: var(--theme-surface-dc2626, #dc2626);
     flex-shrink: 0;
     margin-top: 0.45rem;
 }
@@ -85,7 +85,7 @@
 .withdraw-form-label {
     font-size: 0.825rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--theme-text-374151, #374151);
     margin: 0 0 0.4rem 0;
 }
 
@@ -99,21 +99,21 @@
     width: 100%;
     box-sizing: border-box;
     padding: 0.75rem 1rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--theme-border-e5e7eb, #e5e7eb);
     border-radius: 8px;
     font-size: 0.9rem;
-    color: #111827;
-    background: #fff;
+    color: var(--theme-text-111827, #111827);
+    background: var(--theme-surface-ffffff, #fff);
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .withdraw-input::placeholder {
-    color: #9ca3af;
+    color: var(--theme-text-9ca3af, #9ca3af);
 }
 
 .withdraw-input:focus {
-    border-color: #dc2626;
+    border-color: var(--theme-border-dc2626, #dc2626);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
 }
 
@@ -123,8 +123,8 @@
 .withdraw-btn {
     width: 100%;
     padding: 0.85rem;
-    background: #dc2626;
-    color: #fff;
+    background: var(--theme-surface-dc2626, #dc2626);
+    color: var(--theme-text-ffffff, #fff);
     border: none;
     border-radius: 8px;
     font-size: 0.95rem;
@@ -135,7 +135,7 @@
 }
 
 .withdraw-btn:hover:not(:disabled) {
-    background: #b91c1c;
+    background: var(--theme-surface-b91c1c, #b91c1c);
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     transform: translateY(-1px);
 }
@@ -145,7 +145,7 @@
 }
 
 .withdraw-btn:disabled {
-    background: #f87171;
+    background: var(--theme-surface-f87171, #f87171);
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -153,7 +153,7 @@
 /* =============================
    미디어 쿼리
 ============================= */
-@media (max-width: 900px) {
+@media (max-width: 1199px) {
     .withdraw-container {
         gap: 1.5rem;
     }

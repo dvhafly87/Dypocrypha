@@ -4,6 +4,8 @@ import { useToast } from '../components/ToastContext.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import '../css/BoardWriter.css';
+import { useEditorDraft } from '../util/useEditorDraft.js';
+import EditorDraftNotice from '../components/EditorDraftNotice.jsx';
 import API from '../config/apiConfig.js';
 
 const extractUploadedImages = (html) => {
@@ -82,6 +84,13 @@ export default function PostEdit() {
   const [initialContent, setInitialContent] = useState("");
 
   const editorRef = useRef(null);
+  const draft = useEditorDraft({
+    boardId, postId: postId, privateBoard: false,
+    values: { title, isPinned, isAnonymous }, editorRef,
+    serverVersion: postData?.updatedAt || postData?.createdAt,
+    initialValues: { title: postData?.postTitle || '', isPinned: postData?.postIsPinned || false, isAnonymous: postData?.postAnonymous != null },
+    applyValues: data => { setTitle(data.title); setIsPinned(!!data.isPinned); setIsAnonymous(!!data.isAnonymous); }
+  });
 
   // 게시글 데이터 불러오기
   useEffect(() => {
@@ -123,7 +132,7 @@ export default function PostEdit() {
             message: result.boardPostContentMessage
           };
           localStorage.setItem('redirectToast', JSON.stringify(toastData));
-          navigate('/board');
+          navigate('/boards');
           return;
         }
 
@@ -133,7 +142,7 @@ export default function PostEdit() {
           message: "게시글 조회 에러"
         };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        navigate('/board');
+        navigate('/boards');
       } finally {
         setIsLoading(false);
       }
@@ -143,6 +152,10 @@ export default function PostEdit() {
   }, [boardId, postId, navigate]);
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    if (draft.pending()) { addToast('이미지 업로드가 끝난 후 저장해주세요.', 'warning'); return; }
+    if (draft.candidate) { addToast('이전 임시 글을 복구하거나 현재 내용으로 계속할지 선택해주세요.', 'warning'); return; }
+    draft.flush();
     const editorContent = editorRef.current ? editorRef.current.getData() : '';
 
     if (!title.trim()) {
@@ -186,6 +199,7 @@ export default function PostEdit() {
       });
 
       if (!response.ok) {
+        draft.failed('서버에 저장하지 못했습니다. 입력 내용은 유지됩니다. 다시 저장해주세요.');
         addToast("서버 통신 오류", "error");
         return;
       }
@@ -193,51 +207,22 @@ export default function PostEdit() {
       const result = await response.json();
 
       if (result.updatePostStatus) {
+        draft.markSaved();
         addToast(result.updatePostMessage || "게시글이 수정되었습니다.", "success");
-        navigate(`/board`);
+        navigate(`/boards`);
       } else {
+        draft.failed(result.updatePostMessage || '게시글 수정에 실패했습니다. 입력 내용은 유지됩니다.');
         addToast(result.updatePostMessage || "게시글 수정에 실패했습니다.", "error");
       }
     } catch (error) {
+      draft.failed('게시글 수정 중 오류가 발생했습니다. 입력 내용은 유지됩니다.');
       addToast("게시글 수정 중 오류가 발생했습니다.", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancel = async () => {
-    const editorContent = editorRef.current ? editorRef.current.getData() : '';
-
-    const hasChanges =
-      title !== (postData?.postTitle || "") ||
-      editorContent !== initialContent ||
-      isPinned !== (postData?.postIsPinned || false) ||
-      isAnonymous !== (postData?.postAnonymous != null);
-
-    if (hasChanges) {
-      if (!window.confirm("변경사항이 있습니다. 정말 취소하시겠습니까?")) {
-        return;
-      }
-
-      // 새로 업로드된 이미지 삭제
-      const initialImages = extractUploadedImages(initialContent);
-      const currentImages = extractUploadedImages(editorContent);
-      const newImages = currentImages.filter(img => !initialImages.includes(img));
-
-      if (newImages.length > 0) {
-        await fetch(`${API.API_BASE_URL}/api/upload/deleteAll`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ filenames: newImages })
-        });
-      }
-    }
-
-    navigate(-1);
-  };
+  const handleCancel = () => draft.leave(() => navigate(-1));
 
   if (isLoading) {
     return (
@@ -267,6 +252,7 @@ export default function PostEdit() {
       </div>
 
       <div className="board-writemain-container">
+        <EditorDraftNotice draft={draft} />
         <div className="input-group">
           <label htmlFor="post-title" className="input-label">제목</label>
           <input
@@ -325,6 +311,7 @@ export default function PostEdit() {
           <div className="editor-group">
             <label className="input-label">내용</label>
             <CKEditor
+            onChange={() => draft.changed()}
               editor={ClassicEditor}
 
               // 2. data={initialContent} 속성은 제거! (사용자님이 하신 방식)
@@ -337,6 +324,7 @@ export default function PostEdit() {
                 if (initialContent) {
                   editor.setData(initialContent);
                 }
+                draft.onReady();
               }}
 
               disabled={isSubmitting}

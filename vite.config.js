@@ -13,9 +13,9 @@ export default defineConfig({
   },
   server: {
     port: 1112,
-    https: {
+    https: fs.existsSync(keyPath) && fs.existsSync(certPath) ? {
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath)
-    }
+    } : false
   }
 })

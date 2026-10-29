@@ -95,7 +95,7 @@ export default function ArchiveUpload() {
                 message: '유효하지 않은 접근입니다'
             };
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/archive');
+            navigate('/archives');
         }
     }, []);
 
@@ -259,7 +259,7 @@ export default function ArchiveUpload() {
                     message: result.uploadMessage || '서버 통신 불가' // 메시지가 없으면 백엔드 서버 애플리케이션 실행 x 
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/archive');
+                navigate('/archives');
                 return;
             } else if (response.status === 400) { //value 조작 요청
                 const toastData = {
@@ -268,7 +268,7 @@ export default function ArchiveUpload() {
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
                 logout();
-                navigate('/archive');
+                navigate('/archives');
             } else if (response.status === 401) { //비로그인
                 const toastData = {
                     status: 'error',
@@ -282,7 +282,7 @@ export default function ArchiveUpload() {
                     message: result.uploadMessage
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/archive');
+                navigate('/archives');
             } else if (response.ok) { //업로드 성공
                 if (result.uploadStatus) {
                     const toastData = {
@@ -290,7 +290,7 @@ export default function ArchiveUpload() {
                         message: result.uploadMessage
                     };
                     localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    navigate('/archive');
+                    navigate('/archives');
                 }
             }
         } catch (error) {
@@ -299,7 +299,7 @@ export default function ArchiveUpload() {
                 message: error.message || '파일 업로드에 실패했습니다'
             };
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/archive');
+            navigate('/archives');
             return;
         }
     };
@@ -435,7 +435,7 @@ export default function ArchiveUpload() {
                     </div>
 
                     <div className="upload-action-area">
-                        <button onClick={() => navigate('/archive')} className="cancel-button">
+                        <button onClick={() => navigate('/archives')} className="cancel-button">
                             취소
                         </button>
                         <button

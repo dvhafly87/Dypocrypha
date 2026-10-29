@@ -10,8 +10,8 @@
 .upload-confirmation-header {
     display: flex;
     flex-direction: row;
-    color: white;
-    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: var(--theme-text-ffffff, white);
+    background: linear-gradient(135deg, var(--theme-surface-2e7d32, #2e7d32) 0%, var(--theme-surface-4caf50, #4caf50) 100%);
     justify-content: space-between;
     border-radius: 15px;
 }
@@ -46,13 +46,13 @@
 .upload-preview-wrapper {
     width: 100%;
     aspect-ratio: 1;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--theme-border-dddddd, #ddd);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background-color: #f9f9f9;
+    background-color: var(--theme-surface-f9f9f9, #f9f9f9);
 }
 
 .upload-preview-image,
@@ -74,8 +74,8 @@
 
 .reselect-file-button {
     padding: 0.75rem 1.5rem;
-    background-color: #4caf50;
-    color: white;
+    background-color: var(--theme-surface-4caf50, #4caf50);
+    color: var(--theme-text-ffffff, white);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -85,7 +85,7 @@
 }
 
 .reselect-file-button:hover {
-    background-color: #45a049;
+    background-color: var(--theme-surface-45a049, #45a049);
 }
 
 /* 우측: 파일 정보 섹션 */
@@ -111,17 +111,17 @@
 .file-name-input-group label {
     font-size: 1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--theme-text-333333, #333);
 }
 
 .file-name-wrapper {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    border: 2px solid #ddd;
+    border: 2px solid var(--theme-border-dddddd, #ddd);
     border-radius: 8px;
     padding: 0.75rem 1rem;
-    background-color: white;
+    background-color: var(--theme-surface-ffffff, white);
 }
 
 .file-name-input {
@@ -129,12 +129,12 @@
     border: none;
     outline: none;
     font-size: 1rem;
-    color: #333;
+    color: var(--theme-text-333333, #333);
 }
 
 .file-extension {
     font-size: 1rem;
-    color: #666;
+    color: var(--theme-text-666666, #666);
     font-weight: 600;
     white-space: nowrap;
 }
@@ -145,9 +145,9 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1.5rem;
-    background-color: #f8f9fa;
+    background-color: var(--theme-surface-f8f9fa, #f8f9fa);
     border-radius: 12px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--theme-border-e9ecef, #e9ecef);
 }
 
 .encryption-toggle {
@@ -172,12 +172,12 @@
 .encryption-label-text {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--theme-text-333333, #333);
 }
 
 .encryption-description {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--theme-text-666666, #666);
     margin-left: 2rem;
 }
 
@@ -187,7 +187,7 @@
     gap: 1rem;
     margin-top: 0.5rem;
     padding-top: 1rem;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--theme-border-dee2e6, #dee2e6);
 }
 
 .password-input-group {
@@ -199,12 +199,12 @@
 .password-input-group label {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #333;
+    color: var(--theme-text-333333, #333);
 }
 
 .password-input {
     padding: 0.75rem 1rem;
-    border: 2px solid #ddd;
+    border: 2px solid var(--theme-border-dddddd, #ddd);
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
@@ -212,12 +212,12 @@
 }
 
 .password-input:focus {
-    border-color: #4caf50;
+    border-color: var(--theme-border-4caf50, #4caf50);
 }
 
 .password-error {
     font-size: 0.9rem;
-    color: #f44336;
+    color: var(--theme-text-f44336, #f44336);
     margin: 0;
     margin-top: -0.5rem;
 }
@@ -228,14 +228,14 @@
     justify-content: flex-end;
     gap: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--theme-border-eeeeee, #eee);
 }
 
 .cancel-button {
     padding: 0.75rem 1.5rem;
-    background-color: #f5f5f5;
-    color: #666;
-    border: 1px solid #ddd;
+    background-color: var(--theme-surface-f5f5f5, #f5f5f5);
+    color: var(--theme-text-666666, #666);
+    border: 1px solid var(--theme-border-dddddd, #ddd);
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
@@ -244,13 +244,13 @@
 }
 
 .cancel-button:hover {
-    background-color: #e0e0e0;
+    background-color: var(--theme-surface-e0e0e0, #e0e0e0);
 }
 
 .upload-button {
     padding: 0.75rem 2rem;
-    background-color: #4caf50;
-    color: white;
+    background-color: var(--theme-surface-4caf50, #4caf50);
+    color: var(--theme-text-ffffff, white);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -260,11 +260,11 @@
 }
 
 .upload-button:hover {
-    background-color: #45a049;
+    background-color: var(--theme-surface-45a049, #45a049);
 }
 
 .upload-button:disabled {
-    background-color: #ccc;
+    background-color: var(--theme-surface-cccccc, #ccc);
     cursor: not-allowed;
 }
 
@@ -274,27 +274,27 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1.5rem;
-    background-color: #f8f9fa;
+    background-color: var(--theme-surface-f8f9fa, #f8f9fa);
     border-radius: 12px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--theme-border-e9ecef, #e9ecef);
     transition: all 0.3s ease;
 }
 
 .encryption-section:hover {
-    background-color: #e8f5e9;
-    border-color: #4caf50;
+    background-color: var(--theme-surface-e8f5e9, #e8f5e9);
+    border-color: var(--theme-border-4caf50, #4caf50);
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
 }
 
 /* 자물쇠 아이콘 스타일 */
 .lock-icon {
-    color: #666;
+    color: var(--theme-text-666666, #666);
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
 
 .encryption-checkbox:checked~.lock-icon {
-    color: #4caf50;
+    color: var(--theme-text-4caf50, #4caf50);
 }
 
 .encryption-section:hover .lock-icon {
@@ -317,12 +317,12 @@
 .encryption-label-text {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--theme-text-333333, #333);
     transition: color 0.3s ease;
 }
 
 .encryption-section:hover .encryption-label-text {
-    color: #2e7d32;
+    color: var(--theme-text-2e7d32, #2e7d32);
 }
 
 /* 체크박스 스타일 개선 */
@@ -342,15 +342,15 @@
 .file-mp3-thumbnail-uploader label {
     font-size: 1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--theme-text-333333, #333);
 }
 
 .thumbnail-drop-zone {
-    border: 2px dashed #4caf50;
+    border: 2px dashed var(--theme-border-4caf50, #4caf50);
     border-radius: 8px;
     padding: 0.9rem 1rem;
     cursor: pointer;
-    background-color: #f8fff8;
+    background-color: var(--theme-surface-f8fff8, #f8fff8);
     transition: background-color 0.2s;
     min-height: 48px;
     display: flex;
@@ -358,11 +358,11 @@
 }
 
 .thumbnail-drop-zone:hover {
-    background-color: #e8f5e9;
+    background-color: var(--theme-surface-e8f5e9, #e8f5e9);
 }
 
 .thumbnail-placeholder {
-    color: #999;
+    color: var(--theme-text-999999, #999);
     font-size: 0.95rem;
 }
 
@@ -376,7 +376,7 @@
 
 .thumbnail-file-name {
     font-size: 0.95rem;
-    color: #333;
+    color: var(--theme-text-333333, #333);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -385,7 +385,7 @@
 .thumbnail-remove-btn {
     background: none;
     border: none;
-    color: #999;
+    color: var(--theme-text-999999, #999);
     cursor: pointer;
     font-size: 1rem;
     padding: 0 0.25rem;
@@ -394,11 +394,11 @@
 }
 
 .thumbnail-remove-btn:hover {
-    color: #f44336;
+    color: var(--theme-text-f44336, #f44336);
 }
 
-/* 태블릿 (900px 이하) */
-@media (max-width: 900px) {
+/* 태블릿 (1199px 이하) */
+@media (max-width: 1199px) {
     .upload-confirmation-container {
         padding: 1.5rem 2rem;
         gap: 1.5rem;

@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "echo \"운영 배포는 검토 후 별도 실행하세요.\" && exit 1",
+    "dev:server": "vite --config vite.server.config.js",
+    "build:server": "vite build --config vite.server.config.js --outDir dist-server",
+    "postinstall": "node scripts/copy-pdf-assets.mjs",
+    "prebuild": "node scripts/copy-pdf-assets.mjs"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
@@ -19,9 +24,12 @@
     "@stomp/stompjs": "^7.3.0",
     "@toast-ui/react-editor": "^3.2.3",
     "lucide-react": "^0.555.0",
+    "pdfjs-dist": "6.4.299",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "10.1.0",
     "react-router-dom": "^7.9.5",
+    "remark-gfm": "4.0.1",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {

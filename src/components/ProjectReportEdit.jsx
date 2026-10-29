@@ -204,7 +204,7 @@ export default function ReportEditor() {
             } else if (response.ok && result.reportUpdateStatus) {
                 const toastData = { status: 'success', message: result.reportUpdateMessage || '수정되었습니다' };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate(`/project/manage/${projectId}`);
+                navigate(`/projects/manage/${projectId}`);
                 return;
             } 
         } catch (error) {
@@ -271,7 +271,7 @@ export default function ReportEditor() {
                     ref={editorRef}
                     initialValue=""
                     initialEditType="markdown"
-                    previewStyle="vertical"
+                    previewStyle="tab"
                     height="600px"
                     toolbarItems={[
                         ['heading', 'bold', 'italic', 'strike'],

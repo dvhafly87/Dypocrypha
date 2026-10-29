@@ -164,7 +164,7 @@ export default function ProjectMain() {
       if (!response.ok) {
         const toastData = { status: 'warning', message: '프로젝트 목록을 불러올 수 없습니다.' };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        window.location.href = '/';
+        window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/";
       }
 
       const result = await response.json();
@@ -174,13 +174,13 @@ export default function ProjectMain() {
       } else {
         const toastData = { status: 'warning', message: result.projectDataMessage };
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        window.location.href = '/';
+        window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/";
       }
     } catch (error) {
       console.error('Token validation error:', error);
       const toastData = { status: 'error', message: '프로젝트 페이지 useEffect API 에러' };
       localStorage.setItem('redirectToast', JSON.stringify(toastData));
-      window.location.href = '/';
+      window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/";
     }
   };
 
@@ -223,7 +223,7 @@ export default function ProjectMain() {
   };
 
   const handleProjectClick = (projectId) => {
-    navigate(`/project/manage/${projectId}`);
+    navigate(`/projects/manage/${projectId}`);
   };
 
   const getStatusLabel = (status) => {

@@ -206,7 +206,7 @@ export default function MyContent() {
         storageWithExpiry('selectedBoardName', item.boardName);
         storageWithExpiry('selectedBoardPtd', item.boardProtected.toString());
         storageWithExpiry('selectedBoardDec', item.boardDec || '');
-        navigate('/board');
+        navigate('/boards');
     };
 
     //댓글 엔티티에 게시판 네임이 없는 관계로 보드 아이디만 전송해서 보드 네임 리턴하는 API가 있다?!?!?
@@ -222,7 +222,7 @@ export default function MyContent() {
             const result = await response.json();
 
             if (result.boardInfoStatus) {
-                navigate(`/boardPost/${result.boardName}/${item.board}/${item.post}`);
+                navigate(`/boardsPost/${result.boardName}/${item.board}/${item.post}`);
             } else {
                 throw new Error(result.boardInfoMessage || "서버 통신 불가");
             }
@@ -470,7 +470,7 @@ export default function MyContent() {
                                     <ProjectCard
                                         key={item.id}
                                         item={item}
-                                        onNavigate={() => navigate(`/project/manage/${item.id}`)}
+                                        onNavigate={() => navigate(`/projects/manage/${item.id}`)}
                                         onDelete={() => handleDeleteProject(item)}
                                     />
                                 ))}
@@ -482,7 +482,7 @@ export default function MyContent() {
                                     <ArchiveCard
                                         key={item.archId}
                                         item={item}
-                                        onNavigate={() => navigate(`/archive/fileselect/${item.fileUuidName}`)}
+                                        onNavigate={() => navigate(`/archives/fileselect/${item.fileUuidName}`)}
                                         onDelete={() => handleDeleteArchive(item.fileUuidName)}
                                     />
                                 ))}
@@ -506,7 +506,7 @@ export default function MyContent() {
                                     <PostCard
                                         key={item.boardPostPr}
                                         item={item}
-                                        onNavigate={() => navigate(`/boardPost/${item.boardName}/${item.boardId}/${item.boardPostId}`)}
+                                        onNavigate={() => navigate(`/boardsPost/${item.boardName}/${item.boardId}/${item.boardPostId}`)}
                                         onDelete={() => handleDeletePost(item)}
                                     />
                                 ))}

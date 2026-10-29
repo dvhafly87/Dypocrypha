@@ -14,14 +14,16 @@ export default function ResetPassword() {
 
   // 이메일 전송 공통 함수
   const sendResetEmail = async (isResend = false) => {
+    if (isLoading) return;
     setError('');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if (!email) {
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) {
       setError('이메일 주소를 입력해주세요');
       return;
-    } else if (!emailRegex.test(email)) {
+    } else if (!emailRegex.test(normalizedEmail)) {
       setError('올바른 이메일 주소를 입력해주세요.');
       return;
     }
@@ -35,7 +37,7 @@ export default function ResetPassword() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          memberRegisterEmail: email
+          memberRegisterEmail: normalizedEmail
         })
       });
       
@@ -46,6 +48,7 @@ export default function ResetPassword() {
       const result = await response.json();
 
       if (result.resetPassStt) {
+        setEmail(normalizedEmail);
         setStep(2);
         addToast(
           isResend ? '인증 메일이 재전송되었습니다.' : result.resetStatus, 
@@ -140,7 +143,7 @@ export default function ResetPassword() {
 
               <div className="account-services">
                 <div className="service-links">
-                  <a href="/login" className="service-link">
+                  <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/login"} className="service-link">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                       <polyline points="10 17 15 12 10 7"/>
@@ -148,7 +151,7 @@ export default function ResetPassword() {
                     </svg>
                     <span>로그인하기</span>
                   </a>
-                  <a href="/register" className="service-link">
+                  <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/register"} className="service-link">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                       <circle cx="8.5" cy="7" r="4" />
@@ -183,7 +186,7 @@ export default function ResetPassword() {
                 <div className="action-buttons">
                   <button 
                     className="submit-btn" 
-                    onClick={() => window.location.href = '/login'}
+                    onClick={() => window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/login"}
                   >
                     로그인 페이지로 이동
                   </button>
@@ -205,7 +208,7 @@ export default function ResetPassword() {
 
               <div className="account-services">
                 <div className="service-links">
-                  <a href="/register" className="service-link">
+                  <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/register"} className="service-link">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                       <circle cx="8.5" cy="7" r="4" />

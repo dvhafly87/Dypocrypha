@@ -28,7 +28,7 @@
     
     /* 부드러운 그림자 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    color: white;
+    color: var(--theme-text-ffffff, white);
     font-size: 14px;
     
     min-width: 280px;
@@ -44,14 +44,14 @@
 
 /* 3. 타입별 배경 색상 */
 .toast-success {
-    background-color: #4CAF50; /* 성공: 녹색 계열 */
+    background-color: var(--theme-surface-4caf50, #4CAF50); /* 성공: 녹색 계열 */
 }
 .toast-error {
-    background-color: #F44336; /* 오류/실패: 빨간색 계열 */
+    background-color: var(--theme-surface-f44336, #F44336); /* 오류/실패: 빨간색 계열 */
 }
 .toast-warning {
-    background-color: #FFC107; /* 경고: 노란/주황색 계열 */
-    color: #333; /* 경고는 텍스트 색상을 어둡게 */
+    background-color: var(--theme-surface-ffc107, #FFC107); /* 경고: 노란/주황색 계열 */
+    color: var(--theme-text-333333, #333); /* 경고는 텍스트 색상을 어둡게 */
 }
 
 /* 4. 메시지 텍스트 스타일 */

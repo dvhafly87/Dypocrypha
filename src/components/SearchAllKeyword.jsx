@@ -201,7 +201,7 @@ export default function SearchAllFunction() {
         storageWithExpiry.setItem('selectedBoardName', board.boardName);
         storageWithExpiry.setItem('selectedBoardPtd', board.boardProtected.toString());
         storageWithExpiry.setItem('selectedBoardDec', board.boardDec || '');
-        navigate('/board');
+        navigate('/boards');
     };
 
     const totalCount = searchBoardList.length + searchBoardPostList.length
@@ -285,7 +285,7 @@ export default function SearchAllFunction() {
                                         <tbody>
                                             {searchBoardPostList.map((post) => (
                                                 <tr key={post.boardPostPr} className="search-post-row"
-                                                    onClick={() => navigate(`/boardPost/${post.boardName}/${post.boardId}/${post.boardPostId}`)}>
+                                                    onClick={() => navigate(`/boardsPost/${post.boardName}/${post.boardId}/${post.boardPostId}`)}>
                                                     <td className="search-post-title">
                                                         {highlight(post.postTitle, searchAllKey)}
                                                     </td>
@@ -310,7 +310,7 @@ export default function SearchAllFunction() {
                                     const { label, cls } = getStatusInfo(project.status);
                                     return (
                                         <div key={project.id} className="search-project-card"
-                                            onClick={() => navigate(`/project/manage/${project.id}`)}>
+                                            onClick={() => navigate(`/projects/manage/${project.id}`)}>
                                             <div className="search-project-thumb">
                                                 {project.projectThumb ? (
                                                     <img
@@ -362,7 +362,7 @@ export default function SearchAllFunction() {
                             <div className="search-archive-grid">
                                 {searchArchiveList.map((archive) => (
                                     <div key={archive.archId} className="search-archive-card"
-                                        onClick={() => navigate(`/archive/fileSelect/${archive.fileUuidName}`)}>
+                                        onClick={() => navigate(`/archives/fileSelect/${archive.fileUuidName}`)}>
                                         <div className="search-archive-preview">
                                             <ArchivePreview archive={archive} />
                                         </div>

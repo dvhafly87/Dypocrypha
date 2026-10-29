@@ -1,0 +1,120 @@
+/* Project calendar and its read-only log dialog. Existing editors retain their styles. */
+html .project-calendar-section {
+  --fc-border-color: var(--border); --fc-page-bg-color: var(--surface);
+  --fc-neutral-bg-color: var(--surface-raised); --fc-today-bg-color: transparent;
+  --fc-event-bg-color: var(--surface-raised); --fc-event-text-color: var(--text);
+  --fc-event-border-color: var(--border);
+  padding: 24px; min-width: 0; color: var(--text);
+}
+.project-calendar-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.project-calendar-caption > span { font-size: 16px; font-weight: 600; }
+.project-calendar-caption small { color: var(--text-muted); font-size: 13px; }
+html .project-calendar-section .fc .fc-toolbar { gap: 16px; margin-bottom: 20px; }
+html .project-calendar-section .fc .fc-toolbar-title { color: var(--text); background: transparent; font-size: 22px; font-weight: 600; line-height: 1.4; margin: 0; padding: 0; }
+html .project-calendar-section .fc .fc-button-group { gap: 8px; }
+html .project-calendar-section .fc .fc-button-primary {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  min-width: 44px; height: 44px; padding: 0 12px; border-radius: 8px; box-shadow: none; font-size: 14px;
+}
+html .project-calendar-section .fc .fc-button-group > .fc-button { margin-left: 0; border-radius: 8px; }
+html .project-calendar-section .fc .fc-button-primary:hover:not(:disabled) { background: var(--surface-raised); border-color: var(--brand-text); }
+html .project-calendar-section .fc .fc-button-primary:disabled { opacity: .5; }
+html .project-calendar-section .fc .fc-col-header-cell { padding: 10px 0; background: var(--surface-raised); }
+html .project-calendar-section .fc .fc-col-header-cell-cushion { color: var(--text-muted); font-size: 13px; font-weight: 600; padding: 0; }
+html .project-calendar-section .fc .fc-daygrid-day-frame { min-height: 120px; }
+html .project-calendar-section .fc .fc-daygrid-day-top { padding: 4px; }
+html .project-calendar-section .fc .fc-daygrid-day-number { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; color: var(--text); font-size: 14px; text-decoration: none; cursor: pointer; }
+html .project-calendar-section .fc .fc-day-today { background: transparent; }
+html .project-calendar-section .fc .fc-day-today .fc-daygrid-day-number { background: var(--brand-fill); color: var(--on-brand); font-weight: 700; }
+html .project-calendar-section .fc .fc-day-other .fc-daygrid-day-top { opacity: .5; }
+html .project-calendar-section .fc .fc-daygrid-day-events { margin-top: 0 !important; padding: 0 4px 5px; }
+html .project-calendar-section .fc .fc-daygrid-event {
+  font-size: 13px !important; line-height: 1.5 !important; height: auto !important; min-height: 25px;
+  padding: 3px 6px !important; margin: 3px 0 !important; border-radius: 5px !important;
+  background: var(--surface-raised); border: 1px solid var(--border) !important;
+  border-left: 3px solid var(--brand-text) !important; color: var(--text); cursor: pointer;
+}
+html .project-calendar-section .fc .calendar-milestone { border-left-color: var(--text-muted) !important; font-weight: 600; }
+html .project-calendar-section .fc .calendar-event-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+html .project-calendar-section .fc .fc-daygrid-more-link { padding: 4px 3px !important; font-size: 12px !important; color: var(--brand-text); font-weight: 600; }
+html .project-calendar-section .fc :is(a, button):focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+
+html .callendar-modal-overlay.calendar-log-overlay { padding: 24px; z-index: 2000; background: rgba(0,0,0,.55); backdrop-filter: none; }
+html .calendar-log-overlay .callendar-date-container {
+  width: min(760px, 100%); max-width: 760px; max-height: 85vh; max-height: 85dvh;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px;
+  padding: 0; overflow: hidden; box-shadow: 0 16px 56px rgba(0,0,0,.2);
+}
+html .calendar-log-overlay .project-log-container { min-height: 0; height: auto; overflow: hidden; }
+html .calendar-log-overlay .project-modal-log-header { padding: 18px 24px; gap: 16px; align-items: center; margin: 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+html .calendar-log-overlay .project-modal-log-header h3 { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.calendar-log-heading { min-width: 0; }
+.calendar-log-project-name { display: block; color: var(--text-muted); font-size: 13px; margin-bottom: 4px; overflow-wrap: anywhere; }
+.calendar-log-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+html .calendar-log-overlay .project-modal-log-header button { min-width: 44px; height: 44px; font-size: 14px; font-weight: 500; border: 1px solid var(--border); color: var(--text); background: var(--surface); border-radius: 8px; padding: 0 12px; box-shadow: none; }
+html .calendar-log-overlay .project-modal-log-header button:hover { background: var(--surface-raised); transform: none; }
+html .calendar-log-overlay .project-modal-log-header .calendar-log-close { width: 44px; font-size: 24px; padding: 0; }
+html .calendar-log-overlay .project-log-viewer-container { display: flex; flex-direction: column; height: auto; min-height: 0; border: 0; border-radius: 0; background: var(--surface); box-shadow: none; overflow: hidden; }
+html .calendar-log-overlay .project-log-list-section { width: auto; flex: 0 0 auto; max-height: none; border: 0; border-bottom: 1px solid var(--border); padding: 14px 24px; background: var(--surface); }
+.calendar-log-select-label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+html .calendar-log-overlay .calendar-log-select { display: block; width: 100%; min-height: 44px; height: 44px; padding: 0 12px; font-size: 16px; border-radius: 8px; color: var(--text); background: var(--surface-raised); border: 1px solid var(--border); }
+html .calendar-log-overlay .project-log-content-section { min-width: 0; min-height: 0; flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; background: var(--surface); scrollbar-gutter: stable; }
+html .calendar-log-overlay .project-log-detail { height: auto; min-height: 0; }
+html .calendar-log-overlay .log-detail-header { padding: 24px 24px 16px; background: var(--surface); border: 0; }
+html .calendar-log-overlay .log-header-wrapper { gap: 16px; align-items: flex-start; }
+html .calendar-log-overlay .log-detail-header h4 { color: var(--text); font-size: 20px; line-height: 1.45; margin: 0; overflow-wrap: anywhere; }
+html .calendar-log-overlay .log-detail-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+html .calendar-log-overlay .log-detail-meta span { color: var(--text-muted); }
+html .calendar-log-overlay .log-active-button-wrapper { gap: 8px; flex-shrink: 0; }
+html .calendar-log-overlay .log-active-button-wrapper button { min-height: 44px; padding: 0 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; box-shadow: none; }
+html .calendar-log-overlay .log-detail-content { height: auto; min-height: 0; max-height: none; overflow: visible; padding: 0 24px 28px; font-size: 16px; line-height: 1.7; background: var(--surface); }
+html .calendar-log-overlay .log-content-text { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; color: var(--text); }
+html .calendar-log-overlay .toastui-editor-contents { color: var(--text); font-size: 16px; line-height: 1.7; }
+html .calendar-log-overlay .toastui-editor-contents p { color: var(--text); font-size: 16px; line-height: 1.7; }
+html .calendar-log-overlay .toastui-editor-contents img { max-width: 100%; height: auto; }
+html .calendar-log-overlay .toastui-editor-contents :is(pre,table) { display: block; max-width: 100%; overflow-x: auto; }
+html .calendar-log-overlay :is(.project-log-empty-container,.project-log-empty-state) { padding: 32px 24px; height: auto; min-height: 160px; color: var(--text-muted); background: var(--surface); }
+html .calendar-log-overlay :focus-visible { outline: 2px solid var(--brand-text); outline-offset: 2px; }
+
+@media (max-width: 768px) {
+  html .project-calendar-section { padding: 16px; }
+  .project-calendar-caption { align-items: flex-start; flex-direction: column; gap: 4px; }
+  html .calendar-log-overlay .log-header-wrapper { flex-direction: column; gap: 12px; }
+}
+@media (max-width: 600px) {
+  html .project-calendar-section { padding: 12px; }
+  html .project-calendar-section .fc .fc-toolbar { gap: 12px; align-items: center; flex-wrap: wrap; }
+  html .project-calendar-section .fc .fc-toolbar-title { font-size: 18px; }
+  html .project-calendar-section .fc .fc-button-group { gap: 4px; }
+  html .project-calendar-section .fc .fc-button-primary { padding: 0 8px; }
+  html .project-calendar-section .fc .fc-daygrid-day-frame { min-height: 76px; }
+  html .project-calendar-section .fc .fc-daygrid-day-top { padding: 2px; }
+  html .project-calendar-section .fc .fc-daygrid-day-number { width: 28px; height: 28px; font-size: 13px; }
+  html .project-calendar-section .fc .fc-daygrid-day-events { padding: 0 2px 4px; }
+  html .project-calendar-section .fc .calendar-day-summary { border: 0 !important; border-radius: 4px !important; padding: 4px 1px !important; text-align: center; min-height: 26px; }
+  html .project-calendar-section .fc .calendar-event-label { font-size: 12px; letter-spacing: -.3px; }
+  html .callendar-modal-overlay.calendar-log-overlay { padding: 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  html .calendar-log-overlay .callendar-date-container { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px - env(safe-area-inset-bottom)); border-radius: 12px; }
+  html .calendar-log-overlay .project-modal-log-header { padding: 14px 16px; gap: 8px; }
+  html .calendar-log-overlay .project-modal-log-header h3 { font-size: 17px; }
+  html .calendar-log-overlay .project-modal-log-header button { padding: 0 8px; }
+  html .calendar-log-overlay .project-modal-log-header .calendar-log-close { padding: 0; }
+  html .calendar-log-overlay .project-log-list-section { padding: 12px 16px; }
+  html .calendar-log-overlay .log-detail-header { padding: 20px 16px 14px; }
+  html .calendar-log-overlay .log-detail-header h4 { font-size: 18px; }
+  html .calendar-log-overlay .log-detail-content { padding: 0 16px 24px; }
+}
+@media (prefers-reduced-motion: reduce) { html .calendar-log-overlay { animation: none; } }
+
+/* Override legacy mobile flex/overflow rules inside this dialog only. */
+html .calendar-log-overlay .project-modal-log-header { flex-direction: row; text-align: left; }
+html .calendar-log-overlay .calendar-log-heading { flex: 1 1 auto; }
+html .calendar-log-overlay .project-modal-log-header h3 { display: block; width: auto; text-align: left; }
+html .calendar-log-overlay .project-log-viewer-container { max-height: none; padding: 0; gap: 0; }
+html .calendar-log-overlay .project-log-detail { flex: 0 0 auto; overflow: visible; }
+html .calendar-log-overlay .log-detail-content { flex: 0 0 auto; }
+html .calendar-log-overlay .log-detail-creator::before,
+html .calendar-log-overlay .log-detail-datetime::before { content: none; }
+html .calendar-log-overlay .log-detail-meta span { font-size: 13px; font-weight: 400; }
+
+html .calendar-log-overlay .log-active-button-wrapper button { min-width: 44px; }

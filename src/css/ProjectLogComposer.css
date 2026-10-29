@@ -1,0 +1,24 @@
+.project-log-composer { margin:auto;inset:0; width:min(900px,calc(100% - 32px)); max-height:calc(100dvh - 32px); overflow-y:auto; box-sizing:border-box; padding:24px; border:1px solid var(--border); border-radius:var(--radius-card,12px); background:var(--surface); color:var(--text); }
+.project-log-composer::backdrop { background:rgba(0,0,0,.45); }
+.project-log-composer form { display:flex;flex-direction:column;gap:12px;min-width:0; }
+.project-log-composer-heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
+.project-log-composer-heading span,.project-log-draft-status { color:var(--text-secondary);font-size:13px;line-height:1.6; }
+.project-log-composer h2 { margin:4px 0 8px;font-size:20px;color:var(--text); }
+.project-log-composer label { display:flex;justify-content:space-between;gap:12px;font-size:14px;font-weight:600; }
+.project-log-composer label span { color:var(--text-secondary);font-weight:400; }
+.project-log-composer input { width:100%;box-sizing:border-box;min-height:44px;padding:10px 12px;font-size:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text); }
+.project-log-composer :is(.project-log-composer-heading,.project-log-composer-actions) button { min-width:44px;min-height:44px;padding:8px 12px;font-size:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer; }
+.project-log-composer :is(.project-log-composer-heading,.project-log-composer-actions) button:hover { background:var(--surface-raised); }
+.project-log-composer button[type=submit] { background:var(--brand-fill);color:var(--on-brand); }
+.project-log-composer button:disabled { opacity:.6;cursor:default; }
+.project-log-composer-actions { display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px; }
+.project-log-draft-notice { background:var(--surface-raised);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:14px;line-height:1.6;overflow-wrap:anywhere; }
+.project-log-draft-notice p,.project-log-draft-status { margin:0 0 8px; }
+.project-log-draft-title { font-weight:600; }
+.project-log-content-label { font-size:14px;font-weight:600; }
+.project-log-composer .toastui-editor-defaultUI { min-width:0; }
+@media(max-width:600px){ .project-log-composer{padding:16px;} .project-log-composer-actions button { flex:1 1 auto; } }
+
+.project-log-draft-list { margin-bottom:20px;padding:12px 16px;background:var(--surface-raised);border:1px solid var(--border);border-radius:8px; }
+.project-log-draft-list p { margin:0 0 8px;color:var(--text-secondary);font-size:14px;line-height:1.6; }
+.project-log-draft-list button { display:block;max-width:100%;min-height:44px;margin-top:8px;padding:8px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:left;overflow-wrap:anywhere;cursor:pointer; }

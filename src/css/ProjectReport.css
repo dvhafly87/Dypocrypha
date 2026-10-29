@@ -27,7 +27,7 @@
     margin-bottom: 20px;
     /* 섹션 간격 조절 */
     padding: 25px 30px;
-    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    background: linear-gradient(135deg, var(--theme-surface-2e7d32, #2e7d32) 0%, var(--theme-surface-4caf50, #4caf50) 100%);
     /* 제출 버튼과 동일한 색상 */
     border-radius: 15px;
     /* 요청하신 둥근 모서리 */
@@ -37,7 +37,7 @@
 
 .report-header h2 {
     font-size: 24px;
-    color: var(--white);
+    color: var(--theme-text-ffffff, white);
     /* 배경이 진하므로 글자는 흰색으로 */
     font-weight: 700;
     margin: 0;
@@ -48,7 +48,7 @@
 .report-editor-section {
     width: 100%;
     max-width: 1000px;
-    background: var(--white);
+    background: var(--theme-surface-ffffff, white);
     padding: 30px;
     border-radius: 15px;
     /* 에디터 박스도 15px로 통일하면 더 일체감 있어요 */
@@ -66,7 +66,7 @@
     color: var(--text-main);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    background-color: var(--white);
+    background-color: var(--theme-surface-ffffff, white);
     box-sizing: border-box;
     transition: all 0.3s ease;
 }
@@ -78,7 +78,7 @@
 }
 
 .report-title-input::placeholder {
-    color: #999;
+    color: var(--theme-text-999999, #999);
     font-weight: 400;
 }
 
@@ -89,7 +89,7 @@
     gap: 15px;
     margin-bottom: 20px;
     padding: 15px;
-    background: #f0f4f8;
+    background: var(--theme-surface-f0f4f8, #f0f4f8);
     border-radius: 8px;
     border: 1px dashed var(--border-color);
 }
@@ -142,17 +142,17 @@
 }
 
 .btn-cancel {
-    background-color: #e0e0e0;
-    color: #444;
+    background-color: var(--theme-surface-e0e0e0, #e0e0e0);
+    color: var(--theme-text-444444, #444);
 }
 
 .btn-cancel:hover {
-    background-color: #d0d0d0;
+    background-color: var(--theme-surface-d0d0d0, #d0d0d0);
 }
 
 .btn-submit {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--theme-text-ffffff, white);
 }
 
 .btn-submit:hover {
@@ -164,8 +164,8 @@
    📱 Responsive Design (Media Queries)
 ------------------------------------------------------ */
 
-/* 1. 태블릿 및 작은 스크린 (900px 이하) */
-@media (max-width: 900px) {
+/* 1. 태블릿 및 작은 스크린 (1199px 이하) */
+@media (max-width: 1199px) {
     .report-insert-container {
         padding: 20px 15px;
     }

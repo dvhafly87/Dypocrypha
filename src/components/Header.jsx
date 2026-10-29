@@ -1,8 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
+
 import ProfileContainer from '../components/ProfileContainer.jsx';
+import ThemeSettings from './ThemeSettings.jsx';
+
 import { useAuth } from '../context/AuthContext.jsx';
 import API from '../config/apiConfig.js';
 import SockJS from 'sockjs-client';
@@ -17,6 +20,8 @@ export default function Header() {
   const { isLogined } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const loginOrigin = location.pathname + location.search + location.hash;
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchAllKey, setSearchAllKey] = useState('');
@@ -112,7 +117,11 @@ export default function Header() {
   };
 
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setWindowWidth(width);
+      if (width > 600) setIsSidebarOpen(false);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -131,17 +140,12 @@ export default function Header() {
     };
   }, [isSidebarOpen]);
 
-  // 사이드바 열릴 때 body 스크롤 방지
+  // Restore the previous body style when closing, resizing or unmounting.
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    if (!isSidebarOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
   }, [isSidebarOpen]);
 
   const toggleSidebar = () => {
@@ -155,6 +159,15 @@ export default function Header() {
   // const topValue = windowWidth <= 900
   //   ? (isLogined ? '97px' : '97px')
   //   : (isLogined ? '111px' : '');
+
+  const displayVisitorCount = count => windowWidth <= 600 && count >= 10000
+    ? new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(count)
+    : count;
+  const visitorLabel = `오늘 방문자 ${totalVisitors}명, 현재 접속 ${onlineUsers}명`;
+  const visitorBadge = <div className="visitor-badge" role="group" aria-label={visitorLabel} title={visitorLabel}>
+    <span className="visitor-total">{displayVisitorCount(totalVisitors)}</span>
+    <span className="visitor-online">•{displayVisitorCount(onlineUsers)}</span>
+  </div>;
 
   return (
     <>
@@ -171,13 +184,13 @@ export default function Header() {
           <span></span>
         </button>
         <div className="brand-box">
-          <img src={DOGE} alt="로고" />
-          <Link to="/">Dypocrypha</Link>
-          <div className="visitor-badge">
-            <span className="visitor-total">{totalVisitors}</span>
-            <span className="visitor-online">•{onlineUsers}</span>
-          </div>
+          <Link className="brand-home" to="/" aria-label="Dypocrypha 홈">
+            <img src={DOGE} alt="" />
+            <span>Dypocrypha</span>
+          </Link>
+          {windowWidth > 600 && visitorBadge}
         </div>
+        {windowWidth <= 600 && visitorBadge}
 
         {/* 데스크톱 검색창 */}
         <form className="search-box desktop-search" onSubmit={handleSearchKey}>
@@ -205,15 +218,15 @@ export default function Header() {
         </form>
 
         {/* 데스크톱 로그인/프로필 (모바일에서 CSS로 숨김) */}
-        {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login">로그인</Link>}
+        {isLogined ? <ProfileContainer /> : <Link className="move-agreeAndlogin" to="/login" state={{ from: loginOrigin }}>로그인</Link>}
       </header>
 
       {/* <nav className="sub-nav" style={{ top: topValue }}> */}
       <nav className="sub-nav">
-        <Link to="/">홈</Link>
-        <Link to="/board">게시판</Link>
-        <Link to="/project">프로젝트</Link>
-        <Link to="/archive">아카이브</Link>
+        <NavLink to="/" end>홈</NavLink>
+        <NavLink to="/boards">게시판</NavLink>
+        <NavLink to="/projects">프로젝트</NavLink>
+        <NavLink to="/archives">아카이브</NavLink>
       </nav>
 
       {/* 사이드바 오버레이 - 항상 렌더링하되 클래스로 제어 */}
@@ -221,12 +234,14 @@ export default function Header() {
         className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
         onClick={closeSidebar}
         aria-hidden={!isSidebarOpen}
+        inert={!isSidebarOpen ? '' : undefined}
       ></div>
 
       {/* 모바일 사이드바 - 항상 렌더링하되 클래스로 제어 */}
       <aside
         className={`mobile-sidebar ${isSidebarOpen ? 'open' : ''}`}
         aria-hidden={!isSidebarOpen}
+        inert={!isSidebarOpen ? '' : undefined}
       >
         <div className="sidebar-header">
 
@@ -239,7 +254,7 @@ export default function Header() {
           ) : (
             <Link
               className="move-agreeAndlogin sidebar-login"
-              to="/login"
+              to="/login" state={{ from: loginOrigin }}
               onClick={closeSidebar}
             >
               로그인
@@ -274,12 +289,14 @@ export default function Header() {
 
         {/* 메뉴 항목들 */}
         <nav className="sidebar-nav">
-          <Link to="/" onClick={closeSidebar}>홈</Link>
-          <Link to="/board" onClick={closeSidebar}>게시판</Link>
-          <Link to="/project" onClick={closeSidebar}>프로젝트</Link>
-          <Link to="/archive" onClick={closeSidebar}>아카이브</Link>
+          <NavLink to="/" end onClick={closeSidebar}>홈</NavLink>
+          <NavLink to="/boards" onClick={closeSidebar}>게시판</NavLink>
+          <NavLink to="/projects" onClick={closeSidebar}>프로젝트</NavLink>
+          <NavLink to="/archives" onClick={closeSidebar}>아카이브</NavLink>
         </nav>
+        {windowWidth <= 600 && isSidebarOpen && <ThemeSettings placement="sidebar" onCloseSidebar={closeSidebar} />}
       </aside>
+      {windowWidth > 600 && <ThemeSettings />}
     </>
   );
 }

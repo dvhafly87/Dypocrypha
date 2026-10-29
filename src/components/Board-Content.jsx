@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import { useBoardListState } from '../util/useBoardListState.js';
 import API from '../config/apiConfig';
 import '../css/BoardPost.css';
+import { formatListDate, isSeoulToday, parseDate } from '../util/dateFormat.js';
 
 export default function BoardPost({ boardId, boardName, boardDescription }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
-  const [isComport, setIsComport] = useState(window.innerWidth <= 1300);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { currentPage, setCurrentPage, postSearchQuery, setPostSearchQuery, loaded, setLoaded, rememberList } = useBoardListState(boardId, 'public');
 
   const isPostEdited = (createdAt, updatedAt) => {
-    const created = new Date(createdAt).getTime();
-    const updated = new Date(updatedAt).getTime();
+    const created = parseDate(createdAt)?.getTime();
+    const updated = parseDate(updatedAt)?.getTime();
     return (updated - created) > 1000;
   };
 
-  const [postSearchQuery, setPostSearchQuery] = useState('');
+
 
   // 검색 필터링
   const filteredPosts = posts.filter(post =>
@@ -41,7 +42,6 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 600);
-      setIsComport(window.innerWidth <= 1300);
     };
 
     window.addEventListener('resize', handleResize);
@@ -74,6 +74,7 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
         const result = await response.json();
 
         if (result.boardPostCallingStatus) {
+          setLoaded(true);
           if (result.boardPostCallingBoard != null) {
             setPosts(result.boardPostCallingBoard);
           } else {
@@ -101,39 +102,6 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
     boardPostCalling();
   }, [boardId, boardName, navigate, addToast]);
 
-  const getPostTitleDisplay = (title) => {
-    if (isComport && title.length > 5) {
-      return title.substring(0, 5) + "...";
-    }
-    return title;
-  };
-
-  const formatDate = (dateString) => {
-    // Z를 제거하고 한국 시간으로 파싱
-    const dateWithoutZ = dateString.replace('Z', '');
-    const date = new Date(dateWithoutZ);
-    const today = new Date();
-
-    const dateYear = date.getFullYear();
-    const dateMonth = date.getMonth();
-    const dateDay = date.getDate();
-
-    const todayYear = today.getFullYear();
-    const todayMonth = today.getMonth();
-    const todayDay = today.getDate();
-
-    if (dateYear === todayYear && dateMonth === todayMonth && dateDay === todayDay) {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    } else {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-  };
-
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
@@ -159,22 +127,26 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
   };
 
   const handlePostClick = (postId) => {
-    navigate(`/boardPost/${boardName}/${boardId}/${postId}`);
+    rememberList();
+    navigate(`/boardsPost/${boardName}/${boardId}/${postId}`);
   };
 
   const handleWritePost = () => {
     // navigate(`/board/${boardId}/write`);
-    navigate(`/boardwriter/${boardId}`);
+    navigate(`/boardsWriter/${boardId}`);
   };
 
   const handleBack = () => {
-    navigate('/board');
+    navigate('/boards');
   };
 
   // 페이지네이션 계산
-  postsPerPage = postsPerPage - pinnedPosts.length;
+  postsPerPage = Math.max(1, postsPerPage - pinnedPosts.length);
 
-  const totalPages = Math.ceil(normalPosts.length / postsPerPage);
+  const totalPages = Math.max(1, Math.ceil(normalPosts.length / postsPerPage));
+  useEffect(() => {
+    if (loaded && currentPage > totalPages) setCurrentPage(totalPages);
+  }, [loaded, currentPage, totalPages, setCurrentPage]);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = normalPosts.slice(indexOfFirstPost, indexOfLastPost);
@@ -244,7 +216,7 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
           <tbody>
             {posts.length === 0 ? (
               <tr>
-                <td colSpan="6" className="board-post-empty">
+                <td colSpan="5" className="board-post-empty">
                   <div className="board-post-empty-icon">📝</div>
                   <h3 className="board-post-empty-title">게시글이 없습니다</h3>
                 </td>
@@ -252,7 +224,7 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
             ) : pinnedPosts.length === 0 && normalPosts.length === 0 ? (
               // ↑ 검색 결과 없을 때
               <tr>
-                <td colSpan="6" className="board-post-empty">
+                <td colSpan="5" className="board-post-empty">
                   <div className="board-post-empty-icon">🔍</div>
                   <h3 className="board-post-empty-title">
                     "{postSearchQuery}"에 해당하는 게시글이 없습니다
@@ -271,11 +243,8 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
                       </td>
                       <td>
                         <div className="board-post-title-cell">
-                          {post.postTitle.length > 5 && (
-                            <p className="board-title-hidden-hover">{post.postTitle}</p>
-                          )}
-                          <span className="board-post-title-text">
-                            {getPostTitleDisplay(post.postTitle)}
+                          <span className="board-post-title-text" title={post.postTitle}>
+                            {post.postTitle}
                           </span>
                           {edited && (
                             <span className="board-post-edited-badge">수정됨</span>
@@ -288,17 +257,10 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
                       <td className="board-post-date">
                         {edited && (
                           <span className="date-label">
-                            {(() => {
-                              const date = new Date(post.updatedAt.replace('Z', ''));
-                              const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() &&
-                                date.getMonth() === today.getMonth() &&
-                                date.getDate() === today.getDate();
-                              return isToday ? '수정됨 ' : '수정일 ';
-                            })()}
+                            {isSeoulToday(post.updatedAt) ? '수정됨 ' : '수정일 '}
                           </span>
                         )}
-                        {formatDate(edited ? post.updatedAt : post.createdAt)}
+                        {formatListDate(edited ? post.updatedAt : post.createdAt)}
                       </td>
                       <td className="board-post-views">{post.postViewCount}</td>
                     </tr>
@@ -313,11 +275,8 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
                       <td className="board-post-number">{post.boardPostId}</td>
                       <td>
                         <div className="board-post-title-cell">
-                          {post.postTitle.length > 5 && (
-                            <p className="board-title-hidden-hover">{post.postTitle}</p>
-                          )}
-                          <span className="board-post-title-text">
-                            {getPostTitleDisplay(post.postTitle)}
+                          <span className="board-post-title-text" title={post.postTitle}>
+                            {post.postTitle}
                           </span>
                           {edited && (
                             <span className="board-post-edited-badge">수정됨</span>
@@ -328,33 +287,15 @@ export default function BoardPost({ boardId, boardName, boardDescription }) {
                       <td className="board-post-date">
                         {edited && (
                           <span className="date-label">
-                            {(() => {
-                              const date = new Date(post.updatedAt.replace('Z', ''));
-                              const today = new Date();
-                              const isToday = date.getFullYear() === today.getFullYear() &&
-                                date.getMonth() === today.getMonth() &&
-                                date.getDate() === today.getDate();
-                              return isToday ? '수정됨 ' : '수정일 ';
-                            })()}
+                            {isSeoulToday(post.updatedAt) ? '수정됨 ' : '수정일 '}
                           </span>
                         )}
-                        {formatDate(edited ? post.updatedAt : post.createdAt)}
+                        {formatListDate(edited ? post.updatedAt : post.createdAt)}
                       </td>
                       <td className="board-post-views">{post.postViewCount}</td>
                     </tr>
                   );
                 })}
-
-                {Array.from({
-                  length: Math.max(0, postsPerPage - currentPosts.length)
-                }).map((_, index) => (
-                  <tr key={`empty-${index}`} className="board-post-row-empty">
-                    <td colSpan="6" style={{
-                      height: isMobile ? '60px' : '70px',
-                      borderBottom: '1px solid #f0f0f0'
-                    }}></td>
-                  </tr>
-                ))}
               </>
             )}
           </tbody>

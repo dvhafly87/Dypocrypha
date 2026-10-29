@@ -1,31 +1,46 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, Calendar, User, Edit2, Trash2, List, Pin, MessageSquare, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '../components/ToastContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import PostBody from './PostBody.jsx';
+import '../css/PostViewer.css';
 import API from '../config/apiConfig.js';
 import '../css/BoardPostContent.css';
 
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
+import { formatDateTime as formatDate } from '../util/dateFormat.js';
 
 export default function BoardPostContent() {
   const { boardName, boardId, postId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isLogined, isLoading: authLoading } = useAuth();
+  const [editablePostKey, setEditablePostKey] = useState(null);
+  const postKey = `${boardId}:${postId}`;
+  const canManagePost = isLogined && editablePostKey === postKey;
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [postData, setPostData] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Display permissions come from the existing server check, never the visible author name.
+  useEffect(() => {
+    setEditablePostKey(null);
+    if (!isLogined) return;
+    const controller = new AbortController();
+    fetch(`${API.API_BASE_URL}/private/postcontent/authorcheck`, {
+      method: 'POST', credentials: 'include', signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callingContentBoardId: boardId, calliingContentPostId: postId })
+    }).then(async response => {
+      if (!response.ok) return;
+      const result = await response.json();
+      if (!controller.signal.aborted && result.AuthorChecker === true) setEditablePostKey(postKey);
+    }).catch(() => { /* Fail closed; existing server checks remain authoritative. */ });
+    return () => controller.abort();
+  }, [isLogined, boardId, postId, postKey]);
 
   const postContentSection = useMemo(() => {
     if (!postData) return null;
@@ -58,14 +73,18 @@ export default function BoardPostContent() {
           </div>
         </div>
   
-        <div 
-          className="post-body"
-          dangerouslySetInnerHTML={{ __html: postData.postContent }}
-        />
+        <PostBody html={postData.postContent} />
       </div>
     );
   }, [postData]);
   
+  useEffect(() => {
+    if (postData && location.hash === '#post-comments') {
+      const frame = requestAnimationFrame(() => document.getElementById('post-comments')?.scrollIntoView({ block: 'start' }));
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [postData, location.hash]);
+
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 6;
@@ -234,7 +253,7 @@ export default function BoardPostContent() {
       
       if (result.deletePostStatus) {
         addToast(result.deletePostMessage, 'success');
-        navigate(`/board`);
+        navigate(`/boards`);
       } else {
         addToast(result.deletePostMessage || '삭제 실패', 'error');
       }
@@ -244,7 +263,15 @@ export default function BoardPostContent() {
   };
 
   const handleBackToList = () => {
-    navigate(`/board`);
+    try {
+      const expiry = Date.now() + 2 * 60 * 60 * 1000;
+      const previous = JSON.parse(localStorage.getItem('selectedBoardId') || 'null')?.value;
+      for (const [key, value] of Object.entries({ selectedBoardId: String(boardId), selectedBoardName: boardName, selectedBoardPtd: 'true' })) {
+        localStorage.setItem(key, JSON.stringify({ value, expiry }));
+      }
+      if (String(previous) !== String(boardId)) localStorage.removeItem('selectedBoardDec');
+    } catch { /* Existing list navigation still works if storage is unavailable. */ }
+    navigate(`/boards`);
   };
 
   // 댓글 작성
@@ -364,6 +391,7 @@ export default function BoardPostContent() {
           <h2>{boardName}</h2>
         </div>
         <div className="header-actions">
+          {canManagePost && <>
           <button className="btn-delete-post" onClick={handleDelete}>
             <Trash2 size={18} />
             삭제
@@ -372,6 +400,7 @@ export default function BoardPostContent() {
             <Edit2 size={18} />
             수정
           </button>
+          </>}
           <button className="btn-list" onClick={handleBackToList}>
             <List size={18} />
             목록으로
@@ -382,13 +411,14 @@ export default function BoardPostContent() {
       {postContentSection}
 
       {/* 댓글 섹션 */}
-      <div className="comments-section">
+      <div id="post-comments" className="comments-section">
         <div className="comments-header">
           <MessageSquare size={22} />
           <h3>댓글 {comments.length}개</h3>
         </div>
 
         {/* 댓글 작성 폼 */}
+        {authLoading ? <p role="status">로그인 상태를 확인하고 있습니다.</p> : isLogined ? (
         <form className="comment-form" onSubmit={handleCommentSubmit}>
           <textarea
             className="comment-input"
@@ -407,6 +437,12 @@ export default function BoardPostContent() {
             {isSubmitting ? '등록 중...' : '댓글 등록'}
           </button>
         </form>
+        ) : (
+          <div className="comment-login-notice">
+            <p>댓글을 작성하려면 로그인이 필요합니다.</p>
+            <Link className="comment-login-link" to="/login" state={{ from: location.pathname + location.search + "#post-comments" }}>로그인</Link>
+          </div>
+        )}
 
         {/* 댓글 목록 */}
         <div className="comments-list">
@@ -428,13 +464,14 @@ export default function BoardPostContent() {
                       <span className="comment-date">
                         {formatDate(comment.createdAt)}
                       </span>
-                      <button
+                      {isLogined && <button
                         className="comment-delete-btn"
+                        aria-label="댓글 삭제"
                         onClick={() => handleCommentDelete(comment.boardPostCmId)}
                         title="댓글 삭제"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </button>}
                     </div>
                   </div>
                   <div className="comment-content">

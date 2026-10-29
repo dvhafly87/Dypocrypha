@@ -1,7 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#fafafa" />
+    <style>
+      html[data-theme="dark"], html[data-theme="dark"] body {
+        background-color: #101814; color: #e4ece6; color-scheme: dark;
+      }
+    </style>
+    <script>
+      (function () {
+        var mode = 'auto';
+        try {
+          var saved = localStorage.getItem('dypocrypha-theme');
+          if (saved === 'light' || saved === 'dark') mode = saved;
+        } catch (_) {}
+        var hour = new Date(Date.now() + 9 * 60 * 60 * 1000).getUTCHours();
+        document.documentElement.dataset.theme = mode === 'auto' ? (hour >= 6 && hour < 18 ? 'light' : 'dark') : mode;
+        document.documentElement.dataset.themeMode = mode;
+        document.querySelector('meta[name="theme-color"]').content = document.documentElement.dataset.theme === 'dark' ? '#101814' : '#fafafa';
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="./public/A3.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dypocrypha</title>

@@ -1,0 +1,49 @@
+.project-manage-side-column { display:flex; flex-direction:column; gap:24px; min-width:0; }
+.project-manage-side-column > .project-manage-teamValue-area { width:100%; box-sizing:border-box; position:static; }
+.project-resources-card { padding:24px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card); min-width:0; }
+.project-resources-card h3 { margin:0 0 12px; color:var(--text); font-size:18px; }
+.project-resources-card > p { margin:0; color:var(--text-secondary); line-height:1.6; font-size:14px; }
+.project-resources-card ul { margin:0; padding:0; list-style:none; }
+.project-resources-card li { padding:12px 0; }
+.project-resources-card li + li { border-top:1px solid var(--border); }
+.project-resource-link-row { display:flex; flex-direction:column; min-width:0; gap:4px; }
+.project-resource-link-row > a { min-height:44px; display:flex; gap:8px; align-items:center; color:var(--accent); font-weight:600; text-decoration:none; overflow-wrap:anywhere; }
+.project-resource-link-row > a:hover { text-decoration:underline; text-underline-offset:4px; }
+.project-resource-host { color:var(--text-secondary); font-size:13px; overflow-wrap:anywhere; }
+.project-resource-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.project-description-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.project-description-heading h3 { margin:0; }
+.project-detailed-description { white-space:pre-wrap; overflow-wrap:anywhere; word-break:keep-all; color:var(--text); font-size:16px; line-height:1.8; margin:0; }
+.project-description-form, .project-resource-dialog form { display:flex; flex-direction:column; gap:12px; }
+.project-description-form label { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; font-size:14px; font-weight:600; color:var(--text); }
+.project-description-form label span { font-weight:400; color:var(--text-secondary); font-size:12px; }
+.project-description-form textarea, .project-resource-dialog input { width:100%; min-height:44px; box-sizing:border-box; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); font-size:16px; line-height:1.6; }
+.project-description-form textarea { resize:vertical; }
+.project-description-form > p, .project-resource-dialog p { color:var(--text-secondary); font-size:14px; line-height:1.6; margin:0; }
+.project-resource-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:8px; }
+.project-resource-actions button, .project-description-heading button, .project-resource-add-btn { min-height:44px; padding:8px 14px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); font-size:14px; cursor:pointer; box-sizing:border-box; }
+.project-resource-actions button:hover, .project-description-heading button:hover, .project-resource-add-btn:hover { background:var(--surface-raised); }
+.project-resource-actions button[type="submit"] { background:var(--brand-fill); color:var(--on-brand); border-color:var(--brand-fill); }
+.project-resource-actions button:disabled { cursor:default; opacity:.6; }
+.project-resource-header-actions { align-items:flex-end; }
+.project-resource-management-actions { display:flex; flex-direction:column; gap:8px; }
+.project-resource-dialog { width:min(480px,calc(100% - 32px)); max-height:calc(100dvh - 32px); box-sizing:border-box; padding:24px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.2); }
+.project-resource-dialog::backdrop { background:rgba(0,0,0,.45); }
+.project-resource-dialog h2 { font-size:20px; margin:0 0 8px; line-height:1.4; color:var(--text); }
+.project-resource-dialog label { font-size:14px; font-weight:600; }
+.project-resource-error { color:var(--theme-text-d32f2f,#b42318) !important; }
+@media(max-width:600px) {
+ .project-resources-card { padding:16px; }
+ .project-manage-side-column { gap:20px; }
+ .project-resource-dialog { padding:20px; }
+ .project-resource-management-actions { width:100%; }
+ .project-resource-header-actions { align-items:stretch; }
+}
+
+.project-resource-limit { font-size:13px; font-weight:400; color:var(--text-secondary); }
+
+.project-links-card-heading { display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px; }
+.project-links-card-heading h3 { margin:0; }
+.project-link-order-name { min-height:44px;display:flex;align-items:center;font-weight:600;overflow-wrap:anywhere; }
+.project-link-order-save { background:var(--brand-fill)!important;color:var(--on-brand)!important; }
+.project-link-order-help { color:var(--text-secondary);font-size:14px;line-height:1.6; }

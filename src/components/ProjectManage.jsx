@@ -7,9 +7,10 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 import API from '../config/apiConfig.js';
 import '../css/ProjectManage.css';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import ProjectCalendar from './ProjectCalendar.jsx';
+import ProjectLogComposer, {ProjectLogDraftList} from './ProjectLogComposer.jsx';
+import { useProjectResources, ProjectDescription, ProjectLinks, ProjectLinkDialog } from './ProjectResources.jsx';
+import { formatDate as projectDateKey } from '../util/dateFormat.js';
 import { Editor } from '@toast-ui/react-editor';
 import { onUploadImage } from '../util/onUploadImage.js';
 import { Viewer } from '@toast-ui/react-editor';
@@ -41,17 +42,50 @@ export default function ProjectManage() {
     const [clickCreated, setClickCreated] = useState(false);
     const [showInputCallendarLogModal, setShowInputCallendarLogModal] = useState(false);
     const [showCallendarModal, setShowCallendarModal] = useState(false);
+    const calendarLogDialogRef = useRef(null);
+    const closeCalendarLog = () => {
+        setShowCallendarModal(false);
+        setSelectedLogId(null);
+    };
+    useEffect(() => {
+        if (!showCallendarModal) return;
+        const previousFocus = document.activeElement;
+        const bodyOverflow = document.body.style.overflow;
+        const htmlOverflow = document.documentElement.style.overflow;
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        const frame = requestAnimationFrame(() => calendarLogDialogRef.current?.focus());
+        const onKey = event => {
+            if (event.key === 'Escape') { event.preventDefault(); closeCalendarLog(); return; }
+            if (event.key !== 'Tab') return;
+            const dialog = calendarLogDialogRef.current;
+            const controls = [...(dialog?.querySelectorAll('button:not([disabled]), select:not([disabled]), a[href], input:not([disabled]), [tabindex="0"]') || [])].filter(el => el.getClientRects().length);
+            if (!controls.length) { event.preventDefault(); dialog?.focus(); return; }
+            const first = controls[0], last = controls[controls.length - 1];
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', onKey);
+        return () => {
+            cancelAnimationFrame(frame);
+            document.removeEventListener('keydown', onKey);
+            document.body.style.overflow = bodyOverflow;
+            document.documentElement.style.overflow = htmlOverflow;
+            if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+        };
+    }, [showCallendarModal]);
+
     const [showEditProjectThumbModal, setShowEditProjectThumbModal] = useState(false);
     const [showCategorySelect, setShowCategorySelect] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-    const [showEditSummary, setShowEditSummary] = useState(false);
     const [showEditSkillTool, setShowEditSkillTool] = useState(false);
     const [showEditLogModal, setShowEditLogModal] = useState(false);
 
     const { projectId } = useParams();
+    const projectResources = useProjectResources(projectId);
     const { addToast } = useToast();
-    const { isLogined, loginSuccess, logout } = useAuth();
+    const { isLogined, loginSuccess, logout, nickname } = useAuth();
 
     const [pageIndex, setPageIndex] = useState(0);
     const [dashboardIndex, setDashBoardIndex] = useState('overview');
@@ -65,6 +99,32 @@ export default function ProjectManage() {
     const [reportVideoFile, setReportVideoFile] = useState(null);
     const [videoPreview, setVideoPreview] = useState(null);
     const reportEditorRef = useRef();
+
+    const [memberSlideIndex, setMemberSlideIndex] = useState(0);
+    const memberSlideTimerRef = useRef(null);
+
+    // 슬라이드 타이머 리셋 헬퍼
+    const resetMemberSlideTimer = () => {
+        if (memberSlideTimerRef.current) clearInterval(memberSlideTimerRef.current);
+        memberSlideTimerRef.current = setInterval(() => {
+            setMemberSlideIndex(prev =>
+                projectMember.length > 0 ? (prev + 1) % projectMember.length : 0
+            );
+        }, 15000);
+    };
+
+    // 자동 슬라이드 시작/정리
+    useEffect(() => {
+        if (projectMember.length > 1) resetMemberSlideTimer();
+        return () => {
+            if (memberSlideTimerRef.current) clearInterval(memberSlideTimerRef.current);
+        };
+    }, [projectMember]);
+
+    // 멤버 변경 시 인덱스 초기화
+    useEffect(() => {
+        setMemberSlideIndex(0);
+    }, [projectMember]);
 
     // 영상 파일 선택 핸들러
     const handleVideoSelect = (e) => {
@@ -238,7 +298,7 @@ export default function ProjectManage() {
         // ② 프로젝트 종료 이벤트
         if ((projectBasic.status === 'C' || projectBasic.status === 'D') && projectBasic.endDay) {
             events.push({
-                date: projectBasic.endDay.split('T')[0],
+                date: projectDateKey(projectBasic.endDay),
                 type: projectBasic.status === 'C' ? 'milestone-end' : 'milestone-halted',
                 payload: { datetime: projectBasic.endDay }
             });
@@ -563,122 +623,10 @@ export default function ProjectManage() {
     };
 
     const navigate = useNavigate();
-    const today = new Date();
-    const todayStr =
-        `${today.getFullYear()}-` +
-        `${String(today.getMonth() + 1).padStart(2, '0')}-` +
-        `${String(today.getDate()).padStart(2, '0')}`;
+    const todayStr = projectDateKey(new Date());
 
     const categories = ['개발', '디자인', '기획', '학습', '연구', '취미', '기타'];
 
-    const updateProjectLog = async () => {
-        const selectedLog = getSelectedLog();
-
-        if (!selectedLog) {
-            addToast("수정할 로그를 선택해주세요", "warning");
-            return;
-        }
-
-        if (selectedLogId === 'created' || selectedLogId === 'ended') {
-            addToast("시스템 로그는 수정할 수 없습니다", "warning");
-            return;
-        }
-
-        if (!logTitle || logTitle.trim().length === 0) {
-            addToast("로그 제목을 입력해 주십시오", "warning");
-            return;
-        }
-
-        if (logTitle.length > 20) {
-            addToast("로그 제목은 20자를 초과할 수 없습니다", "warning");
-            return;
-        }
-
-        if (!loginSuccess || !isLogined) {
-            const toastData = {
-                status: 'error',
-                message: "로그인이 필요한 기능입니다"
-            };
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/login');
-            return;
-        }
-
-        const editorInstance = editorRef.current?.getInstance();
-        const content = editorInstance?.getMarkdown()?.trim();
-
-        if (!content) {
-            addToast("내용을 입력해 주십시오", "error");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API.API_BASE_URL}/project/daily/log/update`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    logId: selectedLog.logId,
-                    logProjectDate: selectedDate,
-                    logProjectContent: content,
-                    logProjectId: projectBasic.id,
-                    logProjectTitle: logTitle
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.status === 500) {
-                const toastData = {
-                    status: 'error',
-                    message: result.logUpdateMessage || "서버 통신 불가"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/');
-                return;
-            } else if (response.status === 404 || response.status === 400) {
-                const toastData = {
-                    status: 'error',
-                    message: result.logUpdateMessage || "유효하지 않은 요청입니다"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/');
-                return;
-            } else if (response.status === 401) {
-                const toastData = {
-                    status: 'success',
-                    message: result.logUpdateMessage || "로그인이 필요한 서비스 입니다"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/login');
-                return;
-            } else if (response.status === 403) {
-                addToast(result.logUpdateMessage, "warning");
-                return;
-            } else if (response.status === 200) {
-                if (result.logUpdateStatus) {
-                    setProjectLog((prevLogs) =>
-                        prevLogs.map((log) =>
-                            log.logId === selectedLog.logId
-                                ? { ...log, logContent: content, logTitle: logTitle } // 수정된 데이터로 교체
-                                : log // 나머지 로그는 유지
-                        )
-                    );
-                    // --------------------------------
-
-                    setShowCallendarModal(true);
-                    setShowEditLogModal(false);
-                    setSelectedLogId(null);
-                    addToast(result.logUpdateMessage || '로그가 수정되었습니다', 'success'); // result 변수명 통일 (Delete -> Update)
-                    return;
-                }
-            }
-        } catch (error) {
-            handleNetworkError(error, "프로젝트 로그 수정중 에러가 발생했습니다");
-        }
-    };
     const viewerProjectlogEditModal = () => {
 
         const selectedLog = getSelectedLog();
@@ -696,11 +644,6 @@ export default function ProjectManage() {
 
         setShowEditLogModal(true);
         setShowCallendarModal(false);
-    }
-
-    const exitLogInputModal = () => {
-        setShowCallendarModal(true);
-        setShowInputCallendarLogModal(false);
     }
 
     const deleteThisProjectLog = async () => {
@@ -792,101 +735,6 @@ export default function ProjectManage() {
         const filtered = getFilteredLogs();
         return filtered.find(log => log.logId === selectedLogId);
     };
-
-    const inputNewDailyLog = async () => {
-        if (logTitle.length > 20 || logTitle == null) {
-            addToast("로그 제목을 입력해 주십시오", "warning");
-            return;
-        }
-        if (!loginSuccess || !isLogined) {
-            const toastData = {
-                status: 'error',
-                message: "로그인이 필요한 기능입니다"
-            };
-            localStorage.setItem('redirectToast', JSON.stringify(toastData));
-            navigate('/login');
-            return;
-        }
-
-        const editorInstance = editorRef.current?.getInstance();
-        const content = editorInstance?.getMarkdown()?.trim();
-
-        if (!content) {
-            addToast("내용을 입력해 주십시오", "error");
-            return;
-        }
-
-        //str
-        if (!selectedDate) {
-            addToast("날짜를 선택해 주십시오", "error");
-            return;
-        }
-
-        if (!projectBasic?.id) {
-            addToast("프로젝트 정보가 올바르지 않습니다", "error");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API.API_BASE_URL}/project/daily/log`, {
-                method: 'POST',
-                credentials: 'include', //쿠키값 전송
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    logProjectId: projectBasic.id,
-                    logProjectDate: selectedDate,
-                    logProjectContent: content,
-                    logProjectTitle: logTitle
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.status === 500) {
-                const toastData = {
-                    status: 'error',
-                    message: result.logSavedMessage != null ? result.logSavedMessage : "서버 통신 불가"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/');
-                return;
-            } else if (response.status === 404 || response.status === 400) {
-                const toastData = {
-                    status: 'error',
-                    message: result?.logSavedMessage || "요청을 처리할 수 없습니다"
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/');
-                return;
-            } else if (response.status === 401) {
-                const toastData = {
-                    status: 'error',
-                    message: result.logSavedMessage
-                };
-                localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate('/login');
-                return;
-            } else if (response.status === 403) {
-                addToast(result.logSavedMessage, "warning");
-                return;
-            } else if (response.status === 201) {
-                if (result.logSavedStatus) {
-                    const toastData = {
-                        status: 'success',
-                        message: result.logSavedMessage != null ? result.logSavedMessage : "저장되었습니다"
-                    };
-                    localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    window.location.reload();
-                }
-            }
-
-        } catch (error) {
-            handleNetworkError(error, "프로젝트 로그 작성중 에러가 발생했습니다");
-        }
-    };
-
 
     // 파일 선택 시 미리보기 처리
     const handleFileSelect = (e) => {
@@ -1034,15 +882,6 @@ export default function ProjectManage() {
             };
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             navigate('/');
-        }
-    };
-
-    // 개요 수정 핸들러
-    const handleUpdateSummary = async () => {
-        const success = await updateSubmitProjectInformation();
-        if (success) {
-            // addToast 제거 (updateSubmitProjectInformation에서 이미 띄움)
-            setShowEditSummary(false);
         }
     };
 
@@ -1538,14 +1377,15 @@ export default function ProjectManage() {
         return statusMap[status] || '알 수 없음';
     };
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status, forText = false) => {
         const colorMap = {
             'H': '#6b7280',
             'I': '#3b82f6',
             'C': '#10b981',
             'D': '#ef4444'
         };
-        return colorMap[status] || '#6b7280';
+        const color = colorMap[status] || '#6b7280';
+        return forText ? `var(--theme-text-${color.slice(1)}, ${color})` : color;
     };
 
     const handleStatusChange = async (newStatus) => {
@@ -1638,9 +1478,9 @@ export default function ProjectManage() {
                         message: '삭제되었습니다.'
                     };
                     localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                    navigate('/project');
+                    navigate('/projects');
                 } else {
-                    addToast(result.deleteMessage, "error");
+                    addToast(result.deleteMessage, "error"); ss
                     return;
                 }
 
@@ -1665,7 +1505,7 @@ export default function ProjectManage() {
         // 프로젝트 시작 이벤트
         events.push({
             title: '프로젝트 시작',
-            date: projectBasic.created,
+            date: projectDateKey(projectBasic.created),
             backgroundColor: '#10b981',
             borderColor: '#10b981',
             type: 'project-start'
@@ -1675,7 +1515,7 @@ export default function ProjectManage() {
         if ((projectBasic.status === 'C' || projectBasic.status === 'D') && projectBasic.endDay) {
             events.push({
                 title: projectBasic.status === 'C' ? '✅ 프로젝트 완료' : '⏸️ 프로젝트 중단',
-                date: projectBasic.endDay.split('T')[0],
+                date: projectDateKey(projectBasic.endDay),
                 backgroundColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
                 borderColor: projectBasic.status === 'C' ? '#10b981' : '#ef4444',
                 type: 'project-end'
@@ -1686,9 +1526,7 @@ export default function ProjectManage() {
             projectLog.forEach(log => {
                 const dateStr = log.logDailyDate.split('T')[0];
 
-                const shortContent = log.logTitle.length > 10
-                    ? log.logTitle.substring(0, 10) + '...'
-                    : log.logTitle;
+                const shortContent = log.logTitle || '제목 없는 기록';
 
                 events.push({
                     id: `log-${log.logId}`,
@@ -1775,15 +1613,18 @@ export default function ProjectManage() {
                                         </div>
                                     </div>
                                     {permissionGrade === 'L' && (
-                                        <div className="button-wrapper">
+                                        <div className="button-wrapper project-resource-header-actions">
                                             <button className="project-thumb-edit-btn" onClick={() => setShowEditProjectThumbModal(true)}>
                                                 프로젝트 썸네일 변경
                                             </button>
+                                            <div className="project-resource-management-actions">
+                                                <button type="button" className="project-resource-add-btn" onClick={projectResources.openAdd} disabled={projectResources.loading || projectResources.busy || !!projectResources.order || !projectResources.data || (projectResources.data.links?.length || 0) >= 10}>하이퍼링크 추가</button>
                                             <button className="project-delete-btn"
                                                 onClick={handleDeleteProject}
                                             >
                                                 삭제
                                             </button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -1791,31 +1632,9 @@ export default function ProjectManage() {
                         </div>
                         <div className="project-manage-content-area">
                             <div className="project-manage-summary-area">
-                                <section className="summary-section">
-                                    <h3>프로젝트 설명</h3>
-                                    {showEditSummary ? (
-                                        <p className="summary-text">
-                                            <textarea
-                                                value={summary}
-                                                onChange={(e) => setSummary(e.target.value)}
-                                                autoComplete="off"
-                                                placeholder={projectBasic.summary || '프로젝트 설명을 입력해주세요'}
-                                            />
-                                            <button onClick={handleUpdateSummary}>수정</button>
-                                            <button onClick={() => {
-                                                setSummary(projectBasic.summary || '');
-                                                setShowEditSummary(false);
-                                            }}>취소</button>
-                                        </p>
-                                    ) : (
-                                        <p className="summary-text">
-                                            {projectBasic.summary || '프로젝트 설명이 없습니다.'}
-                                            {permissionGrade === 'L' && (
-                                                <button onClick={() => setShowEditSummary(true)}>수정하기</button>
-                                            )}
-                                        </p>
-                                    )}
-                                </section>
+                                <ProjectDescription key={projectId} resources={projectResources} fallbackSummary={projectBasic.summary}
+                                    canManage={isLogined && loginSuccess && permissionGrade === 'L'}
+                                    onSaved={next => { setProjectBasic(prev => ({ ...prev, summary: next.summary })); setSummary(next.summary); }} />
 
                                 <div className="summary-divider" />
 
@@ -1858,7 +1677,7 @@ export default function ProjectManage() {
                                         <span className="summary-label">상태</span>
                                         <span
                                             className="summary-status"
-                                            style={{ color: getStatusColor(projectBasic.status) }}
+                                            style={{ color: getStatusColor(projectBasic.status, true) }}
                                         >
                                             {getStatusLabel(projectBasic.status)}
                                             <span className="status-duration">
@@ -1920,6 +1739,7 @@ export default function ProjectManage() {
                                     )}
                                 </section>
                             </div>
+                            <div className="project-manage-side-column">
                             <div className="project-manage-teamValue-area">
                                 <div className="project-manage-teamValue">
                                     {projectBasic.teamValue ? "팀 프로젝트" : "개인 프로젝트"}
@@ -1935,47 +1755,93 @@ export default function ProjectManage() {
                                 </div>
 
                                 {projectMember.length > 0 && (
-                                    <div className={permissionGrade === 'L' ? "team-member-information" : "team-member-information-non-leader"}>
-                                        {projectMember.map(member => (
-                                            <div key={member.id} className="member-card">
-                                                <div className="member-name">{member.pjMemberName}</div>
-                                                <div className="member-detail-wrapper">
-                                                    <div className="member-detail">
-                                                        <span className="member-detail-label">권한:</span>
-                                                        <span className="member-grade-badge">
-                                                            {getMemberGradeLabel(member.pjMemberGrade)}
-                                                        </span>
-                                                    </div>
-                                                    {member.pjMemberRole && (
-                                                        <div className="member-detail">
-                                                            <span className="member-detail-label">담당:</span>
-                                                            <span className="member-role-badge">
-                                                                {member.pjMemberRole}
-                                                            </span>
+                                    <div className="member-slide-wrapper">
+                                        {/* 메인 카드 */}
+                                        <div className="member-card">
+                                            {(() => {
+                                                const member = projectMember[memberSlideIndex];
+                                                return (
+                                                    <>
+                                                        <div className="member-name">{member.pjMemberName}</div>
+                                                        <div className="member-detail-wrapper">
+                                                            <div className="member-detail">
+                                                                <span className="member-detail-label">권한:</span>
+                                                                <span className="member-grade-badge">
+                                                                    {getMemberGradeLabel(member.pjMemberGrade)}
+                                                                </span>
+                                                            </div>
+                                                            {member.pjMemberRole && (
+                                                                <div className="member-detail">
+                                                                    <span className="member-detail-label">담당:</span>
+                                                                    <span className="member-role-badge">
+                                                                        {member.pjMemberRole}
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                                <div className="member-actions">
-                                                    {permissionGrade === 'L' && member.pjStatus === 'T' && (
-                                                        <button
-                                                            className="member-action-btn change-grade"
-                                                            onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
-                                                        >
-                                                            {member.pjMemberGrade !== 'L' ? "관리자로 변경" : "팀원으로 변경"}
-                                                        </button>
-                                                    )}
+                                                        {permissionGrade === 'L' && member.pjStatus === 'T' && (
+                                                            <div className="member-actions">
+                                                                <button
+                                                                    className="member-action-btn change-grade"
+                                                                    onClick={() => handleChangeGrade(member.id, member.pjMemberGrade)}
+                                                                >
+                                                                    {member.pjMemberGrade !== 'L' ? "관리자로 변경" : "팀원으로 변경"}
+                                                                </button>
+                                                                <button
+                                                                    className="member-action-btn remove"
+                                                                    onClick={() => handleRemoveMember(member.id)}
+                                                                >
+                                                                    제거
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
 
-                                                    {permissionGrade === 'L' && member.pjStatus === 'T' && (
+                                        {/* 네비게이션 (멤버 2명 이상일 때만) */}
+                                        {projectMember.length > 1 && (
+                                            <div className="member-slide-nav">
+                                                <button
+                                                    className="member-slide-btn"
+                                                    onClick={() => {
+                                                        setMemberSlideIndex(prev =>
+                                                            prev === 0 ? projectMember.length - 1 : prev - 1
+                                                        );
+                                                        resetMemberSlideTimer();
+                                                    }}
+                                                >
+                                                    ‹
+                                                </button>
+
+                                                {/* 점 인디케이터 */}
+                                                <div className="member-slide-dots">
+                                                    {projectMember.map((_, i) => (
                                                         <button
-                                                            className="member-action-btn remove"
-                                                            onClick={() => handleRemoveMember(member.id)}
-                                                        >
-                                                            제거
-                                                        </button>
-                                                    )}
+                                                            key={i}
+                                                            className={`member-slide-dot ${i === memberSlideIndex ? 'active' : ''}`}
+                                                            onClick={() => {
+                                                                setMemberSlideIndex(i);
+                                                                resetMemberSlideTimer();
+                                                            }}
+                                                        />
+                                                    ))}
                                                 </div>
+
+                                                <button
+                                                    className="member-slide-btn"
+                                                    onClick={() => {
+                                                        setMemberSlideIndex(prev =>
+                                                            (prev + 1) % projectMember.length
+                                                        );
+                                                        resetMemberSlideTimer();
+                                                    }}
+                                                >
+                                                    ›
+                                                </button>
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
                                 )}
 
@@ -2001,6 +1867,10 @@ export default function ProjectManage() {
                                     </button>
                                 }
                             </div>
+
+                                <ProjectLinks resources={projectResources} canManage={isLogined && loginSuccess && permissionGrade === 'L'} />
+                            </div>
+                            <ProjectLinkDialog resources={projectResources} />
 
                             {showAddMemberModal && (
                                 <div className="project-modal-overlay" onClick={() => setShowAddMemberModal(false)}>
@@ -2209,80 +2079,41 @@ export default function ProjectManage() {
                                 </div>
                             </div>
                         )}
-                        {showInputCallendarLogModal && isLogined && loginSuccess && !showCallendarModal && !showEditLogModal && (
-                            <>
-                                <div className="project-modal-overlay" onClick={() => setShowInputCallendarLogModal(false)}>
-                                    <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
-                                        <div className="callendar-log-input-header">
-                                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 기록</h4>
-                                        </div>
-                                        <div>
-                                            <input
-                                                placeholder="제목을 입력해주세요 ..."
-                                                autoComplete='off'
-                                                maxLength={20}
-                                                value={logTitle}
-                                                onChange={(e) => setLogTitle(e.target.value)}
-                                            />
-                                            <div style={{ fontSize: '12px', color: '#888' }}>
-                                                {logTitle.length} / {MAX_LOG_TITLE}
-                                            </div>
-                                        </div>
-                                        <div className="callendar-log-input-main-container">
-                                            <Editor
-                                                ref={editorRef}
-                                                initialValue=""
-                                                initialEditType="markdown"
-                                                previewStyle="vertical"
-                                                height="500px"
-                                                hooks={{
-                                                    addImageBlobHook: adapter
-                                                }}
-                                                useCommandShortcut={true}
-                                            />
-                                            <div className="log-input-button-wrapper">
-                                                <button
-                                                    onClick={() => exitLogInputModal()}
-                                                >
-                                                    취소
-                                                </button>
-                                                <button onClick={() => inputNewDailyLog()}> 등록 </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
+                        {(showInputCallendarLogModal || showEditLogModal) && !showCallendarModal && isLogined && nickname && (
+                            <ProjectLogComposer key={`${nickname}:${projectId}:${selectedDate}:${showEditLogModal ? selectedLogId : 'new'}`}
+                                user={nickname} projectId={projectId} projectTitle={projectBasic.title} date={selectedDate}
+                                log={showEditLogModal ? getSelectedLog() : null} adapter={adapter}
+                                onClose={() => { setShowInputCallendarLogModal(false); setShowEditLogModal(false); setShowCallendarModal(true); }}
+                                onSaved={value => {
+                                    if (showEditLogModal) {
+                                        setProjectLog(logs => logs.map(log => log.logId === value.logId ? {...log, logTitle:value.title, logContent:value.content} : log));
+                                        setShowEditLogModal(false);setShowCallendarModal(true);
+                                        addToast('기록이 수정되었습니다.', 'success');
+                                    } else { window.location.reload(); }
+                                }}/>
                         )}
                         {showCallendarModal && (
-                            <div className="callendar-modal-overlay" onClick={() => {
-                                setShowCallendarModal(false);
-                                setSelectedLogId(null);
+                            <div className="callendar-modal-overlay calendar-log-overlay" onClick={event => {
+                                if (event.target === event.currentTarget) closeCalendarLog();
                             }}>
-                                <div className="callendar-date-container" onClick={(e) => e.stopPropagation()}>
+                                <div className="callendar-date-container" ref={calendarLogDialogRef} role="dialog" aria-modal="true"
+                                    aria-labelledby="calendar-log-dialog-title" tabIndex={-1} onClick={e => e.stopPropagation()}>
                                     <div className="project-log-container">
-                                        {/* 헤더 */}
                                         <div className="project-modal-log-header">
-                                            <h3>
-                                                <span>{projectBasic.title} - {selectedDate}</span>
-                                            </h3>
-
-                                            {isLogined && loginSuccess && selectedDate === todayStr ? (
-                                                <button
-                                                    onClick={() => {
-                                                        if (!isLogined || !loginSuccess) {
-                                                            navigatedLoginPage();
-                                                            return;
-                                                        }
+                                            <div className="calendar-log-heading">
+                                                <span className="calendar-log-project-name">{projectBasic.title}</span>
+                                                <h3 id="calendar-log-dialog-title">{selectedDate}</h3>
+                                            </div>
+                                            <div className="calendar-log-actions">
+                                                {isLogined && loginSuccess && selectedDate === todayStr && (
+                                                    <button type="button" onClick={() => {
                                                         setShowInputCallendarLogModal(true);
-                                                        setLogTitle("");
+                                                        setLogTitle('');
                                                         setShowCallendarModal(false);
-                                                    }}
-                                                >
-                                                    +
-                                                </button>
-                                            ) : (
-                                                <button disabled>+</button>
-                                            )}
+                                                    }}>기록 추가</button>
+                                                )}
+                                                <button type="button" className="calendar-log-close" aria-label="로그 뷰어 닫기" onClick={closeCalendarLog}>×</button>
+                                            </div>
                                         </div>
 
                                         {/* 로그 뷰어 */}
@@ -2291,88 +2122,26 @@ export default function ProjectManage() {
                                             const selectedLog = getSelectedLog();
 
                                             // 프로젝트 생성일/종료일 체크
-                                            const isCreatedDate = projectBasic.created?.split('T')[0] === selectedDate;
+                                            const isCreatedDate = projectDateKey(projectBasic.created) === selectedDate;
                                             const isEndDate = (projectBasic.status === 'D' || projectBasic.status === 'C') &&
-                                                projectBasic.endDay?.split('T')[0] === selectedDate;
+                                                projectDateKey(projectBasic.endDay) === selectedDate;
 
                                             return filteredLogs.length > 0 || isCreatedDate || isEndDate ? (
                                                 <div className="project-log-viewer-container">
-                                                    {/* 좌측: 로그 목록 */}
                                                     <div className="project-log-list-section">
-                                                        <div className="project-log-list-header">
-                                                            <h4>로그 목록</h4>
-                                                            <span className="log-count">
-                                                                {filteredLogs.length + (isCreatedDate ? 1 : 0) + (isEndDate ? 1 : 0)}개
-                                                            </span>
-                                                        </div>
-                                                        <div className="project-log-list-items">
-                                                            {/* 프로젝트 생성일 카드 */}
-                                                            {isCreatedDate && (
-                                                                <div
-                                                                    className={`project-log-list-item special-log ${selectedLogId === 'created' ? 'active' : ''}`}
-                                                                    onClick={() => setSelectedLogId('created')}
-                                                                >
-                                                                    <div className="log-list-title">
-                                                                        프로젝트 생성일
-                                                                    </div>
-                                                                    <div className="log-list-meta">
-                                                                        <span className="log-creator">시스템</span>
-                                                                        <span className="log-time">
-                                                                            {new Date(projectBasic.created).toLocaleTimeString('ko-KR', {
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                            })}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* 프로젝트 종료일 카드 */}
-                                                            {isEndDate && (
-                                                                <div
-                                                                    className={`project-log-list-item special-log ${selectedLogId === 'ended' ? 'active' : ''}`}
-                                                                    onClick={() => setSelectedLogId('ended')}
-                                                                >
-                                                                    <div className="log-list-title">
-                                                                        {projectBasic.status === 'C' ? '✅ 프로젝트 완료일' : '⏸️ 프로젝트 중단일'}
-                                                                    </div>
-                                                                    <div className="log-list-meta">
-                                                                        <span className="log-creator">시스템</span>
-                                                                        <span className="log-time">
-                                                                            {new Date(projectBasic.endDay).toLocaleTimeString('ko-KR', {
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                            })}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* 일반 로그 목록 */}
-                                                            {filteredLogs.map((log) => (
-                                                                <div
-                                                                    key={log.logId}
-                                                                    className={`project-log-list-item ${selectedLogId === log.logId ? 'active' : ''}`}
-                                                                    onClick={() => setSelectedLogId(log.logId)}
-                                                                >
-                                                                    <div className="log-list-title">
-                                                                        {log.logTitle.length > 15
-                                                                            ? log.logTitle.substring(0, 15) + "..."
-                                                                            : log.logTitle}
-                                                                    </div>
-
-                                                                    <div className="log-list-meta">
-                                                                        <span className="log-creator">{log.logCreator}</span>
-                                                                        <span className="log-time">
-                                                                            {log.createdDate && new Date(log.createdDate).toLocaleTimeString('ko-KR', {
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                            })}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                                        <label className="calendar-log-select-label" htmlFor="calendar-log-select">
+                                                            기록 선택 · {filteredLogs.length + (isCreatedDate ? 1 : 0) + (isEndDate ? 1 : 0)}개
+                                                        </label>
+                                                        <select id="calendar-log-select" className="calendar-log-select" value={selectedLogId == null ? '' : String(selectedLogId)}
+                                                            onChange={event => {
+                                                                const value = event.target.value;
+                                                                setSelectedLogId(value === 'created' || value === 'ended' ? value : filteredLogs.find(log => String(log.logId) === value)?.logId ?? null);
+                                                            }}>
+                                                            <option value="" disabled>확인할 기록을 선택해주세요</option>
+                                                            {isCreatedDate && <option value="created">시스템 · 프로젝트 시작</option>}
+                                                            {isEndDate && <option value="ended">시스템 · {projectBasic.status === 'C' ? '프로젝트 완료' : '프로젝트 중단'}</option>}
+                                                            {filteredLogs.map(log => <option key={log.logId} value={String(log.logId)}>{log.logTitle}</option>)}
+                                                        </select>
                                                     </div>
 
                                                     {/* 우측: 로그 상세 내용 */}
@@ -2384,7 +2153,7 @@ export default function ProjectManage() {
                                                                         <h4>{selectedLog.logTitle}</h4>
                                                                         {isLogined && loginSuccess && (
                                                                             <div className="log-active-button-wrapper">
-                                                                                <button onClick={() => viewerProjectlogEditModal()}>
+                                                                                <button type="button" aria-label="로그 수정" title="수정" onClick={() => viewerProjectlogEditModal()}>
                                                                                     <svg
                                                                                         className="edit-log-btn"
                                                                                         width="16"
@@ -2410,7 +2179,7 @@ export default function ProjectManage() {
                                                                                         수정
                                                                                     </p>
                                                                                 </button>
-                                                                                <button onClick={() => deleteThisProjectLog()}>
+                                                                                <button type="button" aria-label="로그 삭제" title="삭제" onClick={() => deleteThisProjectLog()}>
                                                                                     <svg
                                                                                         className="delete-log-btn"
                                                                                         width="16"
@@ -2578,138 +2347,21 @@ export default function ProjectManage() {
                                 </div>
                             </div>
                         )}
-                        {/* 프로젝트 로그 수정 모달 */}
-                        {showEditLogModal && !showCallendarModal && !showInputCallendarLogModal && isLogined && loginSuccess && (
-                            <>
-                                <div className="project-modal-overlay" onClick={() => {
-                                    setShowEditLogModal(false);
-                                    setShowCallendarModal(true);
-                                    // 초기화
-                                    setLogTitle('');
-                                }}>
-                                    <div className="callendar-input-log-modal" onClick={(e) => e.stopPropagation()}>
-                                        <div className="callendar-log-input-header">
-                                            <h4>프로젝트 {projectBasic.title} - {selectedDate} 로그 수정</h4>
-                                        </div>
-                                        <div>
-                                            <input
-                                                placeholder={"수정할 제목을 입력해주세요 {" + getSelectedLog()?.logTitle + "}"}
-                                                autoComplete='off'
-                                                maxLength={20}
-                                                value={logTitle}
-                                                onChange={(e) => setLogTitle(e.target.value)}
-                                            />
-                                            <div style={{ fontSize: '12px', color: '#888' }}>
-                                                {logTitle.length} / {MAX_LOG_TITLE}
-                                            </div>
-                                        </div>
-                                        <div className="callendar-log-input-main-container">
-                                            <Editor
-                                                ref={editorRef}
-                                                initialValue={getSelectedLog()?.logContent || ''}
-                                                initialEditType="markdown"
-                                                previewStyle="vertical"
-                                                height="500px"
-                                                hooks={{
-                                                    addImageBlobHook: adapter
-                                                }}
-                                                useCommandShortcut={true}
-                                            />
-                                            <div className="log-input-button-wrapper">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowEditLogModal(false);
-                                                        setShowCallendarModal(true);
-                                                        setLogTitle('');
-                                                    }}
-                                                >
-                                                    취소
-                                                </button>
-                                                <button onClick={() => updateProjectLog()}>수정</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
                         <div className="project-calendar-section">
-                            {projectBasic.created && projectBasic.status === 'C' && (
-                                <FullCalendar
-                                    plugins={[dayGridPlugin, interactionPlugin]}
-                                    initialView="dayGridMonth"
-                                    initialDate={projectBasic.created}
-                                    locale="ko"
-                                    headerToolbar={{
-                                        left: 'prev',
-                                        center: 'title',
-                                        right: 'next'
-                                    }}
-                                    events={calendarEvents}
-                                    height="auto"
-                                    dateClick={(info) => {
-                                        setSelectedDate(info.dateStr);
-                                        setShowCallendarModal(true);
-                                        setShowEditLogModal(false);
-                                        setSelectedLogId(null); // 초기화
-                                    }}
-                                    eventClick={(info) => {
-                                        // 이벤트 클릭 시 해당 로그 선택
-                                        const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
+                            {isLogined&&nickname&&<ProjectLogDraftList user={nickname} projectId={projectId}
+                                refreshKey={String(showInputCallendarLogModal)+String(showEditLogModal)}
+                                onResume={date=>{setSelectedDate(date);setSelectedLogId(null);setShowCallendarModal(false);setShowEditLogModal(false);setShowInputCallendarLogModal(true);}}/>}
 
-                                        if (eventType === 'project-log') {
-                                            const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId(logId);
-                                            setShowCallendarModal(true);
-                                        } else if (eventType === 'project-start') {
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId('created');
-                                            setShowCallendarModal(true);
-                                        } else if (eventType === 'project-end') {
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId('ended');
-                                            setShowCallendarModal(true);
-                                        }
-                                    }}
-                                />
-                            )}
-                            {projectBasic.status !== 'C' && projectBasic.status !== 'D' && (
-                                <FullCalendar
-                                    plugins={[dayGridPlugin, interactionPlugin]}
-                                    initialView="dayGridMonth"
-                                    locale="ko"
-                                    headerToolbar={{
-                                        left: 'prev',
-                                        center: 'title',
-                                        right: 'next'
-                                    }}
-                                    events={calendarEvents}
-                                    height="auto"
-                                    dateClick={(info) => {
-                                        setSelectedDate(info.dateStr);
-                                        setShowCallendarModal(true);
-                                        setShowEditLogModal(false);
-                                        setSelectedLogId(null); // 초기화
-                                    }}
-                                    eventClick={(info) => {
-
-                                        const eventType = info.event.extendedProps?.type || info.event._def.extendedProps?.type;
-                                        if (eventType === 'project-log') {
-                                            const logId = info.event.extendedProps?.logId || info.event._def.extendedProps?.logId;
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId(logId);
-                                            setShowCallendarModal(true);
-                                        } else if (eventType === 'project-start') {
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId('created');
-                                            setShowCallendarModal(true);
-                                        } else if (eventType === 'project-end') {
-                                            setSelectedDate(info.event.startStr.split('T')[0]);
-                                            setSelectedLogId('ended');
-                                            setShowCallendarModal(true);
-                                        }
-                                    }}
-                                />
+                            {projectBasic.created && projectBasic.status !== 'D' && (
+                                <ProjectCalendar key={`${projectBasic.id}-${projectBasic.status}`} project={projectBasic} events={calendarEvents} onSelect={(date, logId) => {
+                                    const logs = projectLog.filter(log => log.logDailyDate.split('T')[0] === date);
+                                    const fallback = logs[0]?.logId ?? (projectDateKey(projectBasic.created) === date ? 'created' :
+                                        (projectBasic.status === 'C' && projectDateKey(projectBasic.endDay) === date ? 'ended' : null));
+                                    setSelectedDate(date);
+                                    setSelectedLogId(logId ?? fallback);
+                                    setShowCallendarModal(true);
+                                    setShowEditLogModal(false);
+                                }} />
                             )}
                         </div>
                     </div>
@@ -2721,7 +2373,7 @@ export default function ProjectManage() {
                                 <h1>{projectBasic.title} 프로젝트</h1>
                                 <button
                                     className={`rpbtn ${dashboardIndex === 'report' ? 'rpbtn-visible' : 'rpbtn-hidden'}`}
-                                    onClick={() => navigate(`/project/complete/report/${projectId}`)}
+                                    onClick={() => navigate(`/projects/complete/report/${projectId}`)}
                                 >
                                     레포트 추가
                                 </button>
@@ -2767,9 +2419,9 @@ export default function ProjectManage() {
                                 <span className={dashboardIndex === 'timeline' ? "selected-sub-menu active" : "selected-sub-menu"}
                                     data-page="timeline"
                                     onClick={handleChangeDashBoardPage}>타임라인</span>
-                                <span className={dashboardIndex === 'insight' ? "selected-sub-menu active" : "selected-sub-menu"}
+                                {/* <span className={dashboardIndex === 'insight' ? "selected-sub-menu active" : "selected-sub-menu"}
                                     data-page="insight"
-                                    onClick={handleChangeDashBoardPage}>인사이트</span>
+                                    onClick={handleChangeDashBoardPage}>인사이트</span> */}
                                 <span className={dashboardIndex === 'report' ? "selected-sub-menu active" : "selected-sub-menu"}
                                     data-page="report"
                                     onClick={handleChangeDashBoardPage}>레포트</span>
@@ -2779,7 +2431,7 @@ export default function ProjectManage() {
                             <div className="report-section-container">
                                 {/* 헤더 */}
                                 <div className="timeline-section-header">
-                                    <h4>프로젝트 레포트</h4>
+                                    <h4>프로젝트 기술서</h4>
                                     <span className="timeline-summary-badge">
                                         총 {projectCompleteReports.length}개의 레포트
                                     </span>
@@ -2819,7 +2471,7 @@ export default function ProjectManage() {
                                                                 <button
                                                                     className="report-action-btn edit"
                                                                     onClick={(e) => {
-                                                                        navigate(`/project/report/update/${report.reportId}/${projectId}`)
+                                                                        navigate(`/projects/report/update/${report.reportId}/${projectId}`)
                                                                     }}
                                                                     aria-label="레포트 수정"
                                                                 >
@@ -2921,7 +2573,7 @@ export default function ProjectManage() {
                                             <>
                                                 <div className="callendar-log-input-header">
                                                     <h4>{report.reportTitle}</h4>
-                                                    <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '8px' }}>
+                                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary, #6b7280)', marginTop: '8px' }}>
                                                         작성일: {new Date(report.reportCreated).toLocaleDateString('ko-KR', {
                                                             year: 'numeric',
                                                             month: '2-digit',

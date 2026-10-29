@@ -28,7 +28,7 @@
     width: 40px;
     height: 40px;
     border: 3px solid var(--border-color);
-    border-top-color: #4caf50;
+    border-top-color: var(--theme-border-4caf50, #4caf50);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -55,7 +55,7 @@
     max-width: 1000px;
     margin-bottom: 20px;
     padding: 25px 30px;
-    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    background: linear-gradient(135deg, var(--theme-surface-2e7d32, #2e7d32) 0%, var(--theme-surface-4caf50, #4caf50) 100%);
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
     box-sizing: border-box;
@@ -63,7 +63,7 @@
 
 .report-header h2 {
     font-size: 24px;
-    color: var(--white);
+    color: var(--theme-text-ffffff, white);
     font-weight: 700;
     margin: 0;
     letter-spacing: -0.5px;
@@ -73,7 +73,7 @@
 .report-editor-section {
     width: 100%;
     max-width: 1000px;
-    background: var(--white);
+    background: var(--theme-surface-ffffff, white);
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -90,7 +90,7 @@
     color: var(--text-main);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    background-color: var(--white);
+    background-color: var(--theme-surface-ffffff, white);
     box-sizing: border-box;
     transition: all 0.3s ease;
 }
@@ -102,7 +102,7 @@
 }
 
 .report-title-input::placeholder {
-    color: #999;
+    color: var(--theme-text-999999, #999);
     font-weight: 400;
 }
 
@@ -113,7 +113,7 @@
     gap: 15px;
     margin-bottom: 20px;
     padding: 15px;
-    background: #f0f4f8;
+    background: var(--theme-surface-f0f4f8, #f0f4f8);
     border-radius: 8px;
     border: 1px dashed var(--border-color);
 }
@@ -165,17 +165,17 @@
 }
 
 .btn-cancel {
-    background-color: #e0e0e0;
-    color: #444;
+    background-color: var(--theme-surface-e0e0e0, #e0e0e0);
+    color: var(--theme-text-444444, #444);
 }
 
 .btn-cancel:hover:not(:disabled) {
-    background-color: #d0d0d0;
+    background-color: var(--theme-surface-d0d0d0, #d0d0d0);
 }
 
 .btn-submit {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--theme-text-ffffff, white);
 }
 
 .btn-submit:hover:not(:disabled) {
@@ -193,8 +193,8 @@
    📱 반응형 3단계
    ==================================================== */
 
-/* ── 1. 태블릿 (≤ 900px) ─────────────────────────── */
-@media (max-width: 900px) {
+/* ── 1. 태블릿 (≤ 1199px) ─────────────────────────── */
+@media (max-width: 1199px) {
     .report-insert-container {
         padding: 20px 15px;
     }

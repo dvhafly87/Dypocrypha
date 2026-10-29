@@ -5,8 +5,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #fafafa;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: var(--theme-surface-fafafa, #fafafa);
+  border-bottom: 1px solid var(--theme-border-e0e0e0, #e0e0e0);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -30,13 +30,13 @@
 .hamburger-btn span {
   width: 24px;
   height: 3px;
-  background-color: #2ECC71;
+  background-color: var(--theme-surface-2ecc71, #2ECC71);
   border-radius: 2px;
   transition: all 0.3s ease;
 }
 
 .hamburger-btn:hover span {
-  background-color: #27AE60;
+  background-color: var(--theme-surface-27ae60, #27AE60);
 }
 
 /* ========== 브랜드 영역 ========== */
@@ -57,7 +57,7 @@
 .brand-box a {
   font-size: 1.45rem;
   font-weight: 600;
-  color: #2ECC71;
+  color: var(--theme-text-2ecc71, #2ECC71);
   letter-spacing: -0.5px;
   white-space: nowrap;
   text-decoration: none;
@@ -67,10 +67,10 @@
 .search-box {
   display: flex;
   align-items: center;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--theme-border-d0d0d0, #d0d0d0);
   border-radius: 6px;
   padding: 0.25rem 0.45rem;
-  background: #f5f5f5;
+  background: var(--theme-surface-f5f5f5, #f5f5f5);
   gap: 0.4rem;
 }
 
@@ -100,7 +100,7 @@
 
 .search-btn {
   border: none;
-  background-color: #2ECC71;
+  background-color: var(--theme-surface-2ecc71, #2ECC71);
   border-radius: 6px;
   padding: 0.45rem;
   cursor: pointer;
@@ -113,22 +113,22 @@
 
 .visitor-badge {
   margin-left: 8px;
-  font-size: 12px;
-  color: #888;
-  opacity: 0.7;
+  font-size: 13px;
+  color: var(--theme-text-666666, #666);
+  opacity: 0.85;
   font-weight: 500;
 }
 
 .visitor-total {
-  color: red;
+  color: var(--theme-text-ff0000, red);
 }
 
 .visitor-online {
-  color: green;
+  color: var(--theme-text-008000, green);
 }
 
 .search-btn:hover {
-  background-color: #27AE60;
+  background-color: var(--theme-surface-27ae60, #27AE60);
 }
 
 .search-icon {
@@ -141,9 +141,9 @@
 /* ========== 로그인 버튼 ========== */
 .move-agreeAndlogin {
   padding: 0.8rem 1.4rem;
-  background-color: #4CAF50;
+  background-color: var(--theme-surface-4caf50, #4CAF50);
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--theme-text-ffffff, #ffffff);
   text-decoration: none;
   border-radius: 10px;
   transition: all 0.25s ease;
@@ -152,8 +152,8 @@
 }
 
 .move-agreeAndlogin:hover {
-  background-color: #E8F5E9;
-  color: #1B5E20;
+  background-color: var(--theme-surface-e8f5e9, #E8F5E9);
+  color: var(--theme-text-1b5e20, #1B5E20);
   box-shadow: 0 0 0 2px #1B5E20 inset;
 }
 
@@ -164,8 +164,8 @@
   flex-direction: row;
   padding: 1rem 1.8rem;
   gap: 2rem;
-  background-color: #fafafa;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: var(--theme-surface-fafafa, #fafafa);
+  border-bottom: 1px solid var(--theme-border-e0e0e0, #e0e0e0);
   box-sizing: border-box;
   position: sticky;
   z-index: 100;
@@ -175,14 +175,14 @@
 
 .sub-nav a {
   text-decoration: none;
-  color: #333;
+  color: var(--theme-text-333333, #333);
   font-size: 1rem;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .sub-nav a:hover {
-  color: #2ECC71;
+  color: var(--theme-text-2ecc71, #2ECC71);
 }
 
 /* ========== 사이드바 오버레이 (항상 존재하지만 숨김) ========== */
@@ -208,20 +208,26 @@
 
 /* ========== 모바일 사이드바 (항상 존재하지만 화면 밖에 위치) ========== */
 .mobile-sidebar {
+  box-sizing: border-box;
+  visibility: hidden;
+  pointer-events: none;
   position: fixed;
   top: 0;
   left: -320px;
   width: 280px;
   height: 100%;
-  background-color: #ffffff;
+  background-color: var(--theme-surface-ffffff, #ffffff);
   z-index: 99;
   padding: 1.5rem;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-sidebar.open {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
   left: 0;
 }
 
@@ -231,16 +237,16 @@
 }
 
 .mobile-sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--theme-surface-f1f1f1, #f1f1f1);
 }
 
 .mobile-sidebar::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--theme-surface-c1c1c1, #c1c1c1);
   border-radius: 3px;
 }
 
 .mobile-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--theme-surface-a8a8a8, #a8a8a8);
 }
 
 .sidebar-header {
@@ -252,7 +258,7 @@
 
 .sidebar-header h2 {
   font-size: 1.3rem;
-  color: #2ECC71;
+  color: var(--theme-text-2ecc71, #2ECC71);
   font-weight: 600;
 }
 
@@ -260,7 +266,7 @@
   background: none;
   border: none;
   font-size: 1.8rem;
-  color: #666;
+  color: var(--theme-text-666666, #666);
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -272,7 +278,7 @@
 }
 
 .close-btn:hover {
-  color: #2ECC71;
+  color: var(--theme-text-2ecc71, #2ECC71);
 }
 
 /* ========== 사이드바 네비게이션 ========== */
@@ -285,7 +291,7 @@
 .sidebar-nav a {
   padding: 0.8rem 1rem;
   text-decoration: none;
-  color: #333;
+  color: var(--theme-text-333333, #333);
   font-size: 1rem;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -293,8 +299,8 @@
 }
 
 .sidebar-nav a:hover {
-  background-color: #E8F5E9;
-  color: #1B5E20;
+  background-color: var(--theme-surface-e8f5e9, #E8F5E9);
+  color: var(--theme-text-1b5e20, #1B5E20);
 }
 
 .input-wrapper {
@@ -314,17 +320,12 @@
   position: absolute;
   right: 8px;
   font-size: 0.7rem;
-  color: #888;
+  color: var(--theme-text-888888, #888);
   pointer-events: none;
 }
 
-.char-counter.warning {
-  color: #e74c3c;
-  font-weight: 600;
-}
-
-/* ========== 태블릿 (900px 이하) ========== */
-@media (max-width: 900px) {
+/* ========== 태블릿 (1199px 이하) ========== */
+@media (max-width: 1199px) {
   .main-header {
     padding: 0.9rem 1.5rem;
   }
@@ -352,10 +353,8 @@
     gap: 1.5rem;
     top: 90px;
   }
-}
 
-/* ========== 태블릿 세로모드 (601-773px) ========== */
-@media (min-width: 601px) and (max-width: 773px) {
+  /* ========== 태블릿 세로모드 (601-773px) ========== */
   .main-header {
     padding: 0.85rem 1.4rem;
   }
@@ -480,6 +479,16 @@ body.sidebar-open {
   overflow: hidden;
 }
 
+/* Mobile controls remain readable and easy to tap. */
+@media (max-width: 600px) {
+  .main-header { gap: 8px; }
+  .main-header .brand-box { margin-left: 0; min-width: 0; }
+  .hamburger-btn { width: 44px; height: 44px; flex-shrink: 0; justify-content: center; align-items: center; }
+  .mobile-search { box-sizing: border-box; }
+  .mobile-search input { font-size: 16px; min-height: 44px; }
+  .mobile-search .search-btn { min-width: 44px; min-height: 44px; }
+}
+
 /* ========== 접근성 개선 ========== */
 @media (prefers-reduced-motion: reduce) {
 
@@ -489,3 +498,6 @@ body.sidebar-open {
     transition: none;
   }
 }
+
+/* Logo and site name share one home link, retaining desktop spacing. */
+.main-header .brand-home { display:inline-flex; align-items:center; gap:8px; }

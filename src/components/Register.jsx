@@ -145,7 +145,7 @@ export default function Register() {
                     message: result.EmailMessage
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                window.location.href = '/';
+                window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/";
                 setVerification(prev => ({ ...prev, isLoading: false }));
             } else {
                 addToast(result.message + "메일 생성 실패 관리자 문의 요망", "warning");
@@ -311,7 +311,7 @@ export default function Register() {
             };
         }
         localStorage.setItem('redirectToast', JSON.stringify(toastData));
-        window.location.href = '/';
+        window.location.href = (import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/";
     };
 
     return (
@@ -511,7 +511,7 @@ export default function Register() {
                         </div>
 
                         <div className="account-services">
-                            <a href="/login" className="service-link">
+                            <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/login"} className="service-link">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                                     <polyline points="10 17 15 12 10 7"/>

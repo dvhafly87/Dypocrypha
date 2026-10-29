@@ -3,6 +3,7 @@ import { useToast } from '../components/ToastContext.jsx';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../config/apiConfig.js';
 import '../css/UploadFileContent.css';
+import ArchiveDocumentPreview, {ArchiveMediaPreview} from './ArchiveDocumentPreview.jsx';
 
 // ----------------------------------------------------------------
 // 공통 파일 아이콘 SVG
@@ -207,7 +208,7 @@ function FileDetailSection({ fileInfo, onDownload }) {
                 throw new Error(result.fileDeleteMessage || "서버 통신 에러");
             } else {
                 localStorage.setItem('redirectToast', JSON.stringify({ status: 'success', message: result.fileDeleteMessage }));
-                navigate('/archive');
+                navigate('/archives');
             }
         } catch (error) {
             localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: error.message }));
@@ -217,47 +218,9 @@ function FileDetailSection({ fileInfo, onDownload }) {
     }
 
     return (
-        <div className="select-file-viewer-container">
-            {/* 좌: 미리보기 */}
-            <div className="file-detail-preview-section">
-                <div className="file-detail-preview-wrapper">
-                    {isImage && (
-                        <div className="file-detail-image-wrapper">
-                            <img className="file-detail-preview-img-bg" src={fileUrl} alt="" />
-                            <img className="file-detail-preview-img" src={fileUrl} alt={fileInfo.fileMainName} />
-                        </div>
-                    )}
-                    {isVideo && (
-                        <video src={fileUrl} controls className="file-detail-preview-video" />
-                    )}
-                    {isAudio && (
-                        <div className="file-detail-audio-wrapper">
-                            {fileInfo.mp3FileThumb !== null ? (
-                                <>
-                                    <img
-                                        className="mp3-thumbnail-bg"
-                                        src={`${API.API_BASE_URL}/archive/file/mp3/${fileInfo.mp3FileThumb}`}
-                                        alt=""
-                                    />
-                                    <img
-                                        className="mp3-thumbnail"
-                                        src={`${API.API_BASE_URL}/archive/file/mp3/${fileInfo.mp3FileThumb}`}
-                                        alt={fileInfo.mp3FileThumb}
-                                    />
-                                </>
-                            ) : (
-                                <span className="file-detail-preview-icon">{getFileIcon(ext, 72)}</span>
-                            )}
-                            <audio src={fileUrl} controls className="file-detail-audio" />
-                        </div>
-                    )}
-                    {isPdf && (
-                        <iframe src={fileUrl} className="file-detail-preview-pdf" title={fileInfo.fileMainName} />
-                    )}
-                    {!isImage && !isVideo && !isAudio && !isPdf && (
-                        <span className="file-detail-preview-icon">{getFileIcon(ext, 80)}</span>
-                    )}
-                </div>
+        <div className="select-file-viewer-container archive-preview-layout">
+            <div className="file-detail-preview-section archive-preview-section">
+                {isImage||isVideo||isAudio?<ArchiveMediaPreview key={fileInfo.fileUuidName} fileInfo={fileInfo} fileUrl={fileUrl}/>:<ArchiveDocumentPreview key={fileInfo.fileUuidName} fileInfo={fileInfo}/>}
             </div>
 
             {/* 우: 파일 정보 */}
@@ -270,7 +233,7 @@ function FileDetailSection({ fileInfo, onDownload }) {
                             <div className="file-detail-divider" />
                             <span className="file-detail-ext">{fileInfo.fileExtension}</span>
                         </div>
-                        <button className="file-detail-delete-icon-btn" onClick={handleDeleteFile}>
+                        <button className="file-detail-delete-icon-btn" aria-label="파일 삭제" onClick={handleDeleteFile}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="3 6 5 6 21 6" />
@@ -357,10 +320,11 @@ export default function UploadFileContent() {
     const [showPassAuth, setShowPassAuth] = useState(false);
 
     useEffect(() => {
+        const controller=new AbortController();setFileInfo(null);setShowPassAuth(false);
         const getFileUploadInformation = async () => {
             try {
                 const response = await fetch(`${API.API_BASE_URL}/archive/getfileinformation`, {
-                    method: 'POST',
+                    method: 'POST',signal:controller.signal,
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fileUuid })
@@ -376,7 +340,7 @@ export default function UploadFileContent() {
                     }
                     if (response.status === 400) {
                         localStorage.setItem('redirectToast', JSON.stringify({ status: 'error', message: result.infoMessage || '유효하지 않은 요청입니다' }));
-                        navigate('/archive');
+                        navigate('/archives');
                         return;
                     }
                     throw new Error(result.infoMessage || '서버 통신 불가');
@@ -388,11 +352,13 @@ export default function UploadFileContent() {
                     }
                 }
             } catch (error) {
+                if(controller.signal.aborted)return;
                 localStorage.setItem('redirectToast', JSON.stringify({ status: 'error', message: error.message }));
                 navigate('/');
             }
         };
         getFileUploadInformation();
+        return()=>controller.abort();
     }, [fileUuid]);
 
     const handleDownload = async () => {
@@ -413,7 +379,7 @@ export default function UploadFileContent() {
                 }
                 if (response.status === 404 || response.status === 400) {
                     localStorage.setItem('redirectToast', JSON.stringify({ status: 'warning', message: result.downloadMessage }));
-                    navigate('/archive');
+                    navigate('/archives');
                     return;
                 }
                 addToast(result.downloadMessage || '다운로드 실패', 'error');
@@ -444,10 +410,10 @@ export default function UploadFileContent() {
         <div className="file-content-main-container">
             <div className="file-content-header">
                 <span className="file-content-header-title">
-                    <p className="file-content-main-title">Dypocrypha</p>
-                    <p className="file-content-sub-title">파일 상세</p>
+                    <h1 className="file-content-main-title">파일 상세</h1>
+                    <p className="file-content-sub-title">파일 정보와 미리보기</p>
                 </span>
-                <button className="file-content-back-btn" onClick={() => navigate('/archive')}>
+                <button className="file-content-back-btn" onClick={() => navigate('/archives')}>
                     ← 아카이브로
                 </button>
             </div>
@@ -456,7 +422,7 @@ export default function UploadFileContent() {
                 <PasswordAuthSection onSuccess={handlePasswordSuccess} />
             )}
             {fileInfo && (
-                <FileDetailSection fileInfo={fileInfo} onDownload={handleDownload} />
+                <FileDetailSection key={fileUuid} fileInfo={fileInfo} onDownload={handleDownload} />
             )}
         </div>
     );

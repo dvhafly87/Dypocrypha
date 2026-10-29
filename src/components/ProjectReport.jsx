@@ -147,7 +147,7 @@ export default function ProjectReport() {
                     message: result.reportSubmitMessage || "등록되었습니다"
                 };
                 localStorage.setItem('redirectToast', JSON.stringify(toastData));
-                navigate(`/project/manage/${projectId}`)
+                navigate(`/projects/manage/${projectId}`)
                 return;
             }
         } catch (error) {
@@ -190,7 +190,7 @@ export default function ProjectReport() {
                     ref={editorRef}
                     initialValue=""
                     initialEditType="markdown"
-                    previewStyle="vertical"
+                    previewStyle="tab"
                     height="600px"
                     toolbarItems={[
                         ['heading', 'bold', 'italic', 'strike'],

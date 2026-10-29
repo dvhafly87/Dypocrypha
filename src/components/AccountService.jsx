@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../components/ToastContext.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import '../css/Login.css';
+import { safeReturnTo } from '../util/loginReturn.js';
 import API from '../config/apiConfig.js';
 
 export default function AccountService() {
     const { isLogined, loginSuccess } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const returnTo = safeReturnTo(location.state?.from);
     const { addToast } = useToast();
     const [loginP, setLoginP] = useState(false);
     const [email, setEmail] = useState('');
@@ -31,9 +34,9 @@ export default function AccountService() {
 
     useEffect(() => {
         if (isLogined) {
-            navigate('/', { replace: true }); 
+            navigate(returnTo, { replace: true }); 
         }
-    }, [isLogined, navigate]);
+    }, [isLogined, navigate, returnTo]);
 
     const handleSubmit = async () => {
         const response = await fetch(`${API.API_BASE_URL}/member/login`,{
@@ -71,7 +74,7 @@ export default function AccountService() {
             
             localStorage.setItem('redirectToast', JSON.stringify(toastData));
             
-            navigate('/');
+            navigate(returnTo, { replace: true });
         }
     };
 
@@ -177,7 +180,7 @@ export default function AccountService() {
                     <div className="account-services">
                         <h3>계정 서비스</h3>
                         <div className="service-links">
-                            <a href="/register" className="service-link">
+                            <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/register"} className="service-link">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                                     <circle cx="8.5" cy="7" r="4" />
@@ -186,7 +189,7 @@ export default function AccountService() {
                                 </svg>
                                 <span>회원가입</span>
                             </a>
-                            <a href="/resetPassword" className="service-link">
+                            <a href={(import.meta.env.VITE_ROUTER_BASE || "/").replace(/\/$/, "") + "/resetPassword"} className="service-link">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />

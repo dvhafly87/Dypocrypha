@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
     const { addToast } = useToast();
     const navigate = useNavigate();
     const [isLogined, setIsLogined] = useState(false);
+    const [nickname, setNickname] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
 
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }) => {
             if (result.logoutSuccess) {
                 setIsLogined(false);
                 localStorage.removeItem('nickname');
+                setNickname('');
                 addToast("로그아웃 되었습니다", "success");
                 navigate('/');
             }
@@ -70,6 +72,7 @@ export const AuthProvider = ({ children }) => {
                 const result = await response.json();
 
                 setIsLogined(result.isLogined ?? false);
+                setNickname(result.isLogined && typeof result.nickname === 'string' ? result.nickname : '');
 
                 if (result.nickname) {
                     localStorage.setItem('nickname', result.nickname);
@@ -89,7 +92,8 @@ export const AuthProvider = ({ children }) => {
         isLogined,
         isLoading,
         logout,
-        loginSuccess
+        loginSuccess,
+        nickname
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
